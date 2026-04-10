@@ -1,2 +1,1 @@
-# x2PiauiAnalitcsX7
-Analise do Piaui Integral
+Super app de Inteligencia e Analise do Piaui
