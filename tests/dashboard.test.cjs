@@ -8,11 +8,13 @@ const root = path.join(__dirname, '..');
 const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
 const dashboard = fs.readFileSync(path.join(root, 'assets/dashboard.js'), 'utf8');
 const news = fs.readFileSync(path.join(root, 'assets/news.js'), 'utf8');
+const cameras = fs.readFileSync(path.join(root, 'assets/cameras.js'), 'utf8');
 
-function createApp({ chart = true, hash = '' } = {}) {
+function createApp({ chart = true, hash = '', timerSpy = null } = {}) {
   const dom = new JSDOM(html, { url: 'https://example.test/' + hash, runScripts: 'outside-only', pretendToBeVisual: true });
   const { window } = dom;
   window.matchMedia = () => ({ matches: false, addListener() {}, removeListener() {} });
+  if (timerSpy) { const interval = window.setInterval.bind(window); window.setInterval = (fn, delay) => { timerSpy.push({fn, delay}); return interval(fn, delay); }; }
   const RealDate = window.Date;
   window.Date = class extends RealDate { constructor(...args) { super(...(args.length ? args : ['2026-10-30T15:00:00-03:00'])); } static now() { return new RealDate('2026-10-30T15:00:00-03:00').getTime(); } };
   window.HTMLElement.prototype.scrollIntoView = function () {};
@@ -27,6 +29,7 @@ function createApp({ chart = true, hash = '' } = {}) {
   const script = [...window.document.querySelectorAll('script')].find(item => !item.src);
   window.eval(script.textContent);
   window.eval(news);
+  window.eval(cameras);
   window.eval(dashboard);
   window.document.dispatchEvent(new window.Event('DOMContentLoaded'));
   return dom;
@@ -90,17 +93,25 @@ test('endereço com hash abre a aba correta e os controles de método funcionam'
 });
 
 
-test('SPIA filtra zonas e identifica demonstração sem câmeras reais', t => {
+test('SPIA possui 30 vídeos identificados, filtra e oferece simulação explícita', t => {
   const dom = createApp(); t.after(() => dom.window.close());
-  const { document } = dom.window;
+  const { document, Event } = dom.window;
   document.getElementById('btn-spia').click();
   assert.equal(document.getElementById('btn-spia').getAttribute('aria-selected'), 'true');
-  assert.match(document.getElementById('tab-spia').textContent, /Não há imagens de câmeras/);
-  document.querySelector('[data-spia-zone="sul"]').click();
+  assert.match(document.getElementById('tab-spia').textContent, /não analisa os vídeos e não usa IA/);
+  assert.equal(document.querySelectorAll('.spia-camera').length, 30);
+  assert.equal(new Set(Array.from(dom.window.SPIA_CAMERAS, x => x.id)).size, 30);
+  document.querySelector('[data-spia-filter="cidade"]').click();
+  assert.equal(document.querySelectorAll('.spia-camera:not([hidden])').length, 14);
+  document.querySelector('[data-spia-filter="todas"]').click();
+  const search = document.getElementById('spiaSearch'); search.value = 'recife'; search.dispatchEvent(new Event('input'));
   assert.equal(document.querySelectorAll('.spia-camera:not([hidden])').length, 1);
-  assert.equal(document.querySelector('.spia-camera:not([hidden])').dataset.zone, 'sul');
-  document.querySelector('[data-spia-zone="todas"]').click();
-  assert.equal(document.querySelectorAll('.spia-camera:not([hidden])').length, 4);
+  document.querySelector('.spia-camera:not([hidden]) .camera-trigger').click();
+  assert.match(document.querySelector('.spia-camera iframe').src, /youtube-nocookie/);
+  document.querySelector('.camera-close').click();
+  assert.equal(document.querySelectorAll('.spia-camera iframe').length, 0);
+  document.getElementById('spiaSimulate').click();
+  assert.match(document.getElementById('spiaOutput').textContent, /Exemplo fictício/);
 });
 
 test('notícias têm links, filtro, navegação, pausa e janela móvel', t => {
@@ -111,7 +122,7 @@ test('notícias têm links, filtro, navegação, pausa e janela móvel', t => {
   assert.equal(document.querySelectorAll('.news-item').length, 50);
   const first = document.querySelector('#terminalBox a').href;
   document.getElementById('newsNext').click();
-  assert.notEqual(document.querySelector('#terminalBox a').href, first);
+  assert.notEqual(document.querySelector('#terminalBox .cmd-line:last-child a').href, first);
   document.getElementById('newsPause').click();
   assert.equal(document.getElementById('newsPause').getAttribute('aria-pressed'), 'true');
   const search = document.getElementById('newsSearch');
@@ -121,4 +132,35 @@ test('notícias têm links, filtro, navegação, pausa e janela móvel', t => {
   search.value = 'teresina'; search.dispatchEvent(new Event('input'));
   assert.ok(document.querySelectorAll('.news-item').length > 0);
   assert.equal(document.querySelectorAll('.chart-context').length, 10);
+});
+
+
+test('atualizador de feeds mescla dados válidos, rejeita URL inválida e agenda 5 minutos', async t => {
+  const intervals = [];
+  const dom = createApp({timerSpy: intervals}); t.after(() => dom.window.close());
+  const { window } = dom;
+  const refreshTimer = intervals.find(timer => timer.delay === 300000); assert.ok(refreshTimer);
+  let requests = 0;
+  window.fetch = async url => { requests++; return ({ ok: true, json: async () => ({status: 'ok', items: [
+    {title: 'Nova notícia de Teresina', link: url.includes('pi.gov.br') ? 'https://www.pi.gov.br/noticia-nova/' : 'https://g1.globo.com/pi/piaui/noticia/nova.ghtml', pubDate: '2026-10-30 15:00:00'},
+    {title: 'Malicioso', link:'https://example.com/fora', pubDate:'2026-10-30 15:00:00'}
+  ]}) }); };
+  window.document.getElementById('btn-terminal').click();
+  await new Promise(resolve => setTimeout(resolve, 10));
+  assert.match(window.document.getElementById('newsStatus').textContent, /Feeds consultados/);
+  assert.equal(window.document.querySelectorAll('.news-item').length, 52);
+  assert.doesNotMatch(window.document.getElementById('newsList').textContent, /Malicioso/);
+  assert.match(window.document.getElementById('newsList').textContent, /Nova notícia de Teresina/);
+  assert.equal(requests, 2); refreshTimer.fn();
+  await new Promise(resolve => setTimeout(resolve, 10));
+  assert.equal(requests, 4);
+});
+
+test('falha dos feeds preserva arquivo local e avisa o usuário', async t => {
+  const dom = createApp(); t.after(() => dom.window.close());
+  dom.window.fetch = async () => { throw new Error('offline'); };
+  dom.window.document.getElementById('btn-terminal').click();
+  await new Promise(resolve => setTimeout(resolve, 10));
+  assert.match(dom.window.document.getElementById('newsStatus').textContent, /feeds indisponíveis/i);
+  assert.equal(dom.window.document.querySelectorAll('.news-item').length, 50);
 });

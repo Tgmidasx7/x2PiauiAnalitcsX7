@@ -1,4 +1,4 @@
-/* Funcionalidades locais do painel. Nenhuma consulta de indicadores é feita à rede. */
+/* Indicadores locais; notícias consultam RSS por serviço externo e vídeos usam YouTube. */
 (() => {
   'use strict';
   const $ = (selector, root = document) => root.querySelector(selector);
@@ -34,6 +34,7 @@
       tab.tabIndex = active ? 0 : -1;
       document.getElementById('tab-' + tab.dataset.tab).classList.toggle('active', active);
     });
+    document.dispatchEvent(new CustomEvent('dashboard:tabchange', { detail: name }));
     if (focus) button.focus();
     if (updateUrl) {
       try { history.replaceState(null, '', '#' + name); } catch (_) { /* file:// or restricted browser */ }
@@ -215,66 +216,163 @@
   }
 
   function setupSpia() {
-    const buttons = $$('[data-spia-zone]');
+    const grid = $('#spiaGrid'), search = $('#spiaSearch'), count = $('#spiaCount');
+    const buttons = $$('[data-spia-filter]');
+    let filterType = 'todas';
+    let activeCard = null;
+    const records = (window.SPIA_CAMERAS || []).filter(item => /^[A-Za-z0-9_-]{11}$/.test(item.id));
+    const cards = records.map((item, i) => {
+      const card = document.createElement('article'); card.className = 'spia-camera';
+      const screen = document.createElement('div'); screen.className = 'camera-screen';
+      const trigger = document.createElement('button'); trigger.type = 'button'; trigger.className = 'camera-trigger';
+      trigger.setAttribute('aria-label', `Reproduzir vídeo público: ${item.title}, ${item.place}`);
+      const image = document.createElement('img'); image.src = `https://i.ytimg.com/vi/${item.id}/hqdefault.jpg`; image.alt = ''; image.loading = 'lazy'; image.referrerPolicy = 'no-referrer'; image.addEventListener('error', () => image.remove());
+      const overlay = document.createElement('span'); overlay.className = 'camera-play'; overlay.textContent = '▶'; overlay.setAttribute('aria-hidden', 'true');
+      const screenLabel = document.createElement('span'); screenLabel.className = 'camera-screen-label'; screenLabel.textContent = 'VÍDEO PÚBLICO • ABRIR';
+      trigger.append(image, overlay, screenLabel); screen.append(trigger);
+      const caption = document.createElement('div'); caption.className = 'camera-caption';
+      const wrap = document.createElement('div'); const h = document.createElement('h4'); h.textContent = item.title;
+      const loc = document.createElement('p'); loc.textContent = item.place + ' • ' + (item.type === 'aeroporto' ? 'Aeroporto' : 'Cidade');
+      const link = document.createElement('a'); link.href = `https://www.youtube.com/watch?v=${item.id}`; link.textContent = 'Canal / vídeo original ↗'; link.target = '_blank'; link.rel = 'noopener noreferrer';
+      const serial = document.createElement('span'); serial.textContent = String(i + 1).padStart(2, '0');
+      wrap.append(h, loc, link); caption.append(wrap, serial); card.append(screen, caption); grid.append(card);
+      function stop() { screen.replaceChildren(trigger); }
+      trigger.addEventListener('click', () => {
+        if (activeCard) activeCard.stop();
+        const frame = document.createElement('iframe'); frame.src = `https://www.youtube-nocookie.com/embed/${item.id}?autoplay=1&mute=1&playsinline=1`;
+        frame.title = `Vídeo público: ${item.title}, ${item.place}`; frame.allow = 'autoplay; encrypted-media; picture-in-picture'; frame.allowFullscreen = true;
+        const close = document.createElement('button'); close.type = 'button'; close.className = 'camera-close'; close.textContent = 'Fechar vídeo';
+        close.addEventListener('click', () => { stop(); activeCard = null; trigger.focus(); });
+        screen.replaceChildren(frame, close); activeCard = {stop, card};
+      });
+      return { item, card };
+    });
+    function filter() {
+      let visible = 0; const query = normalize(search.value.trim());
+      cards.forEach(({ item, card }) => {
+        const show = (filterType === 'todas' || filterType === item.type) && normalize(`${item.title} ${item.place}`).includes(query);
+        card.hidden = !show; if (show) visible++;
+      });
+      if (activeCard && activeCard.card.hidden) { activeCard.stop(); activeCard = null; }
+      count.textContent = `${visible} de ${cards.length} telas`;
+    }
     buttons.forEach(button => button.addEventListener('click', () => {
-      const selected = button.dataset.spiaZone;
-      buttons.forEach(item => item.setAttribute('aria-pressed', String(item === button)));
-      $$('.spia-camera').forEach(card => { card.hidden = selected !== 'todas' && card.dataset.zone !== selected; });
+      filterType = button.dataset.spiaFilter; buttons.forEach(item => item.setAttribute('aria-pressed', String(item === button))); filter();
     }));
+    search.addEventListener('input', filter); filter();
+    document.addEventListener('dashboard:tabchange', event => { if (event.detail !== 'spia' && activeCard) { activeCard.stop(); activeCard = null; } });
+    const scenarios = {
+      norte: ['Exemplo fictício: uma via da Zona Norte apresenta movimento de veículos. Um operador poderia conferir a situação antes de qualquer decisão.', 'Exemplo fictício: uma imagem hipotética da Zona Norte está com visibilidade reduzida. Seria necessário verificar a fonte original.'],
+      sul: ['Exemplo fictício: na Zona Sul, uma via imaginária mostra fluxo alternado. Não há dados reais sendo observados.', 'Exemplo fictício: a simulação sugere revisar uma imagem hipotética da Zona Sul. Nenhuma ocorrência foi detectada.'],
+      leste: ['Exemplo fictício: na Zona Leste, uma central poderia registrar a condição geral de uma via, sempre mediante conferência humana.', 'Exemplo fictício: o exemplo representa uma tela hipotética da Zona Leste sem identificar pessoas ou veículos.'],
+      sudeste: ['Exemplo fictício: no Sudeste de Teresina, uma via imaginária é descrita como movimentada. Isso não é uma medição.', 'Exemplo fictício: uma central poderia revisar uma tela hipotética na região Sudeste. Não há vídeo real associado.'],
+      centro: ['Exemplo fictício: no Centro, uma observação hipotética mencionaria circulação em uma via. O exemplo não descreve o momento atual.', 'Exemplo fictício: para o Centro, o sistema sugere uma verificação humana de uma imagem imaginária. Não é um alerta real.']
+    };
+    let scenarioIndex = 0;
+    $('#spiaSimulate').addEventListener('click', () => { const choices = scenarios[$('#spiaScenario').value]; $('#spiaOutput').textContent = choices[scenarioIndex++ % choices.length]; });
   }
 
   function setupNews() {
     const input = $('#newsSearch'), category = $('#newsCategory'), list = $('#newsList');
-    const terminal = $('#terminalBox'), counter = $('#newsCounter'), pause = $('#newsPause');
-    const today = new Date();
-    const end = today.toLocaleDateString('en-CA', { timeZone: 'America/Fortaleza' });
-    // O filtro é móvel; uma curadoria estática pode ter menos de 50 itens conforme envelhece.
-    const startDate = new Date(today.getTime());
-    startDate.setUTCFullYear(startDate.getUTCFullYear() - 1);
-    const start = startDate.toLocaleDateString('en-CA', { timeZone: 'America/Fortaleza' });
-    const items = (window.PIAUI_NEWS || []).filter(item => item.date >= start && item.date <= end && /^https:\/\//.test(item.url));
-    const categories = [...new Set(items.map(item => item.category))].sort((a, b) => a.localeCompare(b, 'pt-BR'));
-    categories.forEach(name => { const option = document.createElement('option'); option.value = name; option.textContent = name; category.append(option); });
-    let filtered = items, index = 0;
-    let paused = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const terminal = $('#terminalBox'), counter = $('#newsCounter'), pause = $('#newsPause'), status = $('#newsStatus');
+    const sources = [
+      {name:'g1 Piauí', feed:'https://g1.globo.com/rss/g1/pi/piaui/', host:'g1.globo.com'},
+      {name:'Governo do Piauí', feed:'https://www.pi.gov.br/feed/', host:'www.pi.gov.br'}
+    ];
+    const local = window.PIAUI_NEWS || [];
+    const fetched = new Map();
+    let items = [], filtered = [], index = 0, refreshing = false, started = false;
+    let paused = Boolean(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
     const updatePause = () => { pause.setAttribute('aria-pressed', String(paused)); pause.textContent = paused ? '▶ Retomar' : 'Ⅱ Pausar'; };
     const fmt = date => { const [y,m,d] = date.split('-'); return `${d}/${m}/${y}`; };
-    function renderTerminal() {
-      terminal.replaceChildren();
-      if (!filtered.length) {
-        terminal.textContent = 'Nenhuma notícia nesta seleção. Altere os filtros ou consulte as fontes originais.';
-        counter.textContent = '0 resultados'; return;
-      }
+    const dateKey = date => {
+      const parts = new Intl.DateTimeFormat('en-US', {timeZone:'America/Fortaleza', year:'numeric', month:'2-digit', day:'2-digit'}).formatToParts(date);
+      const get = type => parts.find(part => part.type === type).value;
+      return `${get('year')}-${get('month')}-${get('day')}`;
+    };
+    function rebuild() {
+      const now = new Date(), startDate = new Date(now.getTime()); startDate.setUTCFullYear(startDate.getUTCFullYear() - 1);
+      const start = dateKey(startDate), end = dateKey(now), unique = new Map();
+      [...fetched.values()].flat().concat(local).forEach(item => {
+        if (item.date >= start && item.date <= end && /^https:\/\//.test(item.url) && !unique.has(item.url)) unique.set(item.url, item);
+      });
+      items = [...unique.values()].sort((a, b) => b.date.localeCompare(a.date));
+      const selected = category.value;
+      category.replaceChildren(new Option('Todos os assuntos', ''));
+      [...new Set(items.map(item => item.category))].sort((a, b) => a.localeCompare(b, 'pt-BR')).forEach(name => category.add(new Option(name, name)));
+      if ([...category.options].some(option => option.value === selected)) category.value = selected;
+      filter(false);
+    }
+    function writeLine() {
+      if (!filtered.length) { terminal.textContent = 'Nenhuma notícia nesta seleção. Altere os filtros ou consulte as fontes originais.'; counter.textContent = '0 resultados'; return; }
+      if (!terminal.querySelector('.cmd-line')) terminal.replaceChildren();
       const item = filtered[index];
-      const prompt = document.createElement('span'); prompt.className = 'news-prompt'; prompt.textContent = 'piaui@noticias:~$ ';
+      const atBottom = terminal.scrollHeight - terminal.clientHeight - terminal.scrollTop < 45;
+      const line = document.createElement('div'); line.className = 'cmd-line';
+      const prompt = document.createElement('span'); prompt.className = 'news-prompt'; prompt.textContent = `piaui@noticias:~$ [${String(index + 1).padStart(2, '0')}] `;
       const link = document.createElement('a'); link.href = item.url; link.target = '_blank'; link.rel = 'noopener noreferrer'; link.textContent = item.title + ' ↗';
-      const meta = document.createElement('span'); meta.className = 'news-meta'; meta.textContent = `[ ${fmt(item.date)} ]  ${item.source} · ${item.category}`;
-      terminal.append(prompt, link, meta); counter.textContent = `${index + 1} / ${filtered.length} · SELEÇÃO ESTÁTICA`;
+      const meta = document.createElement('span'); meta.className = 'news-meta'; meta.textContent = `    └─ ${fmt(item.date)} · ${item.source} · ${item.category}${item.feed ? ' · FEED' : ' · ARQUIVO'}`;
+      line.append(prompt, link, meta); terminal.append(line);
+      while (terminal.children.length > 120) terminal.firstElementChild.remove();
+      if (atBottom) terminal.scrollTop = terminal.scrollHeight;
+      counter.textContent = `${index + 1} / ${filtered.length} · ROTACIONANDO`;
     }
     function renderList() {
-      list.replaceChildren();
-      $('#archiveCount').textContent = `${filtered.length} notícia${filtered.length === 1 ? '' : 's'}`;
+      list.replaceChildren(); $('#archiveCount').textContent = `${filtered.length} notícia${filtered.length === 1 ? '' : 's'}`;
       if (!filtered.length) { const empty = document.createElement('p'); empty.className = 'news-note'; empty.textContent = 'Nenhuma notícia encontrada para os filtros selecionados.'; list.append(empty); return; }
       filtered.forEach(item => {
         const row = document.createElement('article'); row.className = 'news-item';
-        const wrap = document.createElement('div');
-        const link = document.createElement('a'); link.href = item.url; link.target = '_blank'; link.rel = 'noopener noreferrer'; link.textContent = item.title;
-        const meta = document.createElement('small'); meta.textContent = `${fmt(item.date)} · ${item.source} · ${item.category}`;
+        const wrap = document.createElement('div'); const link = document.createElement('a'); link.href = item.url; link.target = '_blank'; link.rel = 'noopener noreferrer'; link.textContent = item.title;
+        const meta = document.createElement('small'); meta.textContent = `${fmt(item.date)} · ${item.source} · ${item.category}${item.feed ? ' · Feed' : ' · Arquivo'}`;
         const arrow = document.createElement('span'); arrow.className = 'news-arrow'; arrow.setAttribute('aria-hidden', 'true'); arrow.textContent = '↗';
         wrap.append(link, meta); row.append(wrap, arrow); list.append(row);
       });
     }
-    function filter() {
+    function filter(clear = true) {
       const query = normalize(input.value.trim());
       filtered = items.filter(item => (!category.value || item.category === category.value) && normalize([item.title,item.source,item.category].join(' ')).includes(query));
-      index = 0; renderList(); renderTerminal();
+      index = 0; renderList(); if (clear) terminal.replaceChildren(); writeLine();
     }
-    input.addEventListener('input', filter); category.addEventListener('change', filter);
-    $('#newsNext').addEventListener('click', () => { if (filtered.length) { index = (index + 1) % filtered.length; renderTerminal(); } });
-    $('#newsPrev').addEventListener('click', () => { if (filtered.length) { index = (index - 1 + filtered.length) % filtered.length; renderTerminal(); } });
+    async function fetchSource(source) {
+      const controller = new AbortController(); const timeout = setTimeout(() => controller.abort(), 12000);
+      try {
+        const endpoint = 'https://api.rss2json.com/v1/api.json?rss_url=' + encodeURIComponent(source.feed);
+        const response = await fetch(endpoint, { signal: controller.signal });
+        if (!response.ok) throw new Error('HTTP ' + response.status);
+        const data = await response.json(); if (data.status !== 'ok' || !Array.isArray(data.items)) throw new Error('Feed indisponível');
+        return data.items.flatMap(item => {
+          try {
+            const url = new URL(item.link); const published = new Date(item.pubDate.replace(' ', 'T') + (/[zZ]|[+-]\d\d:?\d\d$/.test(item.pubDate) ? '' : 'Z'));
+            if (url.protocol !== 'https:' || url.hostname !== source.host || !Number.isFinite(published.getTime()) || typeof item.title !== 'string') return [];
+            const title = new DOMParser().parseFromString(item.title, 'text/html').body.textContent.trim();
+            return title ? [{date:dateKey(published), title, url:url.href, source:source.name, category:'Atualidades', feed:true}] : [];
+          } catch (_) { return []; }
+        });
+      } finally { clearTimeout(timeout); }
+    }
+    async function refresh() {
+      if (refreshing) return; started = true;
+      if (typeof fetch !== 'function') { status.textContent = 'Consulta indisponível neste navegador. Mantendo curadoria local.'; return; }
+      refreshing = true; status.textContent = 'Consultando os feeds via RSS2JSON…';
+      const results = await Promise.allSettled(sources.map(fetchSource));
+      const failed = [];
+      results.forEach((result, i) => { if (result.status === 'fulfilled') fetched.set(sources[i].name, result.value); else failed.push(sources[i].name); });
+      rebuild();
+      const time = new Date().toLocaleTimeString('pt-BR', {timeZone:'America/Fortaleza', hour:'2-digit', minute:'2-digit'});
+      status.textContent = failed.length === sources.length ? `Consulta às ${time}: feeds indisponíveis. Mantendo arquivo e última consulta bem-sucedida da sessão.` : failed.length ? `Consulta às ${time}: sem resposta de ${failed.join(', ')}. Outros feeds atualizados; mantendo dados anteriores quando houver.` : `Feeds consultados às ${time} (hora de Teresina). Próxima tentativa em 5 minutos.`;
+      refreshing = false;
+    }
+    input.addEventListener('input', () => filter()); category.addEventListener('change', () => filter());
+    $('#newsNext').addEventListener('click', () => { if (filtered.length) { index = (index + 1) % filtered.length; writeLine(); } });
+    $('#newsPrev').addEventListener('click', () => { if (filtered.length) { index = (index - 1 + filtered.length) % filtered.length; writeLine(); } });
+    $('#newsClear').addEventListener('click', () => { terminal.replaceChildren(); writeLine(); });
+    $('#newsRefresh').addEventListener('click', refresh);
     pause.addEventListener('click', () => { paused = !paused; updatePause(); });
-    setInterval(() => { if (!paused && filtered.length && !document.hidden && $('#tab-terminal').classList.contains('active')) { index = (index + 1) % filtered.length; renderTerminal(); } }, 6000);
-    updatePause(); filter();
+    setInterval(() => { if (!paused && filtered.length && !document.hidden && $('#tab-terminal').classList.contains('active')) { index = (index + 1) % filtered.length; writeLine(); } }, 5000);
+    setInterval(() => { if (started) refresh(); }, 300000);
+    document.addEventListener('dashboard:tabchange', event => { if (event.detail === 'terminal' && !started) refresh(); });
+    updatePause(); rebuild();
+    if ($('#tab-terminal').classList.contains('active')) refresh();
   }
 
   const chartNotes = {
