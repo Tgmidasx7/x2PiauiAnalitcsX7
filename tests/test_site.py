@@ -19,6 +19,7 @@ class PageParser(HTMLParser):
         self.tabs = []
         self.canvases = set()
         self.scripts = []
+        self.script_sources = []
         self.in_inline_script = False
         self.lang = None
         self.viewport = False
@@ -40,6 +41,8 @@ class PageParser(HTMLParser):
             self.tabs.append(attrs["data-tab"])
         if tag == "canvas" and "id" in attrs:
             self.canvases.add(attrs["id"])
+        if tag == "script" and "src" in attrs:
+            self.script_sources.append(attrs["src"])
         if tag == "script" and "src" not in attrs:
             self.in_inline_script = True
             self.scripts.append("")
@@ -85,6 +88,12 @@ class SiteTests(unittest.TestCase):
         for target in chart_targets:
             with self.subTest(chart=target):
                 self.assertIn(target, self.page.canvases)
+
+    def test_chart_library_is_local_and_available(self):
+        self.assertIn("assets/vendor/chart.umd.js", self.page.script_sources)
+        for src in self.page.script_sources:
+            self.assertFalse(src.startswith(("http:", "https:")), f"Script externo: {src}")
+            self.assertTrue((ROOT / src).is_file(), f"Script ausente: {src}")
 
     def test_inline_javascript_syntax(self):
         self.assertTrue(self.page.scripts, "Nenhum script embutido encontrado")

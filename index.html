@@ -6,7 +6,7 @@
 <title>Piauí Teresina Analytics | Painel de Indicadores</title>
 <meta name="description" content="Explore indicadores e análises sobre o Piauí e Teresina em um painel temático.">
 <meta name="theme-color" content="#0a0a0f">
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<script defer src="assets/vendor/chart.umd.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600;700&family=Orbitron:wght@400;500;600;700;800;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -157,8 +157,8 @@ body {
 
 /* MAIN APP */
 #mainApp {
-  display: none;
-  opacity: 0;
+  display: block;
+  opacity: 1;
   transition: opacity 0.8s ease;
 }
 
@@ -884,29 +884,14 @@ body {
 }
 </style>
 <link rel="stylesheet" href="assets/enhancements.css">
-<noscript><style>#loadingScreen{display:none} #mainApp{display:block;opacity:1}</style></noscript>
+<noscript><style>.tab-content{display:block!important;margin-bottom:2rem}.dashboard-tools,.tab-navigation,.data-notice button{display:none!important}</style></noscript>
 </head>
 <body>
 <a class="skip-link" href="#mainContent">Pular para o conteúdo</a>
-<noscript><div class="noscript-alert">Ative o JavaScript para usar as abas, a busca e os gráficos deste painel.</div></noscript>
+<noscript><div class="noscript-alert">O conteúdo está disponível abaixo. Ative o JavaScript para usar as abas, a busca e os gráficos interativos.</div></noscript>
 
 <!-- SCANLINES OVERLAY -->
 <div class="scanlines"></div>
-
-<!-- LOADING SCREEN -->
-<div id="loadingScreen">
-  <canvas id="matrixCanvas"></canvas>
-  <div class="loading-content">
-    <div class="loading-title">PIAUÍ TERESINA ANALYTICS</div>
-    <div class="loading-subtitle">[ SISTEMA DE ANÁLISE DE DADOS ESTADUAIS E MUNICIPAIS ]</div>
-    <div class="loading-terminal" id="loadingTerminal"></div>
-    <div class="loading-bar-container">
-      <div class="loading-bar" id="loadingBar"></div>
-    </div>
-    <div class="loading-percent" id="loadingPercent">0%</div>
-    <button class="loading-skip" id="skipLoading" type="button">Entrar no painel →</button>
-  </div>
-</div>
 
 <!-- MAIN APP -->
 <div id="mainApp">
@@ -1976,23 +1961,17 @@ body {
 </div>
 
 <script>
-// Inicialização resiliente: as funcionalidades do painel não dependem da CDN.
+// Mostra o conteúdo imediatamente e inicializa os recursos após o carregamento da página.
 (function startDashboard() {
   let started = false;
-  function enter() {
+  function start() {
     if (started) return;
     started = true;
-    document.getElementById('loadingScreen').classList.add('hidden');
-    const app = document.getElementById('mainApp');
-    app.style.display = 'block';
-    requestAnimationFrame(() => app.classList.add('visible'));
     try { initCharts(); } catch (error) { console.error('Não foi possível inicializar todos os gráficos:', error); }
-    if (window.initDashboard) window.initDashboard();
+    try { if (window.initDashboard) window.initDashboard(); } catch (error) { console.error('Não foi possível inicializar as ferramentas:', error); }
   }
-  document.getElementById('skipLoading').addEventListener('click', enter);
-  document.getElementById('loadingBar').style.width = '100%';
-  document.getElementById('loadingPercent').textContent = '100%';
-  setTimeout(enter, window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 700);
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start, { once: true });
+  else start();
 })();
 
 // Armazena as configurações para oferecer tabelas inclusive quando o Chart.js falha.

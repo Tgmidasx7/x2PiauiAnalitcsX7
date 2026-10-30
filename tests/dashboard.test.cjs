@@ -24,13 +24,14 @@ function createApp({ chart = true, hash = '' } = {}) {
   const script = [...window.document.querySelectorAll('script')].find(item => !item.src);
   window.eval(script.textContent);
   window.eval(dashboard);
-  window.document.getElementById('skipLoading').click();
+  window.document.dispatchEvent(new window.Event('DOMContentLoaded'));
   return dom;
 }
 
 test('abre o painel e permite navegar pelas abas com teclado', () => {
   const dom = createApp(); const { document, KeyboardEvent } = dom.window;
-  assert.equal(document.getElementById('mainApp').style.display, 'block');
+  assert.ok(document.getElementById('mainApp'));
+  assert.equal(document.getElementById('loadingScreen'), null);
   const overview = document.getElementById('btn-overview');
   overview.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }));
   assert.equal(document.getElementById('btn-geo').getAttribute('aria-selected'), 'true');
@@ -59,12 +60,12 @@ test('busca sem acentos e favoritos persistem ao reiniciar', () => {
   reload.window.localStorage.setItem('pi-analytics-favorites-v1', saved);
   reload.window.eval([...reload.window.document.querySelectorAll('script')].find(item => !item.src).textContent);
   reload.window.eval(dashboard);
-  reload.window.document.getElementById('skipLoading').click();
+  reload.window.document.dispatchEvent(new reload.window.Event('DOMContentLoaded'));
   assert.equal(reload.window.document.querySelector('#tab-overview .favorite-toggle').getAttribute('aria-pressed'), 'true');
   reload.window.close();
 });
 
-test('gráficos oferecem tabelas e a falha da CDN não bloqueia o relógio', () => {
+test('gráficos oferecem tabelas e a falha da biblioteca não bloqueia o relógio', () => {
   const dom = createApp({ chart: false }); const { document } = dom.window;
   assert.equal(document.querySelectorAll('.chart-data').length, 10);
   assert.equal(document.querySelectorAll('.chart-fallback').length, 10);

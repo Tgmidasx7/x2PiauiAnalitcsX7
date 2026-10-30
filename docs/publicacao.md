@@ -20,5 +20,5 @@ Uma alteração que existe apenas em uma branch de trabalho **não** atualiza o 
 
 - Confira se a alteração foi integrada à `main` e se **Settings → Pages** continua apontando para a raiz dessa branch.
 - Consulte o estado da publicação e os logs no GitHub; aguarde a conclusão da atualização.
-- Recarregue sem cache e verifique a disponibilidade da CDN do Chart.js e das fontes caso gráficos ou fontes não apareçam.
+- Recarregue sem cache e verifique se os arquivos em `assets/` foram publicados caso gráficos ou estilos não apareçam. As fontes externas têm alternativas locais.
 - Se houver falha persistente, consulte a documentação e o status do GitHub. Não armazene credenciais no repositório.
