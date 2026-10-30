@@ -1,0 +1,19 @@
+name: Verificações
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    name: Estrutura e sintaxe
+    runs-on: ubuntu-latest
+    steps:
+      - name: Baixar código
+        uses: actions/checkout@v4
+      - name: Verificar página
+        run: python3 -m unittest discover -s tests -v
