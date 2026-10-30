@@ -204,8 +204,91 @@
         body.append(row);
       });
       table.append(body); wrapper.append(table); details.append(wrapper); container.append(details);
+      const note = chartNotes[canvas.id];
+      if (note) {
+        const context = document.createElement('p'); context.className = 'chart-context';
+        const label = document.createElement('strong'); label.textContent = 'Como ler: ';
+        const source = document.createElement('a'); source.href = note[1]; source.target = '_blank'; source.rel = 'noopener noreferrer'; source.textContent = 'Consultar portal de referência ↗';
+        context.append(label, document.createTextNode(note[0] + ' '), source); container.append(context);
+      }
     });
   }
+
+  function setupSpia() {
+    const buttons = $$('[data-spia-zone]');
+    buttons.forEach(button => button.addEventListener('click', () => {
+      const selected = button.dataset.spiaZone;
+      buttons.forEach(item => item.setAttribute('aria-pressed', String(item === button)));
+      $$('.spia-camera').forEach(card => { card.hidden = selected !== 'todas' && card.dataset.zone !== selected; });
+    }));
+  }
+
+  function setupNews() {
+    const input = $('#newsSearch'), category = $('#newsCategory'), list = $('#newsList');
+    const terminal = $('#terminalBox'), counter = $('#newsCounter'), pause = $('#newsPause');
+    const today = new Date();
+    const end = today.toLocaleDateString('en-CA', { timeZone: 'America/Fortaleza' });
+    // O filtro é móvel; uma curadoria estática pode ter menos de 50 itens conforme envelhece.
+    const startDate = new Date(today.getTime());
+    startDate.setUTCFullYear(startDate.getUTCFullYear() - 1);
+    const start = startDate.toLocaleDateString('en-CA', { timeZone: 'America/Fortaleza' });
+    const items = (window.PIAUI_NEWS || []).filter(item => item.date >= start && item.date <= end && /^https:\/\//.test(item.url));
+    const categories = [...new Set(items.map(item => item.category))].sort((a, b) => a.localeCompare(b, 'pt-BR'));
+    categories.forEach(name => { const option = document.createElement('option'); option.value = name; option.textContent = name; category.append(option); });
+    let filtered = items, index = 0;
+    let paused = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const updatePause = () => { pause.setAttribute('aria-pressed', String(paused)); pause.textContent = paused ? '▶ Retomar' : 'Ⅱ Pausar'; };
+    const fmt = date => { const [y,m,d] = date.split('-'); return `${d}/${m}/${y}`; };
+    function renderTerminal() {
+      terminal.replaceChildren();
+      if (!filtered.length) {
+        terminal.textContent = 'Nenhuma notícia nesta seleção. Altere os filtros ou consulte as fontes originais.';
+        counter.textContent = '0 resultados'; return;
+      }
+      const item = filtered[index];
+      const prompt = document.createElement('span'); prompt.className = 'news-prompt'; prompt.textContent = 'piaui@noticias:~$ ';
+      const link = document.createElement('a'); link.href = item.url; link.target = '_blank'; link.rel = 'noopener noreferrer'; link.textContent = item.title + ' ↗';
+      const meta = document.createElement('span'); meta.className = 'news-meta'; meta.textContent = `[ ${fmt(item.date)} ]  ${item.source} · ${item.category}`;
+      terminal.append(prompt, link, meta); counter.textContent = `${index + 1} / ${filtered.length} · SELEÇÃO ESTÁTICA`;
+    }
+    function renderList() {
+      list.replaceChildren();
+      $('#archiveCount').textContent = `${filtered.length} notícia${filtered.length === 1 ? '' : 's'}`;
+      if (!filtered.length) { const empty = document.createElement('p'); empty.className = 'news-note'; empty.textContent = 'Nenhuma notícia encontrada para os filtros selecionados.'; list.append(empty); return; }
+      filtered.forEach(item => {
+        const row = document.createElement('article'); row.className = 'news-item';
+        const wrap = document.createElement('div');
+        const link = document.createElement('a'); link.href = item.url; link.target = '_blank'; link.rel = 'noopener noreferrer'; link.textContent = item.title;
+        const meta = document.createElement('small'); meta.textContent = `${fmt(item.date)} · ${item.source} · ${item.category}`;
+        const arrow = document.createElement('span'); arrow.className = 'news-arrow'; arrow.setAttribute('aria-hidden', 'true'); arrow.textContent = '↗';
+        wrap.append(link, meta); row.append(wrap, arrow); list.append(row);
+      });
+    }
+    function filter() {
+      const query = normalize(input.value.trim());
+      filtered = items.filter(item => (!category.value || item.category === category.value) && normalize([item.title,item.source,item.category].join(' ')).includes(query));
+      index = 0; renderList(); renderTerminal();
+    }
+    input.addEventListener('input', filter); category.addEventListener('change', filter);
+    $('#newsNext').addEventListener('click', () => { if (filtered.length) { index = (index + 1) % filtered.length; renderTerminal(); } });
+    $('#newsPrev').addEventListener('click', () => { if (filtered.length) { index = (index - 1 + filtered.length) % filtered.length; renderTerminal(); } });
+    pause.addEventListener('click', () => { paused = !paused; updatePause(); });
+    setInterval(() => { if (!paused && filtered.length && !document.hidden && $('#tab-terminal').classList.contains('active')) { index = (index + 1) % filtered.length; renderTerminal(); } }, 6000);
+    updatePause(); filter();
+  }
+
+  const chartNotes = {
+    chartPIBSetores: ['Participação setorial em percentuais, conforme os valores já incorporados ao painel. A soma é 100%; a origem e a definição de cada setor precisam ser conferidas.', 'https://www.ibge.gov.br/explica/pib.php'],
+    chartPIBSetores2: ['Os mesmos percentuais do gráfico de visão geral aparecem aqui em formato polar. Áreas do gráfico não devem ser lidas como valores adicionais.', 'https://www.ibge.gov.br/explica/pib.php'],
+    chartIDH: ['Série apresentada para 2000, 2010, 2020 e 2021. Antes de comparar os anos, confira fonte, metodologia e abrangência estadual de cada ponto.', 'https://www.undp.org/pt/brazil'],
+    chartIDH2: ['O gráfico inclui uma série atribuída ao Piauí e um ponto de IDHM para Teresina em 2010. IDH e IDHM podem ter metodologias distintas; a comparação requer confirmação.', 'https://www.undp.org/pt/brazil'],
+    chartRelevo: ['Percentuais de relevo presentes no painel, sem metodologia documentada. Categorias e limites de altitude devem ser validados em uma fonte geográfica.', 'https://www.ibge.gov.br/geociencias.html'],
+    chartPopulacao: ['Contagens em habitantes: Censo 2022 e estimativas para 2023–2025 conforme o painel. Não confunda estimativas com recenseamento; verifique cada ano no IBGE.', 'https://www.ibge.gov.br/cidades-e-estados/pi.html'],
+    chartConcentracao: ['Percentuais atribuídos à concentração da população em 14 municípios e nos demais. O ano e a lista dos municípios não estão documentados e precisam de revisão.', 'https://www.ibge.gov.br/cidades-e-estados/pi.html'],
+    chartFinancas: ['Valores em bilhões de reais. A figura mistura receitas brutas e despesas empenhadas de 2024 com valores correntes de 2025; não é uma série diretamente comparável.', 'https://www.gov.br/tesouronacional/pt-br'],
+    chartIDEB: ['Notas atribuídas a Piauí, Brasil e Nordeste nos níveis do ensino básico. Confirme o ano, a rede de ensino e os rótulos do indicador antes de comparar.', 'https://www.gov.br/inep/pt-br/areas-de-atuacao/pesquisas-estatisticas-e-indicadores/ideb'],
+    chartPosicaoEM: ['Posições de 2021 e 2023 conforme o painel; a escala é invertida porque uma posição menor representa colocação melhor. O critério e a rede devem ser confirmados.', 'https://www.gov.br/inep/pt-br/areas-de-atuacao/pesquisas-estatisticas-e-indicadores/ideb']
+  };
 
   function setupClock() {
     const update = () => {
@@ -220,6 +303,6 @@
 
   window.initDashboard = function () {
     if (initialized) return; initialized = true;
-    setupTabs(); readFavorites(); setupCards(); renderFavorites(); setupSearch(); setupExport(); setupCharts(); setupClock();
+    setupTabs(); readFavorites(); setupCards(); renderFavorites(); setupSearch(); setupExport(); setupCharts(); setupClock(); setupSpia(); setupNews();
   };
 })();

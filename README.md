@@ -56,6 +56,12 @@ Os testes verificam estrutura, sintaxe e interações em um DOM simulado, inclui
 
 Os testes **não** verificam a veracidade dos dados, a renderização real em todos os navegadores nem a acessibilidade completa. Mudanças devem receber revisão manual adicional.
 
+## Terminal de notícias e SPIA
+
+O terminal apresenta uma curadoria estática de 50 links de notícias sobre o Piauí, consultada em 30/10/2026. É possível pausar, navegar, pesquisar e filtrar por assunto. A tela mostra apenas publicações dentro dos últimos 12 meses, calculados na abertura da página no fuso de Teresina; por isso, sem novas edições, o número disponível diminuirá. Não é um feed ao vivo: para atualizar é necessário revisar e editar `assets/news.js`, conferindo título, link, data e fonte originais.
+
+A aba SPIA é uma **demonstração local sem câmeras conectadas**, com filtros por regiões ilustrativas e um link para o projeto externo informado. Não realiza monitoramento, contagens nem coleta de imagens; o conteúdo do site externo não é validado por esta aplicação. Os gráficos agora incluem orientações de leitura, limitações e portais de referência, que não substituem a verificação individual dos indicadores existentes.
+
 ## Hospedagem e atualização
 
 O repositório está configurado para publicar gratuitamente a raiz da branch `main` no GitHub Pages. Mudanças em uma branch de trabalho não aparecem no endereço público até serem integradas à `main` e a publicação terminar. O serviço está sujeito às condições e limites do GitHub; disponibilidade permanente não é garantida.

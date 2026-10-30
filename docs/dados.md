@@ -24,3 +24,9 @@ Separe claramente indicadores estaduais e municipais, assim como séries com ano
 5. Definir uma periodicidade de revisão compatível com cada fonte; não prometer atualização em tempo real sem uma integração real.
 
 Este documento é um guia de verificação, não um atestado da precisão do conteúdo atual. Nenhuma fonte ou indicador foi auditado nesta etapa.
+
+## Curadoria de notícias
+
+A seleção inicial de `assets/news.js` reúne 50 publicações com links, títulos resumidos, datas, fontes e categorias, consultadas em 30/10/2026. É estática: não existe ingestão automática. A interface usa uma janela móvel de 12 meses na abertura; entradas antigas saem da exibição, portanto a manutenção precisa acrescentar novas publicações para manter 50 itens. Ao atualizar, verifique cada URL, data, conteúdo, relação com o Piauí e evite duplicatas. A seleção pode conter comunicados oficiais além de reportagens; uma fonte pode alterar ou remover páginas após a consulta.
+
+A aba SPIA é ilustrativa e não fornece dados de câmeras. As notas nos gráficos explicam unidades e limitações conhecidas; os links de referência não são prova de cada valor já incorporado ao projeto.

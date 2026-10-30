@@ -7,11 +7,14 @@ const { JSDOM } = require('jsdom');
 const root = path.join(__dirname, '..');
 const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
 const dashboard = fs.readFileSync(path.join(root, 'assets/dashboard.js'), 'utf8');
+const news = fs.readFileSync(path.join(root, 'assets/news.js'), 'utf8');
 
 function createApp({ chart = true, hash = '' } = {}) {
   const dom = new JSDOM(html, { url: 'https://example.test/' + hash, runScripts: 'outside-only', pretendToBeVisual: true });
   const { window } = dom;
   window.matchMedia = () => ({ matches: false, addListener() {}, removeListener() {} });
+  const RealDate = window.Date;
+  window.Date = class extends RealDate { constructor(...args) { super(...(args.length ? args : ['2026-10-30T15:00:00-03:00'])); } static now() { return new RealDate('2026-10-30T15:00:00-03:00').getTime(); } };
   window.HTMLElement.prototype.scrollIntoView = function () {};
   if (chart) {
     window.Chart = class {
@@ -23,6 +26,7 @@ function createApp({ chart = true, hash = '' } = {}) {
   // Executa os scripts locais como o navegador, sem carregar CDNs.
   const script = [...window.document.querySelectorAll('script')].find(item => !item.src);
   window.eval(script.textContent);
+  window.eval(news);
   window.eval(dashboard);
   window.document.dispatchEvent(new window.Event('DOMContentLoaded'));
   return dom;
@@ -83,4 +87,38 @@ test('endereço com hash abre a aba correta e os controles de método funcionam'
   assert.equal(document.getElementById('btn-fontes').getAttribute('aria-selected'), 'true');
   assert.ok(document.querySelectorAll('#tab-fontes .source-card').length >= 5);
   dom.window.close();
+});
+
+
+test('SPIA filtra zonas e identifica demonstração sem câmeras reais', t => {
+  const dom = createApp(); t.after(() => dom.window.close());
+  const { document } = dom.window;
+  document.getElementById('btn-spia').click();
+  assert.equal(document.getElementById('btn-spia').getAttribute('aria-selected'), 'true');
+  assert.match(document.getElementById('tab-spia').textContent, /Não há imagens de câmeras/);
+  document.querySelector('[data-spia-zone="sul"]').click();
+  assert.equal(document.querySelectorAll('.spia-camera:not([hidden])').length, 1);
+  assert.equal(document.querySelector('.spia-camera:not([hidden])').dataset.zone, 'sul');
+  document.querySelector('[data-spia-zone="todas"]').click();
+  assert.equal(document.querySelectorAll('.spia-camera:not([hidden])').length, 4);
+});
+
+test('notícias têm links, filtro, navegação, pausa e janela móvel', t => {
+  const dom = createApp(); t.after(() => dom.window.close());
+  const { document, Event } = dom.window;
+  assert.equal(dom.window.PIAUI_NEWS.length, 50);
+  assert.equal(new Set(Array.from(dom.window.PIAUI_NEWS, x => x.url)).size, 50);
+  assert.equal(document.querySelectorAll('.news-item').length, 50);
+  const first = document.querySelector('#terminalBox a').href;
+  document.getElementById('newsNext').click();
+  assert.notEqual(document.querySelector('#terminalBox a').href, first);
+  document.getElementById('newsPause').click();
+  assert.equal(document.getElementById('newsPause').getAttribute('aria-pressed'), 'true');
+  const search = document.getElementById('newsSearch');
+  search.value = 'nao existe esta noticia'; search.dispatchEvent(new Event('input'));
+  assert.equal(document.querySelectorAll('.news-item').length, 0);
+  assert.match(document.getElementById('terminalBox').textContent, /Nenhuma notícia/);
+  search.value = 'teresina'; search.dispatchEvent(new Event('input'));
+  assert.ok(document.querySelectorAll('.news-item').length > 0);
+  assert.equal(document.querySelectorAll('.chart-context').length, 10);
 });

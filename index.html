@@ -965,6 +965,7 @@ body {
       <button type="button" class="tab-btn" data-tab="edu" id="btn-edu" role="tab" aria-controls="tab-edu" aria-selected="false" tabindex="-1">🎓 Educacional</button>
       <button type="button" class="tab-btn" data-tab="idh" id="btn-idh" role="tab" aria-controls="tab-idh" aria-selected="false" tabindex="-1">📈 Desenv. Humano</button>
       <button type="button" class="tab-btn" data-tab="swot" id="btn-swot" role="tab" aria-controls="tab-swot" aria-selected="false" tabindex="-1">⚔️ SWOT</button>
+      <button type="button" class="tab-btn" data-tab="spia" id="btn-spia" role="tab" aria-controls="tab-spia" aria-selected="false" tabindex="-1">◉ SPIA Piauí</button>
       <button type="button" class="tab-btn" data-tab="terminal" id="btn-terminal" role="tab" aria-controls="tab-terminal" aria-selected="false" tabindex="-1">💻 Terminal</button>
       <button type="button" class="tab-btn" data-tab="fontes" id="btn-fontes" role="tab" aria-controls="tab-fontes" aria-selected="false" tabindex="-1">◈ Fontes & método</button>
     </div>
@@ -1560,7 +1561,7 @@ body {
 
         <div class="charts-grid">
           <div class="chart-container">
-            <h3>💰 Evolução das Receitas vs Despesas</h3>
+            <h3>💰 Receitas e despesas (2024–2025)</h3>
             <div class="chart-wrapper">
               <canvas id="chartFinancas"></canvas>
             </div>
@@ -1870,15 +1871,19 @@ body {
           <div class="section-icon">💻</div>
           <div>
             <div class="section-title">Terminal de Dados</div>
-            <div class="section-subtitle">Registro informativo — conteúdo estático do painel</div>
+            <div class="section-subtitle">Notícias de Teresina e do Piauí • seleção dos últimos 12 meses</div>
           </div>
         </div>
 
-        <div class="terminal-box" id="terminalBox">
-          <div class="terminal-line"><span class="prompt">[INFO]</span> Painel de indicadores estaduais e municipais.</div>
-          <div class="terminal-line"><span class="prompt">[INFO]</span> Os valores e gráficos estão armazenados nesta página.</div>
-          <div class="terminal-line"><span class="prompt">[ATENÇÃO]</span> Não há conexão automática com as instituições citadas.</div>
-          <div class="terminal-line"><span class="prompt">[ATENÇÃO]</span> Consulte fontes primárias e períodos antes de usar os dados.</div>
+        <div class="news-console">
+          <div class="news-console-top"><span><i></i> ARQUIVO DE NOTÍCIAS</span><span id="newsCounter">Carregando curadoria...</span></div>
+          <div class="news-terminal" id="terminalBox" aria-live="off"><span class="news-prompt">piaui@noticias:~$</span> <span>Preparando notícias...</span></div>
+          <div class="news-controls" aria-label="Controles do terminal"><button type="button" id="newsPrev" aria-label="Notícia anterior">← Anterior</button><button type="button" id="newsPause" aria-pressed="false">Ⅱ Pausar</button><button type="button" id="newsNext">Próxima →</button></div>
+          <p class="news-note">Curadoria estática consultada em 30/10/2026, não é um feed ao vivo. A rotação é visual; títulos remetem às publicações originais. Eventos e serviços podem ter mudado.</p>
+        </div>
+        <div class="news-archive"><div class="archive-header"><div><span class="eyebrow">// PIAUÍ & TERESINA</span><h3>Arquivo de notícias</h3><p>Publicações dos últimos 12 meses disponíveis nesta seleção.</p></div><span class="archive-count" id="archiveCount">—</span></div>
+          <div class="archive-filters"><label>Buscar notícia<input id="newsSearch" type="search" placeholder="Ex.: Teresina, saúde, educação"></label><label>Assunto<select id="newsCategory"><option value="">Todos os assuntos</option></select></label></div>
+          <div class="news-list" id="newsList" aria-live="polite"></div>
         </div>
 
         <div class="detail-grid">
@@ -1931,6 +1936,21 @@ body {
           </div>
         </div>
       </div>
+    </div>
+
+    <!-- TAB: SPIA — demonstração, sem conexão com câmeras -->
+    <div class="tab-content" id="tab-spia" role="tabpanel" aria-labelledby="btn-spia" tabindex="0">
+      <div class="spia-hero"><div><span class="eyebrow">// SISTEMA DE ANÁLISE • MÓDULO INTEGRADO</span><h2>SPIA <span>Piauí</span></h2><p>Uma central demonstrativa de análise visual para explorar as zonas de Teresina e o Piauí, sem acesso a câmeras reais.</p><div class="spia-actions"><a class="spia-link" href="https://tgmidasx7.github.io/SPIA-PIAUIANALITCS/" target="_blank" rel="noopener noreferrer">Abrir projeto SPIA ↗</a><button type="button" data-open-tab="terminal" class="tool-button">Ver notícias locais →</button></div></div><div class="spia-seal" aria-hidden="true"><span>◉</span><small>SPIA / PI</small></div></div>
+      <div class="data-notice"><span aria-hidden="true">ⓘ</span><div><strong>Modo demonstração</strong><p>As áreas abaixo são exemplos de interface. Não há imagens de câmeras, reconhecimento de pessoas, contagem de veículos ou ligação com o SPIA oficial. O projeto externo tem conteúdo próprio; sua disponibilidade e seus dados não são verificados por este painel.</p></div></div>
+      <div class="spia-status-grid"><div><span>ÁREAS DISPONÍVEIS</span><strong>04</strong><small>Regiões ilustrativas de Teresina</small></div><div><span>TRANSMISSÕES</span><strong>—</strong><small>Nenhuma fonte conectada</small></div><div><span>INTEGRAÇÃO</span><strong>LOCAL</strong><small>Interface demonstrativa</small></div></div>
+      <div class="spia-section-head"><div><span class="eyebrow">// EXPLORAR TERRITÓRIO</span><h3>Painel por região</h3><p>Selecione uma região para filtrar a demonstração.</p></div><div class="spia-filters" role="group" aria-label="Filtrar regiões"><button type="button" data-spia-zone="todas" aria-pressed="true">Todas</button><button type="button" data-spia-zone="norte" aria-pressed="false">Norte</button><button type="button" data-spia-zone="sul" aria-pressed="false">Sul</button><button type="button" data-spia-zone="leste" aria-pressed="false">Leste</button><button type="button" data-spia-zone="oeste" aria-pressed="false">Oeste</button></div></div>
+      <div class="spia-grid">
+        <article class="spia-camera" data-zone="norte"><div class="camera-placeholder"><span>◉</span><b>SEM TRANSMISSÃO</b><small>VISUALIZAÇÃO DEMONSTRATIVA</small></div><div class="camera-caption"><div><h4>Zona Norte</h4><p>Teresina • Área ilustrativa</p></div><span>DEMO</span></div></article>
+        <article class="spia-camera" data-zone="sul"><div class="camera-placeholder"><span>◉</span><b>SEM TRANSMISSÃO</b><small>VISUALIZAÇÃO DEMONSTRATIVA</small></div><div class="camera-caption"><div><h4>Zona Sul</h4><p>Teresina • Área ilustrativa</p></div><span>DEMO</span></div></article>
+        <article class="spia-camera" data-zone="leste"><div class="camera-placeholder"><span>◉</span><b>SEM TRANSMISSÃO</b><small>VISUALIZAÇÃO DEMONSTRATIVA</small></div><div class="camera-caption"><div><h4>Zona Leste</h4><p>Teresina • Área ilustrativa</p></div><span>DEMO</span></div></article>
+        <article class="spia-camera" data-zone="oeste"><div class="camera-placeholder"><span>◉</span><b>SEM TRANSMISSÃO</b><small>VISUALIZAÇÃO DEMONSTRATIVA</small></div><div class="camera-caption"><div><h4>Zona Oeste</h4><p>Teresina • Área ilustrativa</p></div><span>DEMO</span></div></article>
+      </div>
+      <div class="method-grid"><div class="detail-card"><h3>Sobre o módulo</h3><p>O painel reúne navegação por zonas e acesso ao projeto SPIA informado. As regiões são apenas rótulos de navegação, não posições reais de câmeras.</p></div><div class="detail-card"><h3>Privacidade e responsabilidade</h3><p>Este módulo não coleta imagens nem dados pessoais. Qualquer integração real exige autorização, avaliação de privacidade e definição de responsáveis.</p></div><div class="detail-card"><h3>Saiba mais</h3><p>Consulte a <a href="https://www.ssp.pi.gov.br/ssp-pi-amplia-monitoramento-em-teresina-com-inauguracao-de-dois-novos-totens-inteligentes/" target="_blank" rel="noopener noreferrer">publicação da SSP-PI ↗</a> sobre os totens anunciados em 2026.</p></div></div>
     </div>
 
     <!-- TAB: FONTES E MÉTODO -->
@@ -2376,6 +2396,7 @@ function initCharts() {
   });
 }
 </script>
+<script src="assets/news.js"></script>
 <script src="assets/dashboard.js"></script>
 </body>
 </html>
