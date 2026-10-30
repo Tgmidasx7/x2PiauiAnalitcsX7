@@ -15,5 +15,12 @@ jobs:
     steps:
       - name: Baixar código
         uses: actions/checkout@v4
-      - name: Verificar página
-        run: python3 -m unittest discover -s tests -v
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Instalar dependências de teste
+        run: npm ci
+      - name: Verificar página e interações
+        run: npm test

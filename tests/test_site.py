@@ -78,7 +78,7 @@ class SiteTests(unittest.TestCase):
 
     def test_chart_targets_exist(self):
         chart_targets = re.findall(
-            r"new\s+Chart\s*\(\s*document\.getElementById\(\s*['\"]([^'\"]+)['\"]\s*\)",
+            r"createChart\s*\(\s*document\.getElementById\(\s*['\"]([^'\"]+)['\"]\s*\)",
             "\n".join(self.page.scripts),
         )
         self.assertTrue(chart_targets, "Nenhum gráfico encontrado")

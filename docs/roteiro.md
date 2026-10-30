@@ -1,12 +1,12 @@
 # Roteiro de evolução
 
-Este roteiro organiza o trabalho restante; os itens abaixo não representam funcionalidades já entregues.
+Este roteiro distingue itens entregues dos próximos passos. Os itens marcados são melhorias implementadas, não uma auditoria dos dados.
 
 ## Prioridade 1 — confiança
 
 - [ ] Inventariar todos os indicadores e textos da página e verificar cada um em fonte primária específica, com período e metodologia.
 - [ ] Corrigir ou retirar números sem comprovação e rotular estimativas e projeções.
-- [ ] Substituir na interface as referências a dados em tempo real e auditoria enquanto não forem comprovadas.
+- [x] Substituir afirmações de dados em tempo real e auditoria por avisos de conteúdo estático e não verificado.
 - [ ] Identificar claramente o ano de referência de cada gráfico e a data da última revisão.
 
 ## Prioridade 2 — experiência e qualidade
@@ -14,7 +14,8 @@ Este roteiro organiza o trabalho restante; os itens abaixo não representam func
 - [ ] Revisar hierarquia visual, textos, legibilidade, comportamento em dispositivos móveis e tempo de carregamento.
 - [ ] Avaliar navegação por teclado, foco visível, semântica das abas, contraste e alternativas textuais para gráficos.
 - [ ] Separar gradualmente dados, JavaScript e estilos da marcação e introduzir testes de interface.
-- [ ] Definir tratamento para falhas de carregamento da biblioteca de gráficos e das fontes externas.
+- [x] Oferecer tabelas quando a biblioteca de gráficos não estiver disponível.
+- [ ] Avaliar tratamento adicional para falhas de carregamento de fontes externas.
 
 ## Prioridade 3 — manutenção e publicação
 
@@ -22,5 +23,3 @@ Este roteiro organiza o trabalho restante; os itens abaixo não representam func
 - [ ] Registrar uma licença escolhida pelo responsável pelo projeto.
 - [ ] Verificar periodicamente o GitHub Pages e suas condições de uso; planejar contingência antes de depender dele para um serviço crítico.
 - [ ] Avaliar somente quando necessário integrações reais de dados, seus limites, custos e necessidades de proteção de credenciais.
-
-Qualquer alteração visual ou funcional na página exige uma etapa posterior, pois o `index.html` foi preservado nesta revisão.

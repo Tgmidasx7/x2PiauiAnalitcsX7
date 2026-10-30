@@ -3,7 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Piauí Teresina Analytics | Hacker Dashboard</title>
+<title>Piauí Teresina Analytics | Painel de Indicadores</title>
+<meta name="description" content="Explore indicadores e análises sobre o Piauí e Teresina em um painel temático.">
+<meta name="theme-color" content="#0a0a0f">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600;700&family=Orbitron:wght@400;500;600;700;800;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -881,8 +883,12 @@ body {
   background: rgba(0,255,65,0.02);
 }
 </style>
+<link rel="stylesheet" href="assets/enhancements.css">
+<noscript><style>#loadingScreen{display:none} #mainApp{display:block;opacity:1}</style></noscript>
 </head>
 <body>
+<a class="skip-link" href="#mainContent">Pular para o conteúdo</a>
+<noscript><div class="noscript-alert">Ative o JavaScript para usar as abas, a busca e os gráficos deste painel.</div></noscript>
 
 <!-- SCANLINES OVERLAY -->
 <div class="scanlines"></div>
@@ -898,6 +904,7 @@ body {
       <div class="loading-bar" id="loadingBar"></div>
     </div>
     <div class="loading-percent" id="loadingPercent">0%</div>
+    <button class="loading-skip" id="skipLoading" type="button">Entrar no painel →</button>
   </div>
 </div>
 
@@ -910,23 +917,23 @@ body {
       <div class="nav-title">PIAUÍ TERESINA ANALYTICS</div>
     </div>
     <div class="nav-status">
-      <span><span class="status-dot"></span>LIVE</span>
+      <span><span class="status-dot"></span>PAINEL ESTÁTICO</span>
       <span id="navTime" class="nav-hash">00:00:00</span>
-      <span id="navHash" class="nav-hash">0x0000...</span>
+      <span class="nav-hash">DADOS A CONFERIR</span>
     </div>
   </nav>
 
-  <div class="main-content">
+  <main class="main-content" id="mainContent" tabindex="-1">
     <!-- HERO -->
     <div class="hero-section">
       <div class="hero-badge">
         <span class="dot"></span>
-        DOSSIÊ COMPLETO 2025 — DADOS PÚBLICOS AUDITADOS
+        DOSSIÊ TEMÁTICO • PIAUÍ & TERESINA
       </div>
       <h1 class="hero-title">PIAUÍ & TERESINA</h1>
       <p class="hero-subtitle">GEOPOLÍTICA • ECONOMIA • EDUCAÇÃO • DESENVOLVIMENTO HUMANO</p>
       <p class="hero-desc">
-        Dossiê auditado e sintetizado com base em fontes oficiais públicas (IBGE, INEP/MEC, SEFAZ-PI, SEDUC-PI, SEMEC-Teresina, PNUD/UNDP, Seplan-PI e Tesouro Nacional). Análise holística do estado e capital.
+        Um ponto de partida para explorar indicadores, contextos e desafios do estado e da capital. Navegue por temas e consulte as fontes antes de utilizar os dados.
       </p>
       <div class="live-clock-bar">
         <div class="clock-item">
@@ -942,27 +949,43 @@ body {
           <div class="value" id="clockTimestamp">----------</div>
         </div>
         <div class="clock-item">
-          <div class="label">Status</div>
-          <div class="value" style="font-size:0.85rem;">● ONLINE</div>
+          <div class="label">Base do painel</div>
+          <div class="value" style="font-size:0.85rem;">ESTÁTICA</div>
         </div>
       </div>
     </div>
 
+    <section class="dashboard-tools" aria-label="Ferramentas do painel">
+      <div class="tools-heading"><div><span class="eyebrow">CENTRAL DE EXPLORAÇÃO</span><h2>Encontre o que importa<span class="heading-dot">.</span></h2><p>Pesquise os indicadores, salve seus favoritos e explore os dados por tema.</p></div><span class="tool-index">// 01 — EXPLORAR</span></div>
+      <div class="tools-grid">
+        <div class="search-area">
+          <label for="dashboardSearch">BUSCAR NO PAINEL</label>
+          <div class="search-input-wrap"><span aria-hidden="true">⌕</span><input id="dashboardSearch" type="search" autocomplete="off" placeholder="Busque por população, PIB, educação..." aria-describedby="searchHint"><kbd>/</kbd></div>
+          <p id="searchHint">Busque nos indicadores e detalhes por tema, nome ou valor.</p>
+          <div id="searchResults" class="search-results" aria-live="polite" hidden></div>
+        </div>
+        <div class="quick-actions"><span class="tool-label">AÇÕES RÁPIDAS</span><div class="action-row"><button type="button" class="tool-button" id="exportCsv">↓ Exportar indicadores</button><button type="button" class="tool-button" id="printPage">⎙ Imprimir aba</button></div><p>O CSV reúne os cartões do painel, não uma base oficial.</p></div>
+      </div>
+      <div class="favorites-panel"><div><span class="tool-label">★ SEUS FAVORITOS</span><p id="favoritesStatus" aria-live="polite">Salvos apenas neste navegador.</p></div><div id="favoritesList" class="favorites-list"><span class="empty-favorites">Marque uma estrela nos indicadores para acompanhar aqui.</span></div></div>
+    </section>
+    <aside class="data-notice"><span aria-hidden="true">ⓘ</span><div><strong>Transparência dos dados</strong><p>Os valores e análises são estáticos, têm anos de referência diferentes e ainda precisam de verificação individual. Não representam um monitoramento em tempo real. <button type="button" class="text-link" data-open-tab="fontes">Entenda as fontes e limitações →</button></p></div></aside>
+
     <!-- TABS -->
-    <div class="tab-navigation" id="tabNav">
-      <button class="tab-btn active" data-tab="overview">⬡ Visão Geral</button>
-      <button class="tab-btn" data-tab="geo">🌍 Geográfica</button>
-      <button class="tab-btn" data-tab="demo">👥 Demográfica</button>
-      <button class="tab-btn" data-tab="geo-pol">🏛️ Geopolítica</button>
-      <button class="tab-btn" data-tab="eco">📊 Econômica</button>
-      <button class="tab-btn" data-tab="edu">🎓 Educacional</button>
-      <button class="tab-btn" data-tab="idh">📈 Desenv. Humano</button>
-      <button class="tab-btn" data-tab="swot">⚔️ SWOT</button>
-      <button class="tab-btn" data-tab="terminal">💻 Terminal</button>
+    <div class="tab-navigation" id="tabNav" role="tablist" aria-label="Seções do painel">
+      <button type="button" class="tab-btn active" data-tab="overview" id="btn-overview" role="tab" aria-controls="tab-overview" aria-selected="true" tabindex="0">⬡ Visão Geral</button>
+      <button type="button" class="tab-btn" data-tab="geo" id="btn-geo" role="tab" aria-controls="tab-geo" aria-selected="false" tabindex="-1">🌍 Geográfica</button>
+      <button type="button" class="tab-btn" data-tab="demo" id="btn-demo" role="tab" aria-controls="tab-demo" aria-selected="false" tabindex="-1">👥 Demográfica</button>
+      <button type="button" class="tab-btn" data-tab="geo-pol" id="btn-geo-pol" role="tab" aria-controls="tab-geo-pol" aria-selected="false" tabindex="-1">🏛️ Geopolítica</button>
+      <button type="button" class="tab-btn" data-tab="eco" id="btn-eco" role="tab" aria-controls="tab-eco" aria-selected="false" tabindex="-1">📊 Econômica</button>
+      <button type="button" class="tab-btn" data-tab="edu" id="btn-edu" role="tab" aria-controls="tab-edu" aria-selected="false" tabindex="-1">🎓 Educacional</button>
+      <button type="button" class="tab-btn" data-tab="idh" id="btn-idh" role="tab" aria-controls="tab-idh" aria-selected="false" tabindex="-1">📈 Desenv. Humano</button>
+      <button type="button" class="tab-btn" data-tab="swot" id="btn-swot" role="tab" aria-controls="tab-swot" aria-selected="false" tabindex="-1">⚔️ SWOT</button>
+      <button type="button" class="tab-btn" data-tab="terminal" id="btn-terminal" role="tab" aria-controls="tab-terminal" aria-selected="false" tabindex="-1">💻 Terminal</button>
+      <button type="button" class="tab-btn" data-tab="fontes" id="btn-fontes" role="tab" aria-controls="tab-fontes" aria-selected="false" tabindex="-1">◈ Fontes & método</button>
     </div>
 
     <!-- TAB: OVERVIEW -->
-    <div class="tab-content active" id="tab-overview">
+    <div class="tab-content active" id="tab-overview" role="tabpanel" aria-labelledby="btn-overview" tabindex="0">
       <div class="kpi-grid">
         <div class="kpi-card">
           <div class="kpi-icon">🌍</div>
@@ -1039,7 +1062,7 @@ body {
     </div>
 
     <!-- TAB: GEOGRÁFICA -->
-    <div class="tab-content" id="tab-geo">
+    <div class="tab-content" id="tab-geo" role="tabpanel" aria-labelledby="btn-geo" tabindex="0">
       <div class="data-section">
         <div class="section-header">
           <div class="section-icon">🌍</div>
@@ -1074,7 +1097,7 @@ body {
             </div>
             <div class="data-row">
               <span class="data-label">Litoral</span>
-              <span class="data-value warn">Sem litoral direto (Delta do Parnaíba)</span>
+              <span class="data-value warn">Litoral atlântico no norte</span>
             </div>
           </div>
 
@@ -1185,7 +1208,7 @@ body {
     </div>
 
     <!-- TAB: DEMOGRÁFICA -->
-    <div class="tab-content" id="tab-demo">
+    <div class="tab-content" id="tab-demo" role="tabpanel" aria-labelledby="btn-demo" tabindex="0">
       <div class="data-section">
         <div class="section-header">
           <div class="section-icon">👥</div>
@@ -1291,7 +1314,7 @@ body {
     </div>
 
     <!-- TAB: GEOPOLÍTICA -->
-    <div class="tab-content" id="tab-geo-pol">
+    <div class="tab-content" id="tab-geo-pol" role="tabpanel" aria-labelledby="btn-geo-pol" tabindex="0">
       <div class="data-section">
         <div class="section-header">
           <div class="section-icon">🏛️</div>
@@ -1394,7 +1417,7 @@ body {
     </div>
 
     <!-- TAB: ECONÔMICA -->
-    <div class="tab-content" id="tab-eco">
+    <div class="tab-content" id="tab-eco" role="tabpanel" aria-labelledby="btn-eco" tabindex="0">
       <div class="data-section">
         <div class="section-header">
           <div class="section-icon">💰</div>
@@ -1568,7 +1591,7 @@ body {
     </div>
 
     <!-- TAB: EDUCACIONAL -->
-    <div class="tab-content" id="tab-edu">
+    <div class="tab-content" id="tab-edu" role="tabpanel" aria-labelledby="btn-edu" tabindex="0">
       <div class="data-section">
         <div class="section-header">
           <div class="section-icon">🎓</div>
@@ -1695,7 +1718,7 @@ body {
     </div>
 
     <!-- TAB: IDH -->
-    <div class="tab-content" id="tab-idh">
+    <div class="tab-content" id="tab-idh" role="tabpanel" aria-labelledby="btn-idh" tabindex="0">
       <div class="data-section">
         <div class="section-header">
           <div class="section-icon">📈</div>
@@ -1788,7 +1811,7 @@ body {
     </div>
 
     <!-- TAB: SWOT -->
-    <div class="tab-content" id="tab-swot">
+    <div class="tab-content" id="tab-swot" role="tabpanel" aria-labelledby="btn-swot" tabindex="0">
       <div class="data-section">
         <div class="section-header">
           <div class="section-icon">⚔️</div>
@@ -1843,7 +1866,7 @@ body {
         </div>
 
         <div class="detail-card" style="border-color: var(--cyan); background: rgba(0,240,255,0.03);">
-          <h3>📋 Auditoria Geral — Conclusão</h3>
+          <h3>📋 Síntese interpretativa</h3>
           <p style="color: var(--text-secondary); font-size: 0.9rem; line-height: 1.8; margin-top: 0.5rem;">
             O Piauí apresenta <strong style="color: var(--green);">crescimento convergente</strong> (IDH, PIB, educação) acima da média regional, com boa gestão fiscal apesar da dívida. <strong style="color: var(--cyan);">Teresina atua como motor econômico</strong> (PIB per capita 37% acima estadual). 
             <br><br>
@@ -1856,25 +1879,21 @@ body {
     </div>
 
     <!-- TAB: TERMINAL -->
-    <div class="tab-content" id="tab-terminal">
+    <div class="tab-content" id="tab-terminal" role="tabpanel" aria-labelledby="btn-terminal" tabindex="0">
       <div class="data-section">
         <div class="section-header">
           <div class="section-icon">💻</div>
           <div>
             <div class="section-title">Terminal de Dados</div>
-            <div class="section-subtitle">Feed de dados em tempo real — Dossiê Completo 2025</div>
+            <div class="section-subtitle">Registro informativo — conteúdo estático do painel</div>
           </div>
         </div>
 
         <div class="terminal-box" id="terminalBox">
-          <div class="terminal-line"><span class="prompt">root@pi-analytics:~$</span> <span class="info">inicializando sistema de análise...</span></div>
-          <div class="terminal-line"><span class="prompt">root@pi-analytics:~$</span> <span class="info">carregando módulos IBGE, SEFAZ, SEDUC, SEMEC, PNUD...</span></div>
-          <div class="terminal-line"><span class="prompt">[OK]</span> Módulo IBGE: <span class="val">Censo 2022, PIB 2023, estimativas 2025</span></div>
-          <div class="terminal-line"><span class="prompt">[OK]</span> Módulo SEFAZ-PI: <span class="val">Receitas, despesas, dívida, LRF</span></div>
-          <div class="terminal-line"><span class="prompt">[OK]</span> Módulo SEDUC-PI: <span class="val">IDEB 2023, tempo integral, matrículas</span></div>
-          <div class="terminal-line"><span class="prompt">[OK]</span> Módulo SEMEC-Teresina: <span class="val">ICA 2025, EJA, profissionalizante</span></div>
-          <div class="terminal-line"><span class="prompt">[OK]</span> Módulo PNUD: <span class="val">IDH 2000-2021, Gini, desigualdades</span></div>
-          <div class="terminal-line"><span class="prompt">root@pi-analytics:~$</span> <span class="info">compilando dossiê completo...</span></div>
+          <div class="terminal-line"><span class="prompt">[INFO]</span> Painel de indicadores estaduais e municipais.</div>
+          <div class="terminal-line"><span class="prompt">[INFO]</span> Os valores e gráficos estão armazenados nesta página.</div>
+          <div class="terminal-line"><span class="prompt">[ATENÇÃO]</span> Não há conexão automática com as instituições citadas.</div>
+          <div class="terminal-line"><span class="prompt">[ATENÇÃO]</span> Consulte fontes primárias e períodos antes de usar os dados.</div>
         </div>
 
         <div class="detail-grid">
@@ -1903,7 +1922,7 @@ body {
           </div>
 
           <div class="detail-card">
-            <h3>Fontes Oficiais</h3>
+            <h3>Instituições citadas</h3>
             <div class="data-row">
               <span class="data-label">IBGE</span>
               <span class="data-value" style="font-size:0.7rem;">cidades.ibge.gov.br</span>
@@ -1929,208 +1948,74 @@ body {
       </div>
     </div>
 
+    <!-- TAB: FONTES E MÉTODO -->
+    <div class="tab-content" id="tab-fontes" role="tabpanel" aria-labelledby="btn-fontes" tabindex="0">
+      <div class="data-section">
+        <div class="section-header"><div class="section-icon">◈</div><div><div class="section-title">Fontes & metodologia</div><div class="section-subtitle">TRANSPARÊNCIA PARA UMA LEITURA RESPONSÁVEL</div></div></div>
+        <div class="sources-intro"><span class="eyebrow">// ANTES DE COMEÇAR</span><h2>Dados com contexto<span class="heading-dot">.</span></h2><p>Este painel organiza informações já presentes no projeto. Os links abaixo levam aos portais institucionais para iniciar sua pesquisa — não são referências específicas para cada número.</p></div>
+        <div class="source-grid">
+          <a class="source-card" href="https://www.ibge.gov.br/" target="_blank" rel="noopener noreferrer"><span>01 / TERRITÓRIO & POPULAÇÃO</span><h3>IBGE ↗</h3><p>Estatísticas territoriais, demográficas e econômicas.</p></a>
+          <a class="source-card" href="https://www.gov.br/inep/pt-br" target="_blank" rel="noopener noreferrer"><span>02 / EDUCAÇÃO</span><h3>INEP ↗</h3><p>Indicadores e avaliações da educação brasileira.</p></a>
+          <a class="source-card" href="https://www.sefaz.pi.gov.br/" target="_blank" rel="noopener noreferrer"><span>03 / FINANÇAS</span><h3>SEFAZ-PI ↗</h3><p>Informações fiscais e da administração estadual.</p></a>
+          <a class="source-card" href="https://www.gov.br/tesouronacional/pt-br" target="_blank" rel="noopener noreferrer"><span>04 / CONTAS PÚBLICAS</span><h3>Tesouro Nacional ↗</h3><p>Dados e relatórios sobre finanças públicas.</p></a>
+          <a class="source-card" href="https://www.undp.org/pt/brazil" target="_blank" rel="noopener noreferrer"><span>05 / DESENVOLVIMENTO</span><h3>PNUD Brasil ↗</h3><p>Estudos e iniciativas de desenvolvimento humano.</p></a>
+          <a class="source-card" href="https://www.seduc.pi.gov.br/" target="_blank" rel="noopener noreferrer"><span>06 / REDE ESTADUAL</span><h3>SEDUC-PI ↗</h3><p>Informações sobre a educação no Piauí.</p></a>
+        </div>
+        <div class="method-grid"><div class="detail-card"><h3>Como interpretar</h3><p>Confira o ano, a unidade e a área geográfica antes de comparar. Estimativas, dados municipais e estaduais podem usar metodologias diferentes.</p></div><div class="detail-card"><h3>Limitações conhecidas</h3><p>Não há coleta automática nem auditoria comprovada. Alguns títulos, séries e conclusões precisam de validação em suas fontes primárias.</p></div><div class="detail-card"><h3>Próxima etapa</h3><p>Associar cada indicador à tabela ou relatório de origem, documentar a metodologia e revisar os valores antes de qualquer uso decisório.</p></div></div>
+      </div>
+    </div>
+
     <!-- FOOTER -->
     <footer class="app-footer">
       <p style="color: var(--green); font-family: var(--font-display); font-size: 0.8rem; margin-bottom: 8px;">PIAUÍ TERESINA ANALYTICS</p>
-      <p>DOSSIÊ COMPLETO 2025 — DADOS PÚBLICOS AUDITADOS</p>
-      <p>Fontes: IBGE, INEP/MEC, SEFAZ-PI, SEDUC-PI, SEMEC-Teresina, PNUD, Seplan-PI, Tesouro Nacional</p>
-      <p id="footerHash" style="margin-top: 8px; color: var(--cyan);">HASH: ---</p>
+      <p>DOSSIÊ TEMÁTICO • PIAUÍ & TERESINA</p>
+      <p>Conteúdo estático • Indicadores sujeitos a verificação</p>
+      <p><button type="button" class="text-link" data-open-tab="fontes">Fontes e metodologia</button> · <a href="https://github.com/Tgmidasx7/APP-PIAUI-THE" target="_blank" rel="noopener noreferrer">Repositório no GitHub ↗</a></p>
     </footer>
-  </div>
+  </main>
 </div>
 
 <script>
-// ============ MATRIX RAIN ============
-(function initMatrix() {
-  const canvas = document.getElementById('matrixCanvas');
-  const ctx = canvas.getContext('2d');
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-  const chars = 'PIAUI TERESINA ANALYTICS 0123456789ABCDEFアイウエオカキクケコ';
-  const fontSize = 14;
-  const columns = Math.floor(canvas.width / fontSize);
-  const drops = Array(columns).fill(1);
-
-  function drawMatrix() {
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = '#00ff41';
-    ctx.font = fontSize + 'px monospace';
-    for (let i = 0; i < drops.length; i++) {
-      const text = chars[Math.floor(Math.random() * chars.length)];
-      ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-      if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
-        drops[i] = 0;
-      }
-      drops[i]++;
-    }
-  }
-
-  let matrixInterval = setInterval(drawMatrix, 50);
-  window.addEventListener('resize', () => {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-  });
-  window._stopMatrix = () => clearInterval(matrixInterval);
-})();
-
-// ============ LOADING SEQUENCE ============
-(function initLoading() {
-  const terminal = document.getElementById('loadingTerminal');
-  const bar = document.getElementById('loadingBar');
-  const percent = document.getElementById('loadingPercent');
-  const lines = [
-    { text: '> Conectando a servidores IBGE...', delay: 200, color: 'info' },
-    { text: '> [OK] Dados Censo 2022 carregados — 3.271.199 habitantes', delay: 500, color: '' },
-    { text: '> Conectando SEFAZ-PI...', delay: 800, color: 'info' },
-    { text: '> [OK] Receitas 2024: R$ 25,54 BI | Despesas: R$ 22,93 BI', delay: 1100, color: '' },
-    { text: '> Conectando INEP/MEC...', delay: 1400, color: 'info' },
-    { text: '> [OK] IDEB 2023: EM 4,5 (melhor NE, 4º BR)', delay: 1700, color: '' },
-    { text: '> Conectando PNUD/UNDP...', delay: 2000, color: 'info' },
-    { text: '> [OK] IDH 2021: 0,69 | IDHM Teresina: 0,751', delay: 2300, color: '' },
-    { text: '> Conectando SEMEC-Teresina...', delay: 2600, color: 'info' },
-    { text: '> [OK] ICA 2025: 1º lugar nacional', delay: 2900, color: '' },
-    { text: '> Calculando indicadores derivados...', delay: 3200, color: 'info' },
-    { text: '> [OK] PIB per capita PI: R$ 24.736 | TER: R$ 33.994', delay: 3500, color: '' },
-    { text: '> Verificando conformidade LRF...', delay: 3800, color: 'warn' },
-    { text: '> [OK] Educação: 24,75% RCL | Saúde: 14,34% RCL', delay: 4100, color: '' },
-    { text: '> Gerando hash de integridade...', delay: 4400, color: 'info' },
-    { text: '> [OK] Hash verificado: 0x' + generateHash().slice(0, 16), delay: 4700, color: '' },
-    { text: '> Dossiê completo carregado com sucesso.', delay: 5000, color: '' },
-    { text: '> Iniciando dashboard...', delay: 5300, color: 'info' }
-  ];
-
-  let currentLine = 0;
-  const startTime = Date.now();
-
-  function addLine() {
-    if (currentLine >= lines.length) return;
-    const line = lines[currentLine];
-    const elapsed = Date.now() - startTime;
-    if (elapsed >= line.delay) {
-      const div = document.createElement('div');
-      div.className = 'line';
-      div.style.animationDelay = '0s';
-      div.textContent = line.text;
-      if (line.color === 'info') div.style.color = '#00f0ff';
-      else if (line.color === 'warn') div.style.color = '#ff8c00';
-      else div.style.color = '#00cc33';
-      terminal.appendChild(div);
-      terminal.scrollTop = terminal.scrollHeight;
-      currentLine++;
-
-      const progress = Math.min(100, Math.floor((elapsed / 5500) * 100));
-      bar.style.width = progress + '%';
-      percent.textContent = progress + '%';
-    }
-    requestAnimationFrame(addLine);
-  }
-  addLine();
-
-  setTimeout(() => {
-    bar.style.width = '100%';
-    percent.textContent = '100%';
-  }, 5500);
-
-  setTimeout(() => {
+// Inicialização resiliente: as funcionalidades do painel não dependem da CDN.
+(function startDashboard() {
+  let started = false;
+  function enter() {
+    if (started) return;
+    started = true;
     document.getElementById('loadingScreen').classList.add('hidden');
-    const mainApp = document.getElementById('mainApp');
-    mainApp.style.display = 'block';
-    requestAnimationFrame(() => {
-      mainApp.classList.add('visible');
-    });
-    if (window._stopMatrix) window._stopMatrix();
-    initCharts();
-    startLiveUpdates();
-  }, 6200);
+    const app = document.getElementById('mainApp');
+    app.style.display = 'block';
+    requestAnimationFrame(() => app.classList.add('visible'));
+    try { initCharts(); } catch (error) { console.error('Não foi possível inicializar todos os gráficos:', error); }
+    if (window.initDashboard) window.initDashboard();
+  }
+  document.getElementById('skipLoading').addEventListener('click', enter);
+  document.getElementById('loadingBar').style.width = '100%';
+  document.getElementById('loadingPercent').textContent = '100%';
+  setTimeout(enter, window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 700);
 })();
 
-// ============ UTILITY FUNCTIONS ============
-function generateHash() {
-  const chars = '0123456789abcdef';
-  let hash = '0x';
-  for (let i = 0; i < 64; i++) {
-    hash += chars[Math.floor(Math.random() * 16)];
+// Armazena as configurações para oferecer tabelas inclusive quando o Chart.js falha.
+window.chartRecords = [];
+function createChart(canvas, config) {
+  let chart = null;
+  if (typeof Chart !== 'undefined') {
+    try { chart = new Chart(canvas, config); } catch (error) { console.error('Falha no gráfico:', canvas.id, error); }
   }
-  return hash;
+  window.chartRecords.push({ canvas, config, chart });
 }
-
-function formatBR(value) {
-  return value.toLocaleString('pt-BR');
-}
-
-// ============ LIVE CLOCK ============
-function updateClock() {
-  const now = new Date();
-  const options = { timeZone: 'America/Fortaleza' };
-  
-  const dateStr = now.toLocaleDateString('pt-BR', { ...options, day: '2-digit', month: '2-digit', year: 'numeric' });
-  const timeStr = now.toLocaleTimeString('pt-BR', { ...options, hour: '2-digit', minute: '2-digit', second: '2-digit' });
-  const timestamp = Math.floor(now.getTime() / 1000);
-
-  document.getElementById('clockDate').textContent = dateStr;
-  document.getElementById('clockTime').textContent = timeStr;
-  document.getElementById('clockTimestamp').textContent = timestamp.toString();
-  document.getElementById('navTime').textContent = timeStr;
-  document.getElementById('footerHash').textContent = 'HASH: ' + generateHash().slice(0, 40);
-}
-
-function startLiveUpdates() {
-  updateClock();
-  setInterval(updateClock, 1000);
-
-  // Update nav hash periodically
-  setInterval(() => {
-    const hashEl = document.getElementById('navHash');
-    hashEl.textContent = generateHash().slice(0, 22) + '...';
-  }, 3000);
-
-  // Add terminal lines
-  const terminalLines = [
-    '<span class="prompt">[LIVE]</span> <span class="info">Atualizando dados em tempo real...</span>',
-    '<span class="prompt">[OK]</span> <span class="val">PIB 2023: R$ 80,9 BI confirmado</span>',
-    '<span class="prompt">[OK]</span> <span class="val">IDEB 2023: EM 4,5 — 4º Brasil</span>',
-    '<span class="prompt">[WARN]</span> <span style="color:#ff8c00">DCL 2025: R$ 10,93 BI (+30,65%)</span>',
-    '<span class="prompt">[OK]</span> <span class="val">IDH: 0,480 → 0,69 (2000-2021)</span>',
-    '<span class="prompt">[LIVE]</span> <span class="info">Monitorando indicadores...</span>',
-    '<span class="prompt">[OK]</span> <span class="val">185 mil empresas ativas | 88,7% micro</span>',
-    '<span class="prompt">[INFO]</span> <span style="color:#00f0ff">Investimentos 2023-25: R$ 44,7 BI</span>',
-    '<span class="prompt">[OK]</span> <span class="val">Energia: 95% eólica/solar</span>',
-    '<span class="prompt">[LIVE]</span> <span class="info">Sistema estável — todos módulos operacionais</span>'
-  ];
-  let tIdx = 0;
-  setInterval(() => {
-    const box = document.getElementById('terminalBox');
-    if (!box) return;
-    const line = document.createElement('div');
-    line.className = 'terminal-line';
-    line.innerHTML = terminalLines[tIdx % terminalLines.length];
-    box.appendChild(line);
-    box.scrollTop = box.scrollHeight;
-    tIdx++;
-  }, 4000);
-}
-
-// ============ TABS ============
-document.querySelectorAll('.tab-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-    btn.classList.add('active');
-    const tabId = 'tab-' + btn.dataset.tab;
-    document.getElementById(tabId).classList.add('active');
-  });
-});
 
 // ============ CHARTS ============
 function initCharts() {
+  if (typeof Chart !== 'undefined') {
   Chart.defaults.color = '#8899aa';
   Chart.defaults.borderColor = 'rgba(255,255,255,0.05)';
   Chart.defaults.font.family = "'Fira Code', monospace";
   Chart.defaults.font.size = 11;
+  }
 
   // PIE: PIB Setores (Overview)
-  new Chart(document.getElementById('chartPIBSetores'), {
+  createChart(document.getElementById('chartPIBSetores'), {
     type: 'doughnut',
     data: {
       labels: ['Serviços', 'Agropecuária', 'Indústria', 'Outros'],
@@ -2160,7 +2045,7 @@ function initCharts() {
   });
 
   // LINE: IDH Evolution (Overview)
-  new Chart(document.getElementById('chartIDH'), {
+  createChart(document.getElementById('chartIDH'), {
     type: 'line',
     data: {
       labels: ['2000', '2010', '2020', '2021'],
@@ -2198,7 +2083,7 @@ function initCharts() {
   });
 
   // PIE: Relevo
-  new Chart(document.getElementById('chartRelevo'), {
+  createChart(document.getElementById('chartRelevo'), {
     type: 'doughnut',
     data: {
       labels: ['Planícies (<600m)', 'Planaltos', 'Chapadas (>600m)'],
@@ -2226,7 +2111,7 @@ function initCharts() {
   });
 
   // BAR: População
-  new Chart(document.getElementById('chartPopulacao'), {
+  createChart(document.getElementById('chartPopulacao'), {
     type: 'bar',
     data: {
       labels: ['Censo 2022', 'Est. 2023', 'Est. 2024', 'Est. 2025'],
@@ -2278,7 +2163,7 @@ function initCharts() {
   });
 
   // PIE: Concentração
-  new Chart(document.getElementById('chartConcentracao'), {
+  createChart(document.getElementById('chartConcentracao'), {
     type: 'pie',
     data: {
       labels: ['14 municípios (50,1%)', 'Demais municípios (49,9%)'],
@@ -2306,7 +2191,7 @@ function initCharts() {
   });
 
   // BAR: Finanças
-  new Chart(document.getElementById('chartFinancas'), {
+  createChart(document.getElementById('chartFinancas'), {
     type: 'bar',
     data: {
       labels: ['Rec. Brutas 2024', 'Desp. Empenhadas 2024', 'Rec. Correntes 2025', 'Desp. Correntes 2025'],
@@ -2338,7 +2223,7 @@ function initCharts() {
   });
 
   // PIE: PIB Setores 2
-  new Chart(document.getElementById('chartPIBSetores2'), {
+  createChart(document.getElementById('chartPIBSetores2'), {
     type: 'polarArea',
     data: {
       labels: ['Serviços (71,7%)', 'Agropecuária', 'Indústria', 'Outros'],
@@ -2366,7 +2251,7 @@ function initCharts() {
   });
 
   // BAR: IDEB Comparison
-  new Chart(document.getElementById('chartIDEB'), {
+  createChart(document.getElementById('chartIDEB'), {
     type: 'bar',
     data: {
       labels: ['Anos Iniciais EF', 'Anos Finais EF', 'Ensino Médio'],
@@ -2418,7 +2303,7 @@ function initCharts() {
   });
 
   // LINE: Posição Nacional EM
-  new Chart(document.getElementById('chartPosicaoEM'), {
+  createChart(document.getElementById('chartPosicaoEM'), {
     type: 'line',
     data: {
       labels: ['2021', '2023'],
@@ -2462,7 +2347,7 @@ function initCharts() {
   });
 
   // LINE: IDH 2
-  new Chart(document.getElementById('chartIDH2'), {
+  createChart(document.getElementById('chartIDH2'), {
     type: 'line',
     data: {
       labels: ['2000', '2010', '2020', '2021'],
@@ -2512,5 +2397,6 @@ function initCharts() {
   });
 }
 </script>
+<script src="assets/dashboard.js"></script>
 </body>
 </html>

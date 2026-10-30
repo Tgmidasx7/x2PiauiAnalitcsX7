@@ -2,16 +2,13 @@
 
 ## Estado atual
 
-O projeto é uma página estática (`index.html`) que reúne marcação, estilos, indicadores e JavaScript no mesmo arquivo. O navegador renderiza as abas e os gráficos; Chart.js e fontes são carregados de serviços externos. Não há backend, banco de dados, processo de build ou integração de dados identificados no repositório.
+O projeto é um site estático, sem backend, banco de dados, processo de build ou integração de indicadores identificados no repositório. `index.html` reúne a marcação, os dados, os gráficos e parte dos estilos e scripts. `assets/enhancements.css` e `assets/dashboard.js` complementam a interface e suas interações.
 
-O relógio usa a hora do navegador com o fuso `America/Fortaleza`. Já as mensagens periódicas do terminal são pré-definidas e os hashes exibidos são gerados aleatoriamente: eles não comprovam atualização, integridade ou auditoria dos dados. A animação inicial também é visual, não representa o carregamento efetivo de bases oficiais.
+O navegador controla as abas, a busca em indicadores e detalhes, os favoritos locais, a exportação CSV e a impressão. Chart.js e as fontes são carregados de serviços externos. Se Chart.js estiver indisponível, tabelas com os valores das configurações dos gráficos ficam acessíveis; o relógio continua funcionando. O relógio usa o fuso `America/Fortaleza` e o terminal descreve o caráter estático da base. O painel não comprova atualização automática ou auditoria dos números.
 
-## Melhorias recomendadas para uma próxima etapa
+## Evolução recomendada
 
-1. Corrigir na interface as afirmações de atualização em tempo real e auditoria, após validação do conteúdo.
-2. Separar conteúdo, estilos e scripts gradualmente, preservando a aparência e testando cada alteração.
-3. Centralizar indicadores em uma estrutura documentada, com fonte específica e período para cada valor.
-4. Adicionar testes de navegador, acessibilidade e responsividade, além das verificações estruturais atuais.
-5. Avaliar uma estratégia de contingência para os recursos externos e acompanhar custos e limites antes de adicionar serviços.
-
-Essas melhorias da interface não foram aplicadas nesta etapa para preservar o `index.html` existente.
+1. Validar os indicadores com fonte específica, período e metodologia.
+2. Centralizar os dados em uma estrutura documentada e separar gradualmente a lógica restante.
+3. Adicionar testes em navegadores reais e uma revisão completa de acessibilidade e responsividade.
+4. Avaliar uma estratégia para indisponibilidade das fontes externas e acompanhar condições de uso de serviços.

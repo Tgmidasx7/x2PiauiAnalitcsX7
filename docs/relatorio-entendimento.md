@@ -4,7 +4,7 @@
 
 **Data da análise:** 30 de outubro de 2026
 
-**Escopo:** leitura dos arquivos do repositório e da configuração de publicação consultada no GitHub. Este relatório descreve o estado observado, não é auditoria dos dados, avaliação completa de segurança ou teste visual em navegadores.
+**Escopo:** análise histórica da versão inicial, anterior à expansão da interface. Para o estado técnico atual, consulte [arquitetura.md](arquitetura.md) e o [README](../README.md). Leitura dos arquivos do repositório e da configuração de publicação consultada no GitHub. Este relatório descreve o estado observado, não é auditoria dos dados, avaliação completa de segurança ou teste visual em navegadores.
 
 ## 1. Resumo executivo
 
