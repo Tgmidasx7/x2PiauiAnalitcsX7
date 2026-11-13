@@ -9,8 +9,9 @@ const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
 const dashboard = fs.readFileSync(path.join(root, 'assets/dashboard.js'), 'utf8');
 const news = fs.readFileSync(path.join(root, 'assets/news.js'), 'utf8');
 const cameras = fs.readFileSync(path.join(root, 'assets/cameras.js'), 'utf8');
+const eyeOfGod = fs.readFileSync(path.join(root, 'assets/eye-of-god.js'), 'utf8');
 
-function createApp({ chart = true, hash = '', timerSpy = null } = {}) {
+function createApp({ chart = true, hash = '', timerSpy = null, canvasMock = false } = {}) {
   const dom = new JSDOM(html, { url: 'https://example.test/' + hash, runScripts: 'outside-only', pretendToBeVisual: true });
   const { window } = dom;
   window.matchMedia = () => ({ matches: false, addListener() {}, removeListener() {} });
@@ -18,6 +19,29 @@ function createApp({ chart = true, hash = '', timerSpy = null } = {}) {
   const RealDate = window.Date;
   window.Date = class extends RealDate { constructor(...args) { super(...(args.length ? args : ['2026-10-30T15:00:00-03:00'])); } static now() { return new RealDate('2026-10-30T15:00:00-03:00').getTime(); } };
   window.HTMLElement.prototype.scrollIntoView = function () {};
+  if (canvasMock) {
+    window.HTMLCanvasElement.prototype.getContext = function () {
+      return {
+        fillStyle: '',
+        strokeStyle: '',
+        lineWidth: 1,
+        font: '',
+        fillRect() {},
+        clearRect() {},
+        strokeRect() {},
+        beginPath() {},
+        moveTo() {},
+        lineTo() {},
+        arc() {},
+        stroke() {},
+        fill() {},
+        fillText() {},
+        createRadialGradient() { return { addColorStop() {} }; }
+      };
+    };
+  } else {
+    window.HTMLCanvasElement.prototype.getContext = () => null;
+  }
   if (chart) {
     window.Chart = class {
       static defaults = { font: {} };
@@ -31,6 +55,7 @@ function createApp({ chart = true, hash = '', timerSpy = null } = {}) {
   window.eval(news);
   window.eval(cameras);
   window.eval(dashboard);
+  window.eval(eyeOfGod);
   window.document.dispatchEvent(new window.Event('DOMContentLoaded'));
   return dom;
 }
@@ -163,4 +188,112 @@ test('falha dos feeds preserva arquivo local e avisa o usuário', async t => {
   await new Promise(resolve => setTimeout(resolve, 10));
   assert.match(dom.window.document.getElementById('newsStatus').textContent, /feeds indisponíveis/i);
   assert.equal(dom.window.document.querySelectorAll('.news-item').length, 50);
+});
+
+test('aba Eye of God funciona isolada sem afetar as demais abas', t => {
+  const dom = createApp({ hash: '#eye-of-god', canvasMock: true }); t.after(() => dom.window.close());
+  const { document, KeyboardEvent } = dom.window;
+
+  assert.equal(document.querySelectorAll('.tab-btn').length, 12);
+  assert.equal(document.getElementById('btn-eye-of-god').getAttribute('aria-selected'), 'true');
+  assert.ok(document.getElementById('tab-eye-of-god').classList.contains('active'));
+  assert.equal(document.querySelectorAll('#eog-cctv-grid .eog-cam-cell').length, 6);
+  assert.match(document.getElementById('eog-tactical-clock').textContent, /^\d\d:\d\d:\d\d\.\d{3}$/);
+
+  // Modos de câmera (incluindo OPTICAL e NEURAL cujos rótulos são ÓPTICA HUD e FLUXO IA)
+  ['FLIR', 'NVG', 'LIDAR', 'NEURAL', 'SAR', 'OPTICAL'].forEach(mode => {
+    const btn = document.querySelector(`[data-eog-mode="${mode}"]`);
+    btn.click();
+    assert.equal(btn.getAttribute('aria-pressed'), 'true');
+    assert.ok(btn.classList.contains('active'));
+    assert.match(document.getElementById('eog-terminal-body').textContent, new RegExp(mode));
+  });
+
+  // Seleção de câmera e atualização do cartão de alvo
+  const cam3 = document.querySelector('#eog-cctv-grid [data-cam-idx="2"]');
+  cam3.click();
+  assert.ok(cam3.classList.contains('focus'));
+  assert.match(document.getElementById('eog-target-details-label').textContent, /QRT-9A71/);
+
+  // Botões táticos: cravar mira, drone, áudio e lockdown
+  document.getElementById('eog-lock-target-btn').click();
+  assert.match(document.getElementById('eog-terminal-body').textContent, /MIRA CRAVADA/);
+  document.getElementById('eog-dispatch-drone-btn').click();
+  assert.match(document.getElementById('eog-terminal-body').textContent, /DRONE DE INTERCEPTAÇÃO DESPACHADO/);
+
+  const audioBtn = document.getElementById('eog-audio-toggle');
+  audioBtn.click();
+  assert.equal(audioBtn.getAttribute('aria-pressed'), 'false');
+  assert.match(audioBtn.textContent, /AUDIO: OFF/);
+
+  const lockdownBtn = document.getElementById('eog-lockdown-btn');
+  lockdownBtn.click();
+  assert.equal(document.getElementById('eog-defcon-status').textContent, 'NÍVEL 1 - CRÍTICO');
+  assert.ok(document.getElementById('eog-hud-shell').classList.contains('lockdown-active'));
+  lockdownBtn.click();
+  assert.equal(document.getElementById('eog-defcon-status').textContent, 'NÍVEL 2 - ELEVADO');
+  assert.ok(!document.getElementById('eog-hud-shell').classList.contains('lockdown-active'));
+
+  // Terminal CLI interativo e segurança contra injeção HTML
+  const input = document.getElementById('eog-terminal-input');
+  const runCmd = cmd => {
+    input.value = cmd;
+    input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+  };
+  runCmd('help');
+  assert.match(document.getElementById('eog-terminal-body').textContent, /COMANDOS:/);
+  runCmd('thermal');
+  assert.equal(document.querySelector('[data-eog-mode="FLIR"]').getAttribute('aria-pressed'), 'true');
+  runCmd('target <img src=x onerror=alert(1)>');
+  assert.equal(document.querySelectorAll('#eog-terminal-body img').length, 0);
+  runCmd('target PIU-8B42');
+  assert.match(document.getElementById('eog-target-details-label').textContent, /PIU-8B42/);
+  runCmd('scan');
+  assert.match(document.getElementById('eog-terminal-body').textContent, /VARREDURA MULTI-SETORIAL/);
+  runCmd('radar');
+  assert.match(document.getElementById('eog-terminal-body').textContent, /RADAR C4ISR/);
+  runCmd('intercept');
+  assert.match(document.getElementById('eog-terminal-body').textContent, /DRONE DE INTERCEPTAÇÃO/);
+  runCmd('status');
+  assert.match(document.getElementById('eog-terminal-body').textContent, /SISTEMA ESTÁVEL/);
+  runCmd('lockdown');
+  assert.equal(document.getElementById('eog-defcon-status').textContent, 'NÍVEL 1 - CRÍTICO');
+  runCmd('standdown');
+  assert.equal(document.getElementById('eog-defcon-status').textContent, 'NÍVEL 2 - ELEVADO');
+  runCmd('invalido');
+  assert.match(document.getElementById('eog-terminal-body').textContent, /Comando desconhecido/);
+  input.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp', bubbles: true }));
+  assert.equal(input.value, 'invalido');
+  runCmd('clear');
+  assert.equal(document.getElementById('eog-terminal-body').children.length, 0);
+
+  // Não polui os cartões de KPI nem a busca principal
+  assert.equal(document.querySelectorAll('#tab-eye-of-god .kpi-card').length, 0);
+  assert.equal(document.querySelectorAll('.tab-content .kpi-card').length, 26);
+  document.getElementById('btn-overview').click();
+  assert.ok(document.getElementById('tab-overview').classList.contains('active'));
+});
+
+test('aba Eye of God tolera ausência de contexto 2D do canvas', t => {
+  const dom = createApp({ hash: '#eye-of-god', canvasMock: false }); t.after(() => dom.window.close());
+  const { document } = dom.window;
+  assert.ok(document.getElementById('tab-eye-of-god').classList.contains('active'));
+  document.querySelector('[data-eog-mode="FLIR"]').click();
+  document.getElementById('eog-lock-target-btn').click();
+  assert.match(document.getElementById('eog-terminal-body').textContent, /MIRA CRAVADA/);
+});
+
+test('página dedicada /eyeofgod/ funciona de forma autônoma', t => {
+  const eogHtml = fs.readFileSync(path.join(root, 'eyeofgod/index.html'), 'utf8');
+  const dom = new JSDOM(eogHtml, { url: 'https://example.test/eyeofgod/', runScripts: 'outside-only', pretendToBeVisual: true });
+  t.after(() => dom.window.close());
+  const { window } = dom;
+  window.matchMedia = () => ({ matches: false, addListener() {}, removeListener() {} });
+  window.HTMLCanvasElement.prototype.getContext = () => null;
+  window.eval(eyeOfGod);
+  window.document.dispatchEvent(new window.Event('DOMContentLoaded'));
+  assert.equal(window.document.querySelectorAll('#eog-cctv-grid .eog-cam-cell').length, 6);
+  window.document.querySelector('[data-eog-mode="SAR"]').click();
+  assert.equal(window.document.querySelector('[data-eog-mode="SAR"]').getAttribute('aria-pressed'), 'true');
+  assert.match(window.document.getElementById('eog-terminal-body').textContent, /SAR/);
 });

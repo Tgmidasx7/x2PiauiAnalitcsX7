@@ -105,6 +105,22 @@ class SiteTests(unittest.TestCase):
                 )
                 self.assertEqual(result.returncode, 0, result.stderr)
 
+    def test_eyeofgod_standalone_page(self):
+        eog_path = ROOT / "eyeofgod" / "index.html"
+        self.assertTrue(eog_path.is_file(), "Página /eyeofgod/index.html ausente")
+        eog = PageParser()
+        eog.feed(eog_path.read_text(encoding="utf-8"))
+        eog.close()
+        self.assertTrue(eog.has_doctype)
+        self.assertEqual(eog.lang, "pt-BR")
+        self.assertTrue(eog.viewport)
+        duplicates = [key for key, count in collections.Counter(eog.ids).items() if count > 1]
+        self.assertEqual(duplicates, [])
+        for src in eog.script_sources:
+            self.assertFalse(src.startswith(("http:", "https:")), f"Script externo: {src}")
+            resolved = (eog_path.parent / src).resolve()
+            self.assertTrue(resolved.is_file(), f"Script ausente: {src}")
+
 
 if __name__ == "__main__":
     unittest.main()

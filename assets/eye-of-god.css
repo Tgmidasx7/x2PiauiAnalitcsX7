@@ -1,0 +1,838 @@
+/* S.P.I.A. · EYE OF GOD // PALANTIR MATRIX EDITION (escopado exclusivamente na aba #tab-eye-of-god) */
+#tab-eye-of-god {
+  --eog-bg-void: #020408;
+  --eog-bg-panel: rgba(4, 9, 18, 0.9);
+  --eog-panel-border: rgba(0, 255, 102, 0.28);
+  --eog-green: #00ff66;
+  --eog-green-glow: 0 0 10px rgba(0, 255, 102, 0.45), 0 0 22px rgba(0, 255, 102, 0.18);
+  --eog-cyan: #00f0ff;
+  --eog-cyan-glow: 0 0 12px rgba(0, 240, 255, 0.45);
+  --eog-crimson: #ff003c;
+  --eog-crimson-glow: 0 0 15px rgba(255, 0, 60, 0.6);
+  --eog-amber: #ffe600;
+  --eog-font-matrix: 'Share Tech Mono', 'Fira Code', monospace;
+  --eog-font-title: 'Orbitron', sans-serif;
+}
+
+#tab-eye-of-god .eog-hud-shell {
+  position: relative;
+  background: var(--eog-bg-void);
+  color: #e2e8f0;
+  font-family: var(--eog-font-matrix);
+  border: 1px solid var(--eog-panel-border);
+  border-radius: 12px;
+  overflow: hidden;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.65), var(--eog-green-glow);
+  min-height: 760px;
+}
+
+#tab-eye-of-god .eog-hud-shell.lockdown-active {
+  border-color: var(--eog-crimson);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.75), var(--eog-crimson-glow);
+}
+
+#tab-eye-of-god .eog-hud-shell.lockdown-active .eog-header,
+#tab-eye-of-god .eog-hud-shell.lockdown-active .eog-panel-box,
+#tab-eye-of-god .eog-hud-shell.lockdown-active .eog-footer-terminal {
+  border-color: rgba(255, 0, 60, 0.45);
+}
+
+/* Matrix Rain & CRT Scanlines contidos apenas no HUD Eye of God */
+#eog-matrix-rain-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  opacity: 0.2;
+  pointer-events: none;
+}
+
+#tab-eye-of-god .eog-crt-overlay {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.24) 50%),
+    linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+  background-size: 100% 3px, 6px 100%;
+  z-index: 20;
+  pointer-events: none;
+}
+
+#tab-eye-of-god .eog-header,
+#tab-eye-of-god .eog-main-grid,
+#tab-eye-of-god .eog-footer-terminal {
+  position: relative;
+  z-index: 2;
+}
+
+/* Header */
+#tab-eye-of-god .eog-header {
+  background: var(--eog-bg-panel);
+  border: 1px solid var(--eog-panel-border);
+  border-radius: 6px;
+  padding: 10px 14px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  box-shadow: var(--eog-green-glow);
+  backdrop-filter: blur(8px);
+}
+
+#tab-eye-of-god .eog-brand-zone {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+#tab-eye-of-god .eog-god-eye-logo {
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  border: 2px solid var(--eog-green);
+  border-radius: 50%;
+  position: relative;
+  display: grid;
+  place-items: center;
+  box-shadow: var(--eog-green-glow);
+}
+
+#tab-eye-of-god .eog-iris-ring {
+  width: 24px;
+  height: 24px;
+  border: 2px dashed var(--eog-cyan);
+  border-radius: 50%;
+  animation: eogRotateIris 8s linear infinite;
+}
+
+#tab-eye-of-god .eog-pupil-core {
+  width: 8px;
+  height: 8px;
+  background: var(--eog-crimson);
+  border-radius: 50%;
+  position: absolute;
+  box-shadow: var(--eog-crimson-glow);
+  animation: eogPulsePupil 1.2s infinite alternate;
+}
+
+@keyframes eogRotateIris {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes eogPulsePupil {
+  from { transform: scale(0.8); }
+  to { transform: scale(1.3); }
+}
+
+#tab-eye-of-god .eog-glitch-text {
+  font-family: var(--eog-font-title);
+  font-size: clamp(1rem, 1.8vw, 1.25rem);
+  color: var(--eog-green);
+  letter-spacing: 2px;
+  text-shadow: var(--eog-green-glow);
+  line-height: 1.2;
+}
+
+#tab-eye-of-god .eog-brand-sub {
+  font-size: 0.65rem;
+  color: var(--eog-cyan);
+  letter-spacing: 0.8px;
+  margin-top: 2px;
+}
+
+#tab-eye-of-god .eog-header-status-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+#tab-eye-of-god .eog-stat-pill {
+  background: rgba(0, 0, 0, 0.65);
+  border: 1px solid rgba(0, 255, 102, 0.22);
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+#tab-eye-of-god .eog-pill-label {
+  font-size: 0.56rem;
+  color: #8ea1b8;
+  letter-spacing: 0.05em;
+}
+
+#tab-eye-of-god .eog-pill-value {
+  color: #e2e8f0;
+  font-weight: 700;
+}
+
+#tab-eye-of-god .eog-pill-value.ok {
+  color: var(--eog-green);
+}
+
+#tab-eye-of-god .eog-pill-value.warn {
+  color: var(--eog-amber);
+}
+
+#tab-eye-of-god .eog-pill-value.crit {
+  color: var(--eog-crimson);
+  text-shadow: var(--eog-crimson-glow);
+  animation: eogBlink 0.9s infinite;
+}
+
+#tab-eye-of-god .eog-pill-value.clock {
+  color: var(--eog-cyan);
+  font-size: 0.8rem;
+}
+
+#tab-eye-of-god .eog-header-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* Botões táticos */
+#tab-eye-of-god .eog-btn {
+  background: rgba(0, 255, 102, 0.1);
+  border: 1px solid var(--eog-green);
+  color: var(--eog-green);
+  font-family: var(--eog-font-matrix);
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+#tab-eye-of-god .eog-btn:hover {
+  background: var(--eog-green);
+  color: #000;
+  box-shadow: var(--eog-green-glow);
+}
+
+#tab-eye-of-god .eog-btn.alert-btn {
+  background: rgba(255, 0, 60, 0.14);
+  border-color: var(--eog-crimson);
+  color: #ff4772;
+}
+
+#tab-eye-of-god .eog-btn.alert-btn:hover,
+#tab-eye-of-god .eog-btn.alert-btn[aria-pressed="true"] {
+  background: var(--eog-crimson);
+  color: #fff;
+  box-shadow: var(--eog-crimson-glow);
+}
+
+/* Grid Principal 3 Colunas */
+#tab-eye-of-god .eog-main-grid {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 310px minmax(0, 1fr) 350px;
+  gap: 10px;
+  min-height: 0;
+  align-items: stretch;
+}
+
+#tab-eye-of-god .eog-panel-box {
+  background: var(--eog-bg-panel);
+  border: 1px solid var(--eog-panel-border);
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  backdrop-filter: blur(8px);
+  min-width: 0;
+}
+
+#tab-eye-of-god .eog-panel-title {
+  background: rgba(0, 255, 102, 0.06);
+  border-bottom: 1px solid var(--eog-panel-border);
+  padding: 7px 12px;
+  font-size: 0.72rem;
+  color: var(--eog-green);
+  font-weight: 700;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  letter-spacing: 0.8px;
+}
+
+#tab-eye-of-god .eog-corner-code {
+  font-size: 0.62rem;
+  color: var(--eog-cyan);
+}
+
+#tab-eye-of-god .eog-panel-content {
+  padding: 10px;
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Coluna 1: Sensores e Módulos */
+#tab-eye-of-god .eog-telemetry-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+}
+
+#tab-eye-of-god .eog-sensor-card {
+  background: rgba(0, 0, 0, 0.55);
+  border: 1px solid rgba(0, 240, 255, 0.22);
+  padding: 8px;
+  border-radius: 4px;
+}
+
+#tab-eye-of-god .eog-s-label {
+  font-size: 0.58rem;
+  color: #8ea1b8;
+}
+
+#tab-eye-of-god .eog-s-val {
+  font-size: 1.05rem;
+  color: var(--eog-cyan);
+  font-weight: 700;
+  margin: 3px 0;
+}
+
+#tab-eye-of-god .eog-s-sub {
+  font-size: 0.58rem;
+  color: var(--eog-green);
+  line-height: 1.3;
+}
+
+#tab-eye-of-god .eog-sub-section-title {
+  font-size: 0.64rem;
+  color: var(--eog-cyan);
+  border-bottom: 1px dashed rgba(0, 240, 255, 0.25);
+  padding-bottom: 4px;
+  margin-top: 2px;
+  letter-spacing: 0.8px;
+}
+
+#tab-eye-of-god .eog-modules-status-list {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+#tab-eye-of-god .eog-mod-item {
+  background: rgba(255, 255, 255, 0.03);
+  border-left: 2px solid var(--eog-green);
+  padding: 6px 8px;
+  font-size: 0.68rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 6px;
+}
+
+#tab-eye-of-god .eog-mod-badge {
+  font-size: 0.58rem;
+  padding: 2px 6px;
+  border-radius: 2px;
+  white-space: nowrap;
+}
+
+#tab-eye-of-god .eog-mod-badge.active {
+  background: rgba(0, 255, 102, 0.2);
+  color: var(--eog-green);
+}
+
+#tab-eye-of-god .eog-mod-badge.compute {
+  background: rgba(255, 230, 0, 0.2);
+  color: var(--eog-amber);
+  animation: eogBlink 1s infinite;
+}
+
+@keyframes eogBlink {
+  50% { opacity: 0.35; }
+}
+
+#tab-eye-of-god .eog-spectrum-box {
+  width: 100%;
+  height: 74px;
+  background: #000;
+  border: 1px solid rgba(0, 255, 102, 0.24);
+  border-radius: 4px;
+  display: block;
+}
+
+/* Coluna 2: Câmeras e Modulação */
+#tab-eye-of-god .eog-cam-modes-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+#tab-eye-of-god .eog-cam-mode-btn {
+  background: #000;
+  border: 1px solid rgba(0, 255, 102, 0.32);
+  color: var(--eog-green);
+  font-family: var(--eog-font-matrix);
+  font-size: 0.62rem;
+  padding: 4px 8px;
+  cursor: pointer;
+  border-radius: 3px;
+  transition: all 0.18s ease;
+}
+
+#tab-eye-of-god .eog-cam-mode-btn.active,
+#tab-eye-of-god .eog-cam-mode-btn:hover {
+  background: var(--eog-green);
+  color: #000;
+  font-weight: 700;
+}
+
+#tab-eye-of-god .eog-viewport-content {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+#tab-eye-of-god .eog-cctv-matrix-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  flex: 1;
+}
+
+#tab-eye-of-god .eog-cam-cell {
+  background: #000;
+  border: 1px solid rgba(0, 255, 102, 0.25);
+  border-radius: 4px;
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 16 / 9;
+  padding: 0;
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+  color: inherit;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+#tab-eye-of-god .eog-cam-cell:hover {
+  border-color: var(--eog-green);
+}
+
+#tab-eye-of-god .eog-cam-cell.focus {
+  border-color: var(--eog-cyan);
+  box-shadow: var(--eog-cyan-glow);
+}
+
+#tab-eye-of-god .eog-cam-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+#tab-eye-of-god .eog-cam-overlay-hud {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 6px;
+  pointer-events: none;
+  font-size: 0.62rem;
+}
+
+#tab-eye-of-god .eog-cam-header-tag {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 6px;
+  background: rgba(0, 0, 0, 0.7);
+  padding: 2px 5px;
+  border-radius: 2px;
+}
+
+#tab-eye-of-god .eog-cam-id {
+  color: var(--eog-green);
+  font-weight: 700;
+}
+
+#tab-eye-of-god .eog-cam-rec {
+  color: #ff4772;
+  font-weight: 700;
+}
+
+#tab-eye-of-god .eog-cam-loc {
+  background: rgba(0, 0, 0, 0.72);
+  padding: 2px 5px;
+  color: #f1f5f9;
+  border-radius: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Target Inspect Card */
+#tab-eye-of-god .eog-target-inspect-card {
+  background: rgba(0, 0, 0, 0.75);
+  border: 1px solid var(--eog-cyan);
+  border-radius: 5px;
+  padding: 10px 12px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+  box-shadow: var(--eog-cyan-glow);
+}
+
+#tab-eye-of-god .eog-target-profile-pic {
+  width: 72px;
+  height: 72px;
+  background: #000;
+  border: 1px solid var(--eog-green);
+  position: relative;
+  overflow: hidden;
+  flex-shrink: 0;
+  border-radius: 3px;
+}
+
+#tab-eye-of-god #eog-wireframe-face-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+#tab-eye-of-god .eog-target-scan-line {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: var(--eog-crimson);
+  box-shadow: var(--eog-crimson-glow);
+  animation: eogTargetScan 2s linear infinite;
+}
+
+@keyframes eogTargetScan {
+  0% { top: 0%; }
+  100% { top: 100%; }
+}
+
+#tab-eye-of-god .eog-target-data {
+  flex: 1;
+  min-width: 200px;
+}
+
+#tab-eye-of-god .eog-target-id {
+  font-size: 0.78rem;
+  color: var(--eog-cyan);
+  font-weight: 700;
+}
+
+#tab-eye-of-god .eog-target-details {
+  font-size: 0.7rem;
+  color: #cbd5e1;
+  margin-top: 4px;
+  line-height: 1.5;
+}
+
+#tab-eye-of-god .eog-highlight {
+  color: var(--eog-green);
+  font-weight: 700;
+}
+
+#tab-eye-of-god .eog-target-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* Coluna 3: Radar & Grafo Palantir */
+#tab-eye-of-god .eog-radar-wrapper,
+#tab-eye-of-god .eog-graph-wrapper {
+  background: #000;
+  border: 1px solid rgba(0, 255, 102, 0.24);
+  border-radius: 4px;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+#tab-eye-of-god .eog-radar-wrapper canvas,
+#tab-eye-of-god .eog-graph-wrapper canvas {
+  width: 100%;
+  max-width: 340px;
+  height: auto;
+  display: block;
+}
+
+#tab-eye-of-god .eog-radar-hud-info {
+  position: absolute;
+  bottom: 4px;
+  left: 6px;
+  right: 6px;
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.62rem;
+  color: var(--eog-cyan);
+  background: rgba(0, 0, 0, 0.72);
+  padding: 3px 6px;
+  border-radius: 2px;
+}
+
+#tab-eye-of-god .eog-event-feed-list {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  max-height: 140px;
+  overflow-y: auto;
+}
+
+#tab-eye-of-god .eog-event-row {
+  background: rgba(255, 255, 255, 0.03);
+  border-left: 2px solid var(--eog-cyan);
+  padding: 5px 7px;
+  font-size: 0.64rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+#tab-eye-of-god .eog-event-row.crit {
+  border-left-color: var(--eog-crimson);
+  background: rgba(255, 0, 60, 0.1);
+}
+
+/* Terminal CLI Kernel Inferior */
+#tab-eye-of-god .eog-footer-terminal {
+  background: var(--eog-bg-panel);
+  border: 1px solid var(--eog-panel-border);
+  border-radius: 6px;
+  min-height: 135px;
+  max-height: 185px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+#tab-eye-of-god .eog-terminal-bar-header {
+  background: rgba(0, 255, 102, 0.08);
+  padding: 4px 10px;
+  font-size: 0.64rem;
+  color: var(--eog-green);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px;
+  border-bottom: 1px solid var(--eog-panel-border);
+}
+
+#tab-eye-of-god .eog-terminal-body {
+  flex: 1;
+  padding: 7px 10px;
+  overflow-y: auto;
+  font-size: 0.7rem;
+  line-height: 1.5;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+#tab-eye-of-god .eog-term-line {
+  overflow-wrap: anywhere;
+}
+
+#tab-eye-of-god .eog-term-line.output {
+  color: #a7f3d0;
+}
+
+#tab-eye-of-god .eog-term-line.error {
+  color: #ff4772;
+}
+
+#tab-eye-of-god .eog-term-line.success {
+  color: var(--eog-cyan);
+}
+
+#tab-eye-of-god .eog-terminal-prompt {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(0, 0, 0, 0.85);
+  padding: 6px 10px;
+  border-top: 1px solid rgba(0, 255, 102, 0.24);
+}
+
+#tab-eye-of-god .eog-prompt-symbol {
+  color: var(--eog-green);
+  font-size: 0.7rem;
+  white-space: nowrap;
+}
+
+#tab-eye-of-god .eog-prompt-input {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #fff;
+  font-family: var(--eog-font-matrix);
+  font-size: 0.74rem;
+  flex: 1;
+  min-width: 0;
+}
+
+#tab-eye-of-god .eog-prompt-input::placeholder {
+  color: #6b7f96;
+}
+
+#tab-eye-of-god .eog-terminal-prompt:focus-within {
+  outline: 2px solid var(--eog-cyan);
+  outline-offset: -2px;
+}
+
+/* Scrollbars internos do HUD */
+#tab-eye-of-god .eog-hud-shell ::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+#tab-eye-of-god .eog-hud-shell ::-webkit-scrollbar-track {
+  background: var(--eog-bg-void);
+}
+
+#tab-eye-of-god .eog-hud-shell ::-webkit-scrollbar-thumb {
+  background: rgba(0, 255, 102, 0.35);
+  border-radius: 3px;
+}
+
+#tab-eye-of-god .eog-hud-shell ::-webkit-scrollbar-thumb:hover {
+  background: var(--eog-green);
+}
+
+/* Responsividade */
+@media (max-width: 1220px) {
+  #tab-eye-of-god .eog-main-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  #tab-eye-of-god .eog-center-viewport {
+    grid-column: 1 / -1;
+    order: -1;
+  }
+}
+
+@media (max-width: 768px) {
+  #tab-eye-of-god .eog-hud-shell {
+    padding: 8px;
+    min-height: auto;
+  }
+  #tab-eye-of-god .eog-main-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  #tab-eye-of-god .eog-center-viewport {
+    grid-column: auto;
+    order: 0;
+  }
+  #tab-eye-of-god .eog-cctv-matrix-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  #tab-eye-of-god .eog-target-actions {
+    flex-direction: row;
+    flex-wrap: wrap;
+    width: 100%;
+  }
+  #tab-eye-of-god .eog-target-actions .eog-btn {
+    flex: 1;
+  }
+}
+
+@media (max-width: 520px) {
+  #tab-eye-of-god .eog-cctv-matrix-grid,
+  #tab-eye-of-god .eog-telemetry-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  #tab-eye-of-god .eog-terminal-prompt {
+    flex-wrap: wrap;
+  }
+}
+
+@media print {
+  #eog-matrix-rain-canvas,
+  #tab-eye-of-god .eog-crt-overlay {
+    display: none !important;
+  }
+}
+
+/* Link e modo página dedicada (/eyeofgod/) */
+#tab-eye-of-god .eog-link-btn {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+  border-color: var(--eog-cyan);
+  color: var(--eog-cyan);
+  background: rgba(0, 240, 255, 0.08);
+}
+
+#tab-eye-of-god .eog-link-btn:hover {
+  background: var(--eog-cyan);
+  color: #000;
+  box-shadow: var(--eog-cyan-glow);
+}
+
+body.eog-standalone-body {
+  margin: 0;
+  padding: 0;
+  background: #020408;
+  color: #e2e8f0;
+  font-family: 'Share Tech Mono', 'Fira Code', monospace;
+  min-height: 100vh;
+}
+
+.eog-standalone-page {
+  min-height: 100vh;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.eog-standalone-page .eog-hud-shell {
+  flex: 1;
+}
+
+.eog-standalone-notice {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 12px;
+  border: 1px solid #715c27;
+  background: #211b0d;
+  color: #f5d98a;
+  border-radius: 6px;
+  font-size: 0.72rem;
+  line-height: 1.4;
+}
+
+.eog-standalone-notice strong {
+  color: #ffe699;
+}
+
+.eog-standalone-notice a {
+  color: #00f0ff;
+  text-decoration: underline;
+}

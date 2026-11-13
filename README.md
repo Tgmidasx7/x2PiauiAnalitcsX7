@@ -22,6 +22,7 @@ Painel web que reúne indicadores e análises sobre o estado do Piauí e sua cap
 | SWOT | Forças, fraquezas, oportunidades e ameaças |
 | Terminal | Notícias em rolagem, feeds e arquivo de notícias locais |
 | SPIA | Catálogo de 30 vídeos públicos e cenários fictícios para Teresina |
+| Eye of God | Simulação tática e visual em Canvas (`#eye-of-god` e `/eyeofgod/`): 6 modos de câmera, radar, grafo, CLI e áudio sintetizado |
 | Fontes & método | Portais institucionais, orientações de leitura e limitações |
 
 Os temas e indicadores acima descrevem o que a interface **apresenta**, não uma validação de sua precisão. O painel se apresenta como um dossiê de 2025 e reúne referências a diferentes anos; não se deve presumir que os valores estejam atualizados.

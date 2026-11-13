@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>S.P.I.A. · EYE OF GOD // PALANTIR MATRIX EDITION | Piauí Teresina Analytics</title>
+  <meta name="description" content="Simulação tática e visual S.P.I.A. · Eye of God // Palantir Matrix Edition para Teresina e Piauí.">
+  <meta name="theme-color" content="#020408">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Orbitron:wght@600;800;900&family=Rajdhani:wght@500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/eye-of-god.css">
+</head>
+<body class="eog-standalone-body">
+  <main class="tab-content active eog-standalone-page" id="tab-eye-of-god" tabindex="-1">
+    <aside class="eog-standalone-notice">
+      <span><strong>Simulação demonstrativa:</strong> feeds em Canvas, telemetria, radar, grafo, terminal e áudio são gerados proceduralmente no navegador (sem conexão real com câmeras da SSP-PI ou satélites).</span>
+      <span><a href="../#eye-of-god">Ver integrado nas abas do painel ↗</a></span>
+    </aside>
+
+    <div class="eog-hud-shell" id="eog-hud-shell">
+      <canvas id="eog-matrix-rain-canvas" aria-hidden="true"></canvas>
+      <div class="eog-crt-overlay" aria-hidden="true"></div>
+
+      <!-- TOP HEADER BAR -->
+      <header class="eog-header">
+        <div class="eog-brand-zone">
+          <div class="eog-god-eye-logo" aria-hidden="true">
+            <div class="eog-iris-ring"></div>
+            <div class="eog-pupil-core"></div>
+          </div>
+          <div>
+            <h1 class="eog-glitch-text">S.P.I.A. // EYE OF GOD</h1>
+            <p class="eog-brand-sub">SISTEMA INTEGRADO DE INTELIGÊNCIA ARTIFICIAL E VIGILÂNCIA GLOBAL · GOV-PI</p>
+          </div>
+        </div>
+
+        <div class="eog-header-status-grid">
+          <div class="eog-stat-pill">
+            <span class="eog-pill-label">SATELLITE LINK:</span>
+            <span class="eog-pill-value ok" id="eog-sat-uplink">GEO-PI-01 [99.8%]</span>
+          </div>
+          <div class="eog-stat-pill">
+            <span class="eog-pill-label">CRIPTOGRAFIA:</span>
+            <span class="eog-pill-value ok">SHA-512 / POST-QUANTUM</span>
+          </div>
+          <div class="eog-stat-pill">
+            <span class="eog-pill-label">HASH KERNEL:</span>
+            <span class="eog-pill-value" id="eog-kernel-hash">0x9F4C...B21</span>
+          </div>
+          <div class="eog-stat-pill">
+            <span class="eog-pill-label">DEFCON ESTADUAL:</span>
+            <span class="eog-pill-value warn" id="eog-defcon-status">NÍVEL 2 - ELEVADO</span>
+          </div>
+          <div class="eog-stat-pill">
+            <span class="eog-pill-label">HORA TÁTICA:</span>
+            <span class="eog-pill-value clock" id="eog-tactical-clock">00:00:00.000</span>
+          </div>
+        </div>
+
+        <div class="eog-header-actions">
+          <a class="eog-btn eog-link-btn" href="../">← PAINEL PRINCIPAL</a>
+          <button type="button" class="eog-btn alert-btn" id="eog-lockdown-btn" aria-pressed="false">🚨 LOCKDOWN TOTAL</button>
+          <button type="button" class="eog-btn" id="eog-audio-toggle" aria-pressed="true">🔊 AUDIO: ON</button>
+        </div>
+      </header>
+
+      <!-- MAIN TACTICAL GRID -->
+      <div class="eog-main-grid">
+        <!-- COLUNA 1: TELEMETRIA & AMBIENTE DO PIAUÍ -->
+        <aside class="eog-panel-box" id="eog-panel-telemetry">
+          <div class="eog-panel-title">
+            <span>📡 TELEMETRIA AMBIENTAL &amp; MATRIZ ENERGÉTICA (PI)</span>
+            <span class="eog-corner-code">LOC: -05.0892° / -42.8016°</span>
+          </div>
+          <div class="eog-panel-content">
+            <div class="eog-telemetry-grid">
+              <div class="eog-sensor-card">
+                <div class="eog-s-label">ÍNDICE TÉRMICO CAPITAL</div>
+                <div class="eog-s-val" id="eog-sensor-temp">38.8°C</div>
+                <div class="eog-s-sub">Pico Térmico: B-O-B [Alerta 11 UV]</div>
+              </div>
+              <div class="eog-sensor-card">
+                <div class="eog-s-label">POPULAÇÃO ATIVA EM VIAS</div>
+                <div class="eog-s-val" id="eog-sensor-pop">164.210</div>
+                <div class="eog-s-sub">Taxa de Identificação: 99.1%</div>
+              </div>
+              <div class="eog-sensor-card">
+                <div class="eog-s-label">CARGA DA REDE ELÉTRICA</div>
+                <div class="eog-s-val" id="eog-sensor-grid">84.2%</div>
+                <div class="eog-s-sub">Subestação Teresina II: 60.02 Hz</div>
+              </div>
+              <div class="eog-sensor-card">
+                <div class="eog-s-label">ESPECTRO RF / SINAIS</div>
+                <div class="eog-s-val" id="eog-sensor-rf">2.41 GHz</div>
+                <div class="eog-s-sub">Triangulação de 842 Torres ERB</div>
+              </div>
+            </div>
+
+            <div class="eog-sub-section-title">ESTADO DOS MÓDULOS DE COMBATE</div>
+            <div class="eog-modules-status-list">
+              <div class="eog-mod-item">
+                <span>FACE-RECON [BNMP/SESP]</span>
+                <span class="eog-mod-badge active">RODANDO</span>
+              </div>
+              <div class="eog-mod-item">
+                <span>CERCO LPR [DETRAN/RENAVAM]</span>
+                <span class="eog-mod-badge active">RODANDO</span>
+              </div>
+              <div class="eog-mod-item">
+                <span>ACOUSTIC SHOT-SPOTTER</span>
+                <span class="eog-mod-badge active">RODANDO</span>
+              </div>
+              <div class="eog-mod-item">
+                <span>PREDIÇÃO LPA (NEURAL NETWORK)</span>
+                <span class="eog-mod-badge compute">COMPUTANDO</span>
+              </div>
+              <div class="eog-mod-item">
+                <span>PALANTIR THREAT MATRIX</span>
+                <span class="eog-mod-badge active">SINCRONIZADO</span>
+              </div>
+            </div>
+
+            <div class="eog-sub-section-title">ANALISADOR DE ESPECTRO EM TEMPO REAL</div>
+            <canvas id="eog-spectrum-canvas" class="eog-spectrum-box" width="280" height="72" aria-label="Analisador de espectro RF simulado"></canvas>
+          </div>
+        </aside>
+
+        <!-- COLUNA 2: MODULAGEM DE CÂMERAS & VETORIZAÇÃO -->
+        <section class="eog-panel-box eog-center-viewport" aria-label="Modulação de câmeras Eye of God">
+          <div class="eog-panel-title">
+            <span>👁️ MATRIX CAM MODULATION // EYE OF GOD TARGET LOCK</span>
+            <div class="eog-cam-modes-bar" role="group" aria-label="Modo de visão das câmeras">
+              <button type="button" class="eog-cam-mode-btn active" data-eog-mode="OPTICAL" aria-pressed="true">ÓPTICA HUD</button>
+              <button type="button" class="eog-cam-mode-btn" data-eog-mode="FLIR" aria-pressed="false">TÉRMICA FLIR</button>
+              <button type="button" class="eog-cam-mode-btn" data-eog-mode="NVG" aria-pressed="false">NOTURNA NVG</button>
+              <button type="button" class="eog-cam-mode-btn" data-eog-mode="LIDAR" aria-pressed="false">LIDAR 3D</button>
+              <button type="button" class="eog-cam-mode-btn" data-eog-mode="NEURAL" aria-pressed="false">FLUXO IA</button>
+              <button type="button" class="eog-cam-mode-btn" data-eog-mode="SAR" aria-pressed="false">ORBITAL SAR</button>
+            </div>
+          </div>
+
+          <div class="eog-panel-content eog-viewport-content">
+            <div class="eog-cctv-matrix-grid" id="eog-cctv-grid"></div>
+
+            <div class="eog-target-inspect-card">
+              <div class="eog-target-profile-pic">
+                <canvas id="eog-wireframe-face-canvas" width="100" height="100" aria-label="Wireframe biométrico simulado"></canvas>
+                <div class="eog-target-scan-line" aria-hidden="true"></div>
+              </div>
+              <div class="eog-target-data">
+                <div class="eog-target-id" id="eog-target-id-label">ALVO #01: VEÍCULO / INDIVÍDUO IDENTIFICADO</div>
+                <div class="eog-target-details" id="eog-target-details-label">
+                  PLACA: <span class="eog-highlight">PIU-8B42</span> · MODELO: <span class="eog-highlight">Toyota Hilux Prata</span> · RECON: <span class="eog-highlight">98.9%</span><br>
+                  VISTO EM: <span class="eog-highlight">Av. Raul Lopes / Ponte Estaiada</span> · ROTA: <span class="eog-highlight">Sentido Norte (68 km/h)</span>
+                </div>
+              </div>
+              <div class="eog-target-actions">
+                <button type="button" class="eog-btn" id="eog-lock-target-btn">🎯 CRAVAR MIRA</button>
+                <button type="button" class="eog-btn alert-btn" id="eog-dispatch-drone-btn">🚁 DESPACHAR DRONE</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- COLUNA 3: RADAR GEOESPACIAL & GRAFO PALANTIR -->
+        <aside class="eog-panel-box" id="eog-panel-radar-intel">
+          <div class="eog-panel-title">
+            <span>🌐 RADAR C4ISR &amp; GRAFO DE VÍNCULOS TÁTICOS</span>
+            <span class="eog-corner-code">ORBITAL SWEEP 360°</span>
+          </div>
+          <div class="eog-panel-content">
+            <div class="eog-radar-wrapper">
+              <canvas id="eog-tactical-radar-canvas" width="340" height="240" aria-label="Radar orbital tático simulado"></canvas>
+              <div class="eog-radar-hud-info">
+                <span>ALVOS RASTREADOS: <b id="eog-radar-target-count">12</b></span>
+                <span>VIATURAS EM CAMPO: <b id="eog-radar-units-count">8</b></span>
+              </div>
+            </div>
+
+            <div class="eog-sub-section-title">GRAFO DE RELAÇÕES &amp; AMEAÇAS (PALANTIR MATRIX)</div>
+            <div class="eog-graph-wrapper">
+              <canvas id="eog-palantir-graph-canvas" width="340" height="200" aria-label="Grafo de vínculos Palantir Matrix simulado"></canvas>
+            </div>
+
+            <div class="eog-sub-section-title">FEED DE EVENTOS TÁTICOS (INSTANTÂNEO)</div>
+            <div class="eog-event-feed-list" id="eog-event-feed-container" aria-live="polite"></div>
+          </div>
+        </aside>
+      </div>
+
+      <!-- BOTTOM CLI TERMINAL DOCK -->
+      <div class="eog-footer-terminal" role="region" aria-label="Terminal CLI Kernel Eye of God">
+        <div class="eog-terminal-bar-header">
+          <span>⚡ EYE OF GOD KERNEL TERMINAL // V.8.4.2-PROD</span>
+          <span>DIGITE 'help' PARA LISTAR COMANDOS TÁTICOS</span>
+        </div>
+        <div class="eog-terminal-body" id="eog-terminal-body" role="log" aria-live="polite">
+          <div class="eog-term-line output">&gt; S.P.I.A. Interface tática carregada em modo demonstrativo. Autenticação: ALFA-7 [SIMULAÇÃO]</div>
+          <div class="eog-term-line output">&gt; Malha óptica e radar orbital em Canvas prontos para operação.</div>
+        </div>
+        <div class="eog-terminal-prompt">
+          <label class="eog-prompt-symbol" for="eog-terminal-input">root@SPIA-GODS-EYE:~#</label>
+          <input type="text" id="eog-terminal-input" class="eog-prompt-input" autocomplete="off" placeholder="execute comandos como: help, target, lockdown, thermal, scan, clear...">
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="../assets/eye-of-god.js"></script>
+</body>
+</html>
