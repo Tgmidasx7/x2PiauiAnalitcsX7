@@ -18,7 +18,7 @@ function createApp({ chart = true, hash = '', timerSpy = null, canvasMock = fals
   window.matchMedia = () => ({ matches: false, addListener() {}, removeListener() {} });
   if (timerSpy) { const interval = window.setInterval.bind(window); window.setInterval = (fn, delay) => { timerSpy.push({fn, delay}); return interval(fn, delay); }; }
   const RealDate = window.Date;
-  window.Date = class extends RealDate { constructor(...args) { super(...(args.length ? args : ['2026-10-30T15:00:00-03:00'])); } static now() { return new RealDate('2026-10-30T15:00:00-03:00').getTime(); } };
+  window.Date = class extends RealDate { constructor(...args) { super(...(args.length ? args : ['2026-11-13T15:00:00-03:00'])); } static now() { return new RealDate('2026-11-13T15:00:00-03:00').getTime(); } };
   window.HTMLElement.prototype.scrollIntoView = function () {};
   if (canvasMock) {
     window.HTMLCanvasElement.prototype.getContext = function () {
@@ -169,8 +169,8 @@ test('atualizador de feeds mescla dados válidos, rejeita URL inválida e agenda
   const refreshTimer = intervals.find(timer => timer.delay === 300000); assert.ok(refreshTimer);
   let requests = 0;
   window.fetch = async url => { requests++; return ({ ok: true, json: async () => ({status: 'ok', items: [
-    {title: 'Nova notícia de Teresina', link: url.includes('pi.gov.br') ? 'https://www.pi.gov.br/noticia-nova/' : 'https://g1.globo.com/pi/piaui/noticia/nova.ghtml', pubDate: '2026-10-30 15:00:00'},
-    {title: 'Malicioso', link:'https://example.com/fora', pubDate:'2026-10-30 15:00:00'}
+    {title: 'Nova notícia de Teresina', link: url.includes('pi.gov.br') ? 'https://www.pi.gov.br/noticia-nova/' : 'https://g1.globo.com/pi/piaui/noticia/nova.ghtml', pubDate: '2026-11-13 15:00:00'},
+    {title: 'Malicioso', link:'https://example.com/fora', pubDate:'2026-11-13 15:00:00'}
   ]}) }); };
   window.document.getElementById('btn-terminal').click();
   await new Promise(resolve => setTimeout(resolve, 10));

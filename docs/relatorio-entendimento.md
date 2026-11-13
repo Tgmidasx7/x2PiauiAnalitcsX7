@@ -63,7 +63,7 @@ Esses itens são **questões de revisão**, não uma afirmação de que os valor
 
 ## 6. Publicação e operação
 
-Na consulta feita durante esta análise, o GitHub Pages estava habilitado para a raiz da branch `main`, com HTTPS e último build registrado como concluído. A URL configurada é <https://tgmidasx7.github.io/APP-PIAUI-THE/>. Essa verificação é um retrato do momento, não garantia de disponibilidade contínua.
+Na consulta feita durante a análise histórica da base original, o GitHub Pages estava habilitado para a raiz da branch `main`, com HTTPS e último build concluído em <https://tgmidasx7.github.io/APP-PIAUI-THE/> (sendo o endereço deste repositório <https://tgmidasx7.github.io/x2PiauiAnalitcsX7/>). Essa verificação é um retrato do momento, não garantia de disponibilidade contínua.
 
 A publicação usa o mecanismo existente do GitHub Pages. O workflow `.github/workflows/checks.yml` é destinado a testes e **não** faz deploy. Alterações em branches de trabalho só chegam ao site quando integradas à `main` e publicadas. O projeto depende das condições e limites do GitHub Pages e dos serviços externos; não há garantia de funcionamento offline ou disponibilidade permanente.
 

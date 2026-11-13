@@ -1,5 +1,75 @@
-// Curadoria estática: links e datas das publicações; consulta em 30/10/2026.
+// Curadoria estática: links e datas das publicações; consulta atualizada em 13/11/2026.
 window.PIAUI_NEWS = [
+  {
+    "date": "2026-11-13",
+    "title": "PIB per capita do Piauí cresce 961% em 22 anos, aponta levantamento do IBGE",
+    "url": "https://g1.globo.com/pi/piaui/noticia/2026/11/13/pib-per-capita-do-piaui.ghtml",
+    "source": "g1 Piauí",
+    "category": "Economia"
+  },
+  {
+    "date": "2026-11-13",
+    "title": "Teresina recebe reconhecimento nacional por redução de perdas na distribuição de água",
+    "url": "https://www.pi.gov.br/teresina-esta-entre-as-cidades-brasileiras-que-mais-avancaram-no-combate-ao-desperdicio-de-agua-e-recebe-reconhecimento-nacional/",
+    "source": "Governo do Piauí",
+    "category": "Infraestrutura"
+  },
+  {
+    "date": "2026-11-13",
+    "title": "Carretinha da Saúde entrega óculos para crianças atendidas em Teresina",
+    "url": "https://www.pi.gov.br/carretinha-da-saude-entrega-oculos-e-transforma-a-rotina-de-criancas-em-teresina/",
+    "source": "Governo do Piauí",
+    "category": "Saúde"
+  },
+  {
+    "date": "2026-11-13",
+    "title": "Semarh avança na recuperação do Rio Gurguéia e prepara projeto contra assoreamento",
+    "url": "https://www.pi.gov.br/semarh-avanca-na-recuperacao-do-rio-gurgueia-e-prepara-projeto-para-solucionar-assoreamento/",
+    "source": "Governo do Piauí",
+    "category": "Meio ambiente"
+  },
+  {
+    "date": "2026-11-13",
+    "title": "IFPI encerra inscrições para 5,3 mil vagas em cursos técnicos em 23 campi",
+    "url": "https://g1.globo.com/pi/piaui/trabalho-e-carreira/noticia/2026/11/13/inscricoes-ifpi-encerram.ghtml",
+    "source": "g1 Piauí",
+    "category": "Educação"
+  },
+  {
+    "date": "2026-11-13",
+    "title": "Ouvidoria-Geral do Estado leva atendimento à Justiça Itinerante na zona Leste de Teresina",
+    "url": "https://www.pi.gov.br/ouvidoria-geral-do-estado-leva-atendimento-a-populacao-durante-acao-da-justica-itinerante/",
+    "source": "Governo do Piauí",
+    "category": "Serviços"
+  },
+  {
+    "date": "2026-11-13",
+    "title": "Trecho da Avenida Gil Martins é interditado para obras de drenagem em Teresina",
+    "url": "https://g1.globo.com/pi/piaui/noticia/2026/11/13/avenida-gil-martins-teresina.ghtml",
+    "source": "g1 Piauí",
+    "category": "Mobilidade"
+  },
+  {
+    "date": "2026-11-13",
+    "title": "Exames preventivos de câncer são oferecidos sem agendamento em Teresina",
+    "url": "https://g1.globo.com/pi/piaui/noticia/2026/11/13/exames-cancer-teresina.ghtml",
+    "source": "g1 Piauí",
+    "category": "Saúde"
+  },
+  {
+    "date": "2026-11-13",
+    "title": "Câmera de monitoramento registra onça-parda e espécies silvestres no Sudeste do Piauí",
+    "url": "https://g1.globo.com/pi/piaui/noticia/2026/11/13/camera-flagra-especies.ghtml",
+    "source": "g1 Piauí",
+    "category": "Meio ambiente"
+  },
+  {
+    "date": "2026-11-10",
+    "title": "Festival de Violão de Teresina promove concertos gratuitos e oficinas formativas",
+    "url": "https://g1.globo.com/pi/piaui/noticia/2026/11/10/festival-violao-teresina.ghtml",
+    "source": "g1 Piauí",
+    "category": "Cultura"
+  },
   {
     "date": "2026-10-30",
     "title": "VLT de Teresina terá circulação suspensa em datas informadas pelo governo",
@@ -279,75 +349,5 @@ window.PIAUI_NEWS = [
     "url": "https://www.ssp.pi.gov.br/ssp-pi-amplia-monitoramento-em-teresina-com-inauguracao-de-dois-novos-totens-inteligentes/",
     "source": "SSP-PI",
     "category": "Segurança"
-  },
-  {
-    "date": "2026-05-25",
-    "title": "Jovens de assentamento em Teresina criam soluções para agricultura familiar",
-    "url": "https://agenciagov.ebc.com.br/noticias/202605/jovens-assentados-no-piaui-se-destacam-em-inovacao-tecnologica-para-fortalecer-agricultura-familiar",
-    "source": "Agência Gov",
-    "category": "Tecnologia"
-  },
-  {
-    "date": "2026-05-22",
-    "title": "SSP-PI divulga comparação de indicadores de homicídios em Teresina",
-    "url": "https://www.pi.gov.br/assassinatos-caem-50-em-teresina-apos-investimentos-do-governo-do-piaui-na-seguranca-publica/",
-    "source": "Governo do Piauí",
-    "category": "Segurança"
-  },
-  {
-    "date": "2026-04-27",
-    "title": "Vacinação contra gripe em Teresina inclui professores e trabalhadores da saúde",
-    "url": "https://g1.globo.com/pi/piaui/noticia/2026/04/27/professores-e-trabalhadores-da-saude-passam-a-receber-vacina-contra-gripe-nesta-segunda-27-em-teresina.ghtml",
-    "source": "g1 Piauí",
-    "category": "Saúde"
-  },
-  {
-    "date": "2026-03-10",
-    "title": "Câmara de Teresina aprova reajuste para professores da rede municipal",
-    "url": "https://g1.globo.com/pi/piaui/noticia/2026/03/10/reajuste-salario-professores-teresina.ghtml",
-    "source": "g1 Piauí",
-    "category": "Educação"
-  },
-  {
-    "date": "2026-03-08",
-    "title": "Ação em Teresina oferece cadastro e vacinação de animais",
-    "url": "https://agenciagov.ebc.com.br/noticias/202603/governo-do-brasil-na-rua-com-sinpatinhas-mma-faz-registro-e-vacinacao-de-caes-e-gatos-no-piaui",
-    "source": "Agência Gov",
-    "category": "Serviços"
-  },
-  {
-    "date": "2026-03-07",
-    "title": "Governo do Brasil na Rua leva serviços gratuitos a Teresina",
-    "url": "https://agenciagov.ebc.com.br/noticias/202603/governo-do-brasil-na-rua-chega-ao-nordeste-por-teresina",
-    "source": "Agência Gov",
-    "category": "Serviços"
-  },
-  {
-    "date": "2026-02-20",
-    "title": "Teresina anuncia reajuste para professores e convocação de servidores",
-    "url": "https://g1.globo.com/pi/piaui/noticia/2026/02/20/teresina-reajuste-salarial-professores.ghtml",
-    "source": "g1 Piauí",
-    "category": "Educação"
-  },
-  {
-    "date": "2026-01-08",
-    "title": "Piauí alcança emissão da nova identidade para metade da população, segundo governo",
-    "url": "https://agenciagov.ebc.com.br/noticias/202601/piaui-e-o-primeiro-estado-brasileiro-a-emitir-a-cin-para-50-de-sua-populacao",
-    "source": "Agência Gov",
-    "category": "Serviços"
-  },
-  {
-    "date": "2026-01-06",
-    "title": "Seduc apresenta metas de educação especial no Piauí",
-    "url": "https://www.pi.gov.br/seduc-consolida-politica-de-educacao-especial-e-define-metas-para-fortalecer-atendimento-inclusivo-no-piaui/",
-    "source": "Governo do Piauí",
-    "category": "Educação"
-  },
-  {
-    "date": "2025-12-26",
-    "title": "Governo inaugura escola de tecnologia em Teresina",
-    "url": "https://www.pi.gov.br/governador-inaugura-escola-de-tecnologia-em-teresina-que-vai-beneficiar-quase-3-mil-estudantes-com-cursos-na-area-digital/",
-    "source": "Governo do Piauí",
-    "category": "Educação"
   }
 ];

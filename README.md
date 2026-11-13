@@ -2,9 +2,10 @@
 
 Análise do Piauí Integral: painel web que reúne indicadores e análises sobre o estado do Piauí e sua capital, Teresina. A proposta é facilitar a consulta de informações territoriais, sociais e econômicas em uma interface visual com gráficos, seções temáticas, terminal de notícias e módulos demonstrativos (`SPIA` e `Eye of God`).
 
-**Repositório:** [github.com/Tgmidasx7/x2PiauiAnalitcsX7](https://github.com/Tgmidasx7/x2PiauiAnalitcsX7)  
-**GitHub Pages (após ativação na `main`):** `https://tgmidasx7.github.io/x2PiauiAnalitcsX7/`  
-**Referência original publicada:** [tgmidasx7.github.io/APP-PIAUI-THE/](https://tgmidasx7.github.io/APP-PIAUI-THE/)
+**Site público (GitHub Pages):** [tgmidasx7.github.io/x2PiauiAnalitcsX7/](https://tgmidasx7.github.io/x2PiauiAnalitcsX7/)  
+**Rota dedicada Eye of God:** [tgmidasx7.github.io/x2PiauiAnalitcsX7/eyeofgod/](https://tgmidasx7.github.io/x2PiauiAnalitcsX7/eyeofgod/)  
+**Repositório oficial:** [github.com/Tgmidasx7/x2PiauiAnalitcsX7](https://github.com/Tgmidasx7/x2PiauiAnalitcsX7)  
+**Projetos relacionados:** [APP-PIAUI-THE](https://tgmidasx7.github.io/APP-PIAUI-THE/) · [SPIA-PIAUIANALITCS](https://tgmidasx7.github.io/SPIA-PIAUIANALITCS/)
 
 **Relatório de entendimento:** [docs/relatorio-entendimento.md](docs/relatorio-entendimento.md)
 
@@ -12,22 +13,22 @@ Análise do Piauí Integral: painel web que reúne indicadores e análises sobre
 
 ## O que o painel apresenta
 
-| Seção | Conteúdo exibido |
-| --- | --- |
-| Visão Geral | Indicadores resumidos, quadro comparativo multi-escala, atalhos e gráficos de PIB e IDH |
-| Geográfica | Território, relevo, clima, hidrografia e recursos |
-| Demográfica | População estadual e municipal, estimativas e concentração |
-| Municípios & Territórios | Cartograma interativo dos 12 Territórios de Desenvolvimento, diretório de 20 polos e comparador municipal lado a lado |
-| Geopolítica | Papel regional, infraestrutura, desafios e oportunidades |
-| Econômica | PIB, finanças públicas, dívida e investimentos |
-| Energia & Simulador | Matriz elétrica renovável, H₂ verde, logística, Piauí Digital e simulador pedagógico de cenários |
-| Educacional | Indicadores educacionais estaduais e municipais |
-| Desenvolvimento Humano | IDH, componentes e desigualdades |
-| SWOT | Forças, fraquezas, oportunidades e ameaças |
-| Terminal | Notícias em rolagem, feeds e arquivo de notícias locais |
-| SPIA | Catálogo de 30 vídeos públicos e cenários fictícios para Teresina |
-| Eye of God | Simulação tática e visual em Canvas (`#eye-of-god` e `/eyeofgod/`): 6 modos de câmera, radar, grafo, CLI e áudio sintetizado |
-| Fontes & método | 8 portais institucionais, matriz filtrável de rastreabilidade de indicadores e limitações |
+| Seção | Conteúdo exibido | Link direto |
+| --- | --- | --- |
+| Visão Geral | Indicadores resumidos, quadro comparativo multi-escala, atalhos e gráficos de PIB e IDH | [`#overview`](https://tgmidasx7.github.io/x2PiauiAnalitcsX7/#overview) |
+| Geográfica | Território, relevo, clima, hidrografia e recursos | [`#geo`](https://tgmidasx7.github.io/x2PiauiAnalitcsX7/#geo) |
+| Demográfica | População estadual e municipal, estimativas e concentração | [`#demo`](https://tgmidasx7.github.io/x2PiauiAnalitcsX7/#demo) |
+| Municípios & Territórios | Cartograma interativo dos 12 Territórios de Desenvolvimento, diretório de 20 polos e comparador municipal lado a lado | [`#territorios`](https://tgmidasx7.github.io/x2PiauiAnalitcsX7/#territorios) |
+| Geopolítica | Papel regional, infraestrutura, desafios e oportunidades | [`#geo-pol`](https://tgmidasx7.github.io/x2PiauiAnalitcsX7/#geo-pol) |
+| Econômica | PIB, finanças públicas, dívida e investimentos | [`#eco`](https://tgmidasx7.github.io/x2PiauiAnalitcsX7/#eco) |
+| Energia & Simulador | Matriz elétrica renovável, H₂ verde, logística, Piauí Digital e simulador pedagógico de cenários | [`#energia`](https://tgmidasx7.github.io/x2PiauiAnalitcsX7/#energia) |
+| Educacional | Indicadores educacionais estaduais e municipais | [`#edu`](https://tgmidasx7.github.io/x2PiauiAnalitcsX7/#edu) |
+| Desenvolvimento Humano | IDH, componentes e desigualdades | [`#idh`](https://tgmidasx7.github.io/x2PiauiAnalitcsX7/#idh) |
+| SWOT | Forças, fraquezas, oportunidades e ameaças | [`#swot`](https://tgmidasx7.github.io/x2PiauiAnalitcsX7/#swot) |
+| SPIA | Catálogo de 30 vídeos públicos e cenários fictícios para Teresina | [`#spia`](https://tgmidasx7.github.io/x2PiauiAnalitcsX7/#spia) |
+| Eye of God | Simulação tática e visual em Canvas: 6 modos de câmera, radar, grafo, CLI e áudio sintetizado | [`#eye-of-god`](https://tgmidasx7.github.io/x2PiauiAnalitcsX7/#eye-of-god) · [`/eyeofgod/`](https://tgmidasx7.github.io/x2PiauiAnalitcsX7/eyeofgod/) |
+| Terminal | Notícias em rolagem, feeds e arquivo de notícias locais (atualizado em 13/11/2026) | [`#terminal`](https://tgmidasx7.github.io/x2PiauiAnalitcsX7/#terminal) |
+| Fontes & método | 8 portais institucionais, matriz filtrável de rastreabilidade de indicadores e limitações | [`#fontes`](https://tgmidasx7.github.io/x2PiauiAnalitcsX7/#fontes) |
 
 Os temas e indicadores acima descrevem o que a interface **apresenta**, não uma validação de sua precisão. O painel se apresenta como um dossiê de 2025 e reúne referências a diferentes anos; não se deve presumir que os valores estejam atualizados.
 
@@ -64,7 +65,7 @@ Os testes **não** verificam a veracidade dos dados, a renderização real em to
 
 ## Terminal de notícias e SPIA
 
-O terminal mostra as notícias uma a uma em uma janela com histórico rolável. Ao abrir a aba, tenta consultar os feeds RSS do [g1 Piauí](https://g1.globo.com/rss/g1/pi/piaui/) e do [Governo do Piauí](https://www.pi.gov.br/feed/) por meio do serviço externo RSS2JSON; enquanto a página estiver aberta, repete a tentativa a cada cinco minutos. O serviço e os feeds podem estar fora do ar, impor limites, atrasar ou bloquear acesso. A interface informa o resultado, preserva a última consulta da sessão e usa como alternativa a curadoria estática de 50 links em `assets/news.js`, consultada em 30/10/2026. A seleção respeita uma janela móvel de 12 meses; a quantidade pode diminuir e fontes podem modificar ou retirar notícias. A rotação pode ser pausada e o arquivo filtrado por assunto ou busca.
+O terminal mostra as notícias uma a uma em uma janela com histórico rolável. Ao abrir a aba, tenta consultar os feeds RSS do [g1 Piauí](https://g1.globo.com/rss/g1/pi/piaui/) e do [Governo do Piauí](https://www.pi.gov.br/feed/) por meio do serviço externo RSS2JSON; enquanto a página estiver aberta, repete a tentativa a cada cinco minutos. O serviço e os feeds podem estar fora do ar, impor limites, atrasar ou bloquear acesso. A interface informa o resultado, preserva a última consulta da sessão e usa como alternativa a curadoria estática de 50 links em `assets/news.js`, atualizada em 13/11/2026. A seleção respeita uma janela móvel de 12 meses; a quantidade pode diminuir e fontes podem modificar ou retirar notícias. A rotação pode ser pausada e o arquivo filtrado por assunto ou busca.
 
 A aba SPIA é uma **demonstração**, sem acesso a câmeras oficiais de Teresina nem análise real por IA. O mural oferece 30 vídeos públicos do YouTube identificados pelo local verdadeiro; são fontes de terceiros, não necessariamente câmeras de segurança e não necessariamente ao vivo. As miniaturas e vídeos dependem do YouTube e podem estar indisponíveis, gravados, sujeitos a anúncios ou bloqueados para incorporação; cada tela oferece um link ao original. O laboratório de interpretação gera apenas exemplos fictícios, sem examinar vídeos. Ao abrir o mural, o navegador acessa as miniaturas do YouTube; ao abrir um vídeo, acessa o reprodutor do YouTube. Os gráficos incluem limitações e portais de referência, que não substituem a conferência individual dos indicadores existentes.
 
