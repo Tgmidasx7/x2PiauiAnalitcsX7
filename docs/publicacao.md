@@ -2,9 +2,11 @@
 
 ## GitHub Pages
 
-O repositório está configurado no GitHub Pages para publicar a raiz (`/`) da branch `main` em:
+Para publicar este repositório no GitHub Pages, configure **Settings → Pages** para publicar a raiz (`/`) da branch `main` em:
 
-<https://tgmidasx7.github.io/APP-PIAUI-THE/>
+<https://tgmidasx7.github.io/x2PiauiAnalitcsX7/>
+
+(Referência do projeto original: <https://tgmidasx7.github.io/APP-PIAUI-THE/>.)
 
 O Pages hospeda arquivos estáticos sem custo no contexto atual do repositório público, sujeito às [condições e limites do GitHub Pages](https://docs.github.com/pt/pages/getting-started-with-github-pages/github-pages-limits). Serviços externos usados pela página têm suas próprias condições. A disponibilidade permanente não é garantida.
 

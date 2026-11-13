@@ -1,8 +1,10 @@
-# Piauí Teresina Analytics
+# x2PiauiAnalitcsX7 — Piauí Teresina Analytics
 
-Painel web que reúne indicadores e análises sobre o estado do Piauí e sua capital, Teresina. A proposta é facilitar a consulta de informações territoriais, sociais e econômicas em uma interface visual com gráficos e seções temáticas.
+Análise do Piauí Integral: painel web que reúne indicadores e análises sobre o estado do Piauí e sua capital, Teresina. A proposta é facilitar a consulta de informações territoriais, sociais e econômicas em uma interface visual com gráficos, seções temáticas, terminal de notícias e módulos demonstrativos (`SPIA` e `Eye of God`).
 
-**Site público:** [tgmidasx7.github.io/APP-PIAUI-THE/](https://tgmidasx7.github.io/APP-PIAUI-THE/)
+**Repositório:** [github.com/Tgmidasx7/x2PiauiAnalitcsX7](https://github.com/Tgmidasx7/x2PiauiAnalitcsX7)  
+**GitHub Pages (após ativação na `main`):** `https://tgmidasx7.github.io/x2PiauiAnalitcsX7/`  
+**Referência original publicada:** [tgmidasx7.github.io/APP-PIAUI-THE/](https://tgmidasx7.github.io/APP-PIAUI-THE/)
 
 **Relatório de entendimento:** [docs/relatorio-entendimento.md](docs/relatorio-entendimento.md)
 
@@ -66,7 +68,7 @@ A aba SPIA é uma **demonstração**, sem acesso a câmeras oficiais de Teresina
 
 ## Hospedagem e atualização
 
-O repositório está configurado para publicar gratuitamente a raiz da branch `main` no GitHub Pages. Mudanças em uma branch de trabalho não aparecem no endereço público até serem integradas à `main` e a publicação terminar. O serviço está sujeito às condições e limites do GitHub; disponibilidade permanente não é garantida.
+O repositório está pronto para publicar gratuitamente a raiz da branch `main` no GitHub Pages (**Settings → Pages**). Mudanças em uma branch de trabalho não aparecem no endereço público até serem integradas à `main` e a publicação terminar. O serviço está sujeito às condições e limites do GitHub; disponibilidade permanente não é garantida.
 
 Veja [publicação e manutenção](docs/publicacao.md) para o fluxo de atualização e diagnóstico.
 
@@ -74,7 +76,8 @@ Veja [publicação e manutenção](docs/publicacao.md) para o fluxo de atualiza�
 
 ```text
 index.html                      Página principal, dados e gráficos
-assets/                         Recursos de interface (CSS e JavaScript)
+eyeofgod/index.html             Rota dedicada para a simulação Eye of God
+assets/                         Recursos de interface (CSS, JavaScript e Chart.js local)
 README.md                       Visão geral e instruções de uso
 CONTRIBUTING.md                 Orientações de contribuição
 docs/relatorio-entendimento.md  Análise do funcionamento e do estado do projeto
