@@ -9,6 +9,7 @@ const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
 const dashboard = fs.readFileSync(path.join(root, 'assets/dashboard.js'), 'utf8');
 const news = fs.readFileSync(path.join(root, 'assets/news.js'), 'utf8');
 const cameras = fs.readFileSync(path.join(root, 'assets/cameras.js'), 'utf8');
+const territories = fs.readFileSync(path.join(root, 'assets/territories.js'), 'utf8');
 const eyeOfGod = fs.readFileSync(path.join(root, 'assets/eye-of-god.js'), 'utf8');
 
 function createApp({ chart = true, hash = '', timerSpy = null, canvasMock = false } = {}) {
@@ -54,6 +55,7 @@ function createApp({ chart = true, hash = '', timerSpy = null, canvasMock = fals
   window.eval(script.textContent);
   window.eval(news);
   window.eval(cameras);
+  window.eval(territories);
   window.eval(dashboard);
   window.eval(eyeOfGod);
   window.document.dispatchEvent(new window.Event('DOMContentLoaded'));
@@ -99,8 +101,8 @@ test('busca sem acentos e favoritos persistem ao reiniciar', () => {
 
 test('gráficos oferecem tabelas e a falha da biblioteca não bloqueia o relógio', () => {
   const dom = createApp({ chart: false }); const { document } = dom.window;
-  assert.equal(document.querySelectorAll('.chart-data').length, 10);
-  assert.equal(document.querySelectorAll('.chart-fallback').length, 10);
+  assert.equal(document.querySelectorAll('.chart-data').length, 12);
+  assert.equal(document.querySelectorAll('.chart-fallback').length, 12);
   assert.match(document.getElementById('clockTime').textContent, /^\d\d:\d\d:\d\d$/);
   assert.ok(document.querySelector('.chart-data[open] table tbody tr'));
   document.getElementById('btn-eco').click();
@@ -156,7 +158,7 @@ test('notícias têm links, filtro, navegação, pausa e janela móvel', t => {
   assert.match(document.getElementById('terminalBox').textContent, /Nenhuma notícia/);
   search.value = 'teresina'; search.dispatchEvent(new Event('input'));
   assert.ok(document.querySelectorAll('.news-item').length > 0);
-  assert.equal(document.querySelectorAll('.chart-context').length, 10);
+  assert.equal(document.querySelectorAll('.chart-context').length, 12);
 });
 
 
@@ -194,7 +196,7 @@ test('aba Eye of God funciona isolada sem afetar as demais abas', t => {
   const dom = createApp({ hash: '#eye-of-god', canvasMock: true }); t.after(() => dom.window.close());
   const { document, KeyboardEvent } = dom.window;
 
-  assert.equal(document.querySelectorAll('.tab-btn').length, 12);
+  assert.equal(document.querySelectorAll('.tab-btn').length, 14);
   assert.equal(document.getElementById('btn-eye-of-god').getAttribute('aria-selected'), 'true');
   assert.ok(document.getElementById('tab-eye-of-god').classList.contains('active'));
   assert.equal(document.querySelectorAll('#eog-cctv-grid .eog-cam-cell').length, 6);
@@ -269,9 +271,94 @@ test('aba Eye of God funciona isolada sem afetar as demais abas', t => {
 
   // Não polui os cartões de KPI nem a busca principal
   assert.equal(document.querySelectorAll('#tab-eye-of-god .kpi-card').length, 0);
-  assert.equal(document.querySelectorAll('.tab-content .kpi-card').length, 26);
+  assert.equal(document.querySelectorAll('.tab-content .kpi-card').length, 34);
   document.getElementById('btn-overview').click();
   assert.ok(document.getElementById('tab-overview').classList.contains('active'));
+});
+
+test('aba Municípios & Territórios filtra cartograma, diretório e comparador municipal', t => {
+  const dom = createApp({ hash: '#territorios' }); t.after(() => dom.window.close());
+  const { document, Event } = dom.window;
+
+  assert.equal(document.getElementById('btn-territorios').getAttribute('aria-selected'), 'true');
+  assert.equal(dom.window.PIAUI_TERRITORIES.length, 12);
+  assert.equal(dom.window.PIAUI_TERRITORIES.reduce((s, td) => s + td.municipalitiesCount, 0), 224);
+  assert.equal(document.querySelectorAll('#piauiSchematicSvg .td-region').length, 12);
+  assert.equal(document.querySelectorAll('#munTableBody tr').length, 20);
+
+  // Selecionar território no cartograma (SVGElement usa dispatchEvent em JSDOM)
+  const litoranea = document.querySelector('#piauiSchematicSvg [data-td-id="planicie-litoranea"]');
+  litoranea.dispatchEvent(new Event('click', { bubbles: true }));
+  assert.equal(litoranea.getAttribute('aria-pressed'), 'true');
+  assert.match(document.getElementById('tdDetailName').textContent, /Planície Litorânea/);
+  assert.equal(document.querySelectorAll('#munTableBody tr').length, 2);
+
+  document.getElementById('resetTerritoryFilter').click();
+  assert.equal(document.querySelectorAll('#munTableBody tr').length, 20);
+
+  // Busca e ordenação no diretório
+  const munSearch = document.getElementById('munSearch');
+  munSearch.value = 'soja';
+  munSearch.dispatchEvent(new Event('input'));
+  assert.equal(document.querySelectorAll('#munTableBody tr').length, 1);
+  assert.match(document.getElementById('munTableBody').textContent, /Uruçuí/);
+
+  // Comparador lado a lado e inversão
+  assert.match(document.getElementById('munCompareResult').textContent, /Teresina/);
+  assert.match(document.getElementById('munCompareResult').textContent, /Parnaíba/);
+  document.getElementById('swapCompareMun').click();
+  assert.equal(document.getElementById('compareMunA').value, 'Parnaíba');
+  assert.equal(document.getElementById('compareMunB').value, 'Teresina');
+});
+
+test('simulador exploratório, matriz de auditoria, paleta Ctrl+K e alto contraste funcionam', t => {
+  const dom = createApp({ hash: '#energia' }); t.after(() => dom.window.close());
+  const { document, Event, KeyboardEvent } = dom.window;
+
+  assert.equal(document.getElementById('btn-energia').getAttribute('aria-selected'), 'true');
+  assert.equal(document.getElementById('simScoreTotal').textContent, '65 / 100');
+
+  document.querySelector('[data-sim-preset="verde"]').click();
+  assert.equal(document.getElementById('simRenovavel').value, '95');
+  assert.match(document.getElementById('simDiagnosis').textContent, /energia limpa/);
+
+  const slider = document.getElementById('simHidrica');
+  slider.value = '100';
+  slider.dispatchEvent(new Event('input'));
+  assert.equal(document.getElementById('simHidricaVal').textContent, '100%');
+
+  // Matriz de auditoria na aba Fontes
+  document.getElementById('btn-fontes').click();
+  assert.equal(document.querySelectorAll('#tab-fontes .source-card').length, 8);
+  assert.equal(document.querySelectorAll('#auditTableBody tr').length, 10);
+  document.querySelector('[data-audit-filter="simulacao"]').click();
+  assert.equal(document.querySelectorAll('#auditTableBody tr').length, 1);
+
+  // Alto contraste e limpeza de favoritos
+  const contrast = document.getElementById('toggleContrast');
+  contrast.click();
+  assert.ok(document.body.classList.contains('high-contrast'));
+  assert.equal(dom.window.localStorage.getItem('pi-analytics-contrast-v1'), '1');
+
+  const favBtn = document.querySelector('#tab-overview .favorite-toggle');
+  favBtn.click();
+  assert.equal(document.getElementById('clearFavorites').hidden, false);
+  document.getElementById('clearFavorites').click();
+  assert.equal(document.getElementById('clearFavorites').hidden, true);
+
+  // Paleta de comandos Ctrl+K
+  document.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', ctrlKey: true, bubbles: true }));
+  assert.equal(document.getElementById('cmdPalette').hidden, false);
+  const cmdInput = document.getElementById('cmdPaletteInput');
+  cmdInput.value = 'Picos';
+  cmdInput.dispatchEvent(new Event('input'));
+  assert.match(document.getElementById('cmdPaletteList').textContent, /Picos/);
+  // Primeiro resultado é o território TD 06 (Polo: Picos); segundo é o município Picos
+  cmdInput.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
+  cmdInput.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+  assert.equal(document.getElementById('cmdPalette').hidden, true);
+  assert.equal(document.getElementById('btn-territorios').getAttribute('aria-selected'), 'true');
+  assert.equal(document.getElementById('compareMunA').value, 'Picos');
 });
 
 test('aba Eye of God tolera ausência de contexto 2D do canvas', t => {

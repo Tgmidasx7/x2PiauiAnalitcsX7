@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="x2PiauiAnalitcsX7">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#071510"/>
+      <stop offset="100%" stop-color="#0a121c"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#00ff41"/>
+      <stop offset="100%" stop-color="#00f0ff"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="14" fill="url(#bg)" stroke="url(#accent)" stroke-width="2.5"/>
+  <circle cx="32" cy="32" r="21" fill="none" stroke="#1b4335" stroke-width="1.5" stroke-dasharray="4 3"/>
+  <path d="M18 42V22h9.5c4.2 0 6.8 2.3 6.8 6.1 0 3.9-2.6 6.2-6.8 6.2H23v7.7h-5zm5-11.8h4.1c1.8 0 2.9-.9 2.9-2.5 0-1.5-1.1-2.4-2.9-2.4H23v4.9z" fill="#00ff41"/>
+  <path d="M36 22h13v4.2h-4.2V42h-4.7V26.2H36V22z" fill="#00f0ff"/>
+  <circle cx="49" cy="46" r="3" fill="#00ff41"/>
+</svg>

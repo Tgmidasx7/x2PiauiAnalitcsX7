@@ -14,18 +14,20 @@ Análise do Piauí Integral: painel web que reúne indicadores e análises sobre
 
 | Seção | Conteúdo exibido |
 | --- | --- |
-| Visão Geral | Indicadores resumidos e gráficos de PIB e IDH |
+| Visão Geral | Indicadores resumidos, quadro comparativo multi-escala, atalhos e gráficos de PIB e IDH |
 | Geográfica | Território, relevo, clima, hidrografia e recursos |
 | Demográfica | População estadual e municipal, estimativas e concentração |
+| Municípios & Territórios | Cartograma interativo dos 12 Territórios de Desenvolvimento, diretório de 20 polos e comparador municipal lado a lado |
 | Geopolítica | Papel regional, infraestrutura, desafios e oportunidades |
 | Econômica | PIB, finanças públicas, dívida e investimentos |
+| Energia & Simulador | Matriz elétrica renovável, H₂ verde, logística, Piauí Digital e simulador pedagógico de cenários |
 | Educacional | Indicadores educacionais estaduais e municipais |
 | Desenvolvimento Humano | IDH, componentes e desigualdades |
 | SWOT | Forças, fraquezas, oportunidades e ameaças |
 | Terminal | Notícias em rolagem, feeds e arquivo de notícias locais |
 | SPIA | Catálogo de 30 vídeos públicos e cenários fictícios para Teresina |
 | Eye of God | Simulação tática e visual em Canvas (`#eye-of-god` e `/eyeofgod/`): 6 modos de câmera, radar, grafo, CLI e áudio sintetizado |
-| Fontes & método | Portais institucionais, orientações de leitura e limitações |
+| Fontes & método | 8 portais institucionais, matriz filtrável de rastreabilidade de indicadores e limitações |
 
 Os temas e indicadores acima descrevem o que a interface **apresenta**, não uma validação de sua precisão. O painel se apresenta como um dossiê de 2025 e reúne referências a diferentes anos; não se deve presumir que os valores estejam atualizados.
 
@@ -33,7 +35,7 @@ Os temas e indicadores acima descrevem o que a interface **apresenta**, não uma
 
 A aplicação é um site estático: o navegador abre `index.html`, que contém a estrutura, os dados e parte dos estilos e scripts. Os recursos complementares ficam em `assets/`. As abas são controladas no navegador e os gráficos são desenhados com [Chart.js 4.4.7](https://www.chartjs.org/), incluído localmente no projeto. As fontes visuais são carregadas do Google Fonts. Não há backend, banco de dados ou integração com APIs de indicadores no código atual.
 
-O conteúdo principal aparece imediatamente, sem uma tela de carregamento obrigatória. O relógio usa o fuso `America/Fortaleza`; os indicadores são estáticos e o terminal também tenta consultar feeds de notícias. A busca pesquisa indicadores, detalhes e itens SWOT, e os favoritos são armazenados somente no navegador. O CSV exporta os valores exibidos nos cartões, não uma base oficial. Cada gráfico oferece uma tabela com seus dados, inclusive quando a biblioteca de gráficos não estiver disponível. As abas suportam navegação pelo teclado e links diretos por `#nome-da-aba`.
+O conteúdo principal aparece imediatamente, sem uma tela de carregamento obrigatória. O relógio usa o fuso `America/Fortaleza`; os indicadores são estáticos e o terminal também tenta consultar feeds de notícias. A busca (`/`), a paleta global de comandos (`Ctrl+K` / `⌘K`), o modo de alto contraste e os favoritos funcionam localmente no navegador. As exportações em CSV e JSON reúnem os valores exibidos no painel, não uma base oficial. Cada um dos 12 gráficos oferece uma tabela acessível com seus dados, inclusive quando a biblioteca de gráficos não estiver disponível. As 14 abas suportam navegação pelo teclado e links diretos por `#nome-da-aba`.
 
 ## Executar localmente
 
@@ -75,9 +77,11 @@ Veja [publicação e manutenção](docs/publicacao.md) para o fluxo de atualiza�
 ## Estrutura do repositório
 
 ```text
-index.html                      Página principal, dados e gráficos
+index.html                      Página principal (14 abas), dados, gráficos e paleta Ctrl+K
 eyeofgod/index.html             Rota dedicada para a simulação Eye of God
-assets/                         Recursos de interface (CSS, JavaScript e Chart.js local)
+404.html                        Página de retorno personalizada para rotas inexistentes
+manifest.webmanifest            Metadados de instalação Web App (PWA)
+assets/                         CSS, JavaScript, dados territoriais, notícias, ícone SVG e Chart.js local
 README.md                       Visão geral e instruções de uso
 CONTRIBUTING.md                 Orientações de contribuição
 docs/relatorio-entendimento.md  Análise do funcionamento e do estado do projeto
@@ -85,9 +89,10 @@ docs/arquitetura.md             Arquitetura e limitações
 docs/dados.md                   Orientações para verificar indicadores
 docs/publicacao.md              GitHub Pages e manutenção
 docs/roteiro.md                 Prioridades para evolução
-tests/                          Testes estruturais e de interação
+tests/                          Testes estruturais (Python) e de interação (Node.js/JSDOM)
 package.json / package-lock.json Dependências usadas apenas nos testes
-.github/workflows/checks.yml    Verificações no GitHub Actions
+.github/workflows/checks.yml    Verificações automatizadas no GitHub Actions
+.github/workflows/pages.yml     Workflow opcional de publicação no GitHub Pages
 ```
 
 ## Como contribuir

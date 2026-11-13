@@ -121,6 +121,18 @@ class SiteTests(unittest.TestCase):
             resolved = (eog_path.parent / src).resolve()
             self.assertTrue(resolved.is_file(), f"Script ausente: {src}")
 
+    def test_pwa_and_fallback_assets(self):
+        self.assertTrue((ROOT / "assets" / "icon.svg").is_file(), "Ícone SVG ausente")
+        self.assertTrue((ROOT / "manifest.webmanifest").is_file(), "Web App Manifest ausente")
+        fallback_path = ROOT / "404.html"
+        self.assertTrue(fallback_path.is_file(), "Página 404.html ausente")
+        fallback = PageParser()
+        fallback.feed(fallback_path.read_text(encoding="utf-8"))
+        fallback.close()
+        self.assertTrue(fallback.has_doctype)
+        self.assertEqual(fallback.lang, "pt-BR")
+        self.assertTrue(fallback.viewport)
+
 
 if __name__ == "__main__":
     unittest.main()
