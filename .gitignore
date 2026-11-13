@@ -1,0 +1,7 @@
+# Arquivos locais e artefatos de teste
+.DS_Store
+__pycache__/
+*.py[cod]
+.venv/
+coverage/
+node_modules/

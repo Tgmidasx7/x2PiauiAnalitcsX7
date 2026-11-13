@@ -1,0 +1,12 @@
+{
+  "name": "piaui-teresina-analytics",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Testes da interface estática do Piauí Teresina Analytics",
+  "scripts": {
+    "test": "python3 -m unittest discover -s tests -v && node --test tests/dashboard.test.cjs"
+  },
+  "devDependencies": {
+    "jsdom": "^26.1.0"
+  }
+}
