@@ -1,0 +1,19 @@
+{
+  "name": "x2PiauiAnalitcsX7 — Piauí Teresina Analytics",
+  "short_name": "Piauí Analytics",
+  "description": "Painel interativo de indicadores, territórios, transição energética, notícias e simulações sobre o Piauí e Teresina.",
+  "lang": "pt-BR",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0a0a0f",
+  "theme_color": "#0a0a0f",
+  "icons": [
+    {
+      "src": "assets/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

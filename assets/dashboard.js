@@ -104,6 +104,7 @@
 
   function renderFavorites() {
     const list = $('#favoritesList');
+    const clearBtn = $('#clearFavorites');
     list.replaceChildren();
     cards.forEach(card => {
       const isSaved = favorites.has(card.id);
@@ -112,6 +113,7 @@
       card.button.setAttribute('aria-label', (isSaved ? 'Remover dos favoritos: ' : 'Adicionar aos favoritos: ') + card.label);
     });
     const savedCards = cards.filter(card => favorites.has(card.id));
+    if (clearBtn) clearBtn.hidden = savedCards.length === 0;
     if (!savedCards.length) {
       const empty = document.createElement('span'); empty.className = 'empty-favorites';
       empty.textContent = 'Marque uma estrela nos indicadores para acompanhar aqui.'; list.append(empty);
@@ -160,7 +162,21 @@
     });
   }
 
+  function downloadBlob(content, filename, mime) {
+    const url = URL.createObjectURL(new Blob([content], { type: mime }));
+    const link = document.createElement('a'); link.href = url; link.download = filename;
+    document.body.append(link); link.click(); link.remove(); setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+
+  function flashQuickStatus(message) {
+    const el = $('#quickActionStatus');
+    if (!el) return;
+    el.textContent = message;
+    setTimeout(() => { if (el.textContent === message) el.textContent = ''; }, 3500);
+  }
+
   function setupExport() {
+    const contrastKey = 'pi-analytics-contrast-v1';
     $('#exportCsv').addEventListener('click', () => {
       // Prefixa fórmulas para que valores abertos em planilhas sejam tratados como texto.
       const quote = value => {
@@ -170,10 +186,67 @@
       };
       const rows = [['Seção', 'Indicador', 'Valor exibido', 'Contexto exibido', 'Observação'], ...cards.map(card => [card.tabName, card.label, card.value, card.context, 'Valor estático; fonte e período devem ser conferidos'])];
       const content = '\ufeff' + rows.map(row => row.map(quote).join(';')).join('\r\n');
-      const url = URL.createObjectURL(new Blob([content], { type: 'text/csv;charset=utf-8' }));
-      const link = document.createElement('a'); link.href = url; link.download = 'indicadores-piaui-teresina.csv';
-      document.body.append(link); link.click(); link.remove(); setTimeout(() => URL.revokeObjectURL(url), 1000);
+      downloadBlob(content, 'indicadores-piaui-teresina.csv', 'text/csv;charset=utf-8');
+      flashQuickStatus('CSV exportado.');
     });
+
+    const jsonBtn = $('#exportJson');
+    if (jsonBtn) {
+      jsonBtn.addEventListener('click', () => {
+        const payload = {
+          projeto: 'x2PiauiAnalitcsX7 — Piauí Teresina Analytics',
+          aviso: 'Valores estáticos incorporados ao painel; conferir fontes primárias antes de uso decisório.',
+          exportadoEm: new Date().toISOString(),
+          indicadores: cards.map(card => ({ secao: card.tabName, indicador: card.label, valor: card.value, contexto: card.context })),
+          territorios: (window.PIAUI_TERRITORIES || []).map(({ code, name, polo, municipalitiesCount, biome }) => ({ codigo: code, territorio: name, polo, municipios: municipalitiesCount, bioma: biome })),
+          municipiosReferencia: window.PIAUI_MUNICIPALITIES || []
+        };
+        downloadBlob(JSON.stringify(payload, null, 2), 'indicadores-piaui-teresina.json', 'application/json;charset=utf-8');
+        flashQuickStatus('JSON exportado.');
+      });
+    }
+
+    const copyBtn = $('#copyTabLink');
+    if (copyBtn) {
+      copyBtn.addEventListener('click', async () => {
+        const activeTab = tabs.find(tab => tab.classList.contains('active'))?.dataset.tab || 'overview';
+        const shareUrl = location.href.split('#')[0] + '#' + activeTab;
+        try {
+          if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+            await navigator.clipboard.writeText(shareUrl);
+            flashQuickStatus('Link copiado: #' + activeTab);
+          } else {
+            flashQuickStatus('Aba atual: #' + activeTab);
+          }
+        } catch (_) {
+          flashQuickStatus('Aba atual: #' + activeTab);
+        }
+      });
+    }
+
+    const contrastBtn = $('#toggleContrast');
+    if (contrastBtn) {
+      const applyContrast = enabled => {
+        document.body.classList.toggle('high-contrast', enabled);
+        contrastBtn.setAttribute('aria-pressed', String(enabled));
+      };
+      try { if (localStorage.getItem(contrastKey) === '1') applyContrast(true); } catch (_) {}
+      contrastBtn.addEventListener('click', () => {
+        const next = !document.body.classList.contains('high-contrast');
+        applyContrast(next);
+        try { localStorage.setItem(contrastKey, next ? '1' : '0'); } catch (_) {}
+      });
+    }
+
+    const clearFavBtn = $('#clearFavorites');
+    if (clearFavBtn) {
+      clearFavBtn.addEventListener('click', () => {
+        favorites.clear();
+        writeFavorites();
+        renderFavorites();
+      });
+    }
+
     $('#printPage').addEventListener('click', () => window.print());
   }
 
@@ -385,8 +458,493 @@
     chartConcentracao: ['Percentuais atribuídos à concentração da população em 14 municípios e nos demais. O ano e a lista dos municípios não estão documentados e precisam de revisão.', 'https://www.ibge.gov.br/cidades-e-estados/pi.html'],
     chartFinancas: ['Valores em bilhões de reais. A figura mistura receitas brutas e despesas empenhadas de 2024 com valores correntes de 2025; não é uma série diretamente comparável.', 'https://www.gov.br/tesouronacional/pt-br'],
     chartIDEB: ['Notas atribuídas a Piauí, Brasil e Nordeste nos níveis do ensino básico. Confirme o ano, a rede de ensino e os rótulos do indicador antes de comparar.', 'https://www.gov.br/inep/pt-br/areas-de-atuacao/pesquisas-estatisticas-e-indicadores/ideb'],
-    chartPosicaoEM: ['Posições de 2021 e 2023 conforme o painel; a escala é invertida porque uma posição menor representa colocação melhor. O critério e a rede devem ser confirmados.', 'https://www.gov.br/inep/pt-br/areas-de-atuacao/pesquisas-estatisticas-e-indicadores/ideb']
+    chartPosicaoEM: ['Posições de 2021 e 2023 conforme o painel; a escala é invertida porque uma posição menor representa colocação melhor. O critério e a rede devem ser confirmados.', 'https://www.gov.br/inep/pt-br/areas-de-atuacao/pesquisas-estatisticas-e-indicadores/ideb'],
+    chartMunicipios: ['População residente dos dez municípios mais populosos conforme referência do Censo 2022 no painel. Confira cada município na tabela oficial do IBGE.', 'https://www.ibge.gov.br/cidades-e-estados/pi.html'],
+    chartMatrizEletrica: ['Distribuição percentual indicativa das fontes de geração elétrica no estado. Consulte potência outorgada e geração efetiva na ANEEL e no Balanço Energético.', 'https://www.gov.br/aneel/pt-br']
   };
+
+  let selectTerritoryExternal = null;
+  let focusMunicipalityExternal = null;
+
+  function setupTerritories() {
+    const territories = window.PIAUI_TERRITORIES || [];
+    const municipalities = window.PIAUI_MUNICIPALITIES || [];
+    const svg = $('#piauiSchematicSvg');
+    const pillsWrap = $('#territoryPills');
+    const munBody = $('#munTableBody');
+    if (!territories.length || !municipalities.length || !svg || !munBody) return;
+
+    const svgNS = 'http://www.w3.org/2000/svg';
+    const tdSelect = $('#munTerritorySelect');
+    const biomeSelect = $('#munBiomeSelect');
+    const sortSelect = $('#munSortSelect');
+    const searchInput = $('#munSearch');
+    const resetBtn = $('#resetTerritoryFilter');
+    const selA = $('#compareMunA');
+    const selB = $('#compareMunB');
+    const swapBtn = $('#swapCompareMun');
+    const compareOut = $('#munCompareResult');
+
+    let selectedTerritoryId = '';
+    const regionNodes = new Map();
+    const pillNodes = new Map();
+
+    // Preenche seletores
+    territories.forEach(td => {
+      tdSelect.add(new Option(`${td.code} · ${td.name}`, td.id));
+    });
+    [...new Set(municipalities.map(m => m.biome))].sort((a, b) => a.localeCompare(b, 'pt-BR')).forEach(biome => {
+      biomeSelect.add(new Option(biome, biome));
+    });
+    municipalities.forEach(m => {
+      selA.add(new Option(`${m.name} (${m.territoryName})`, m.name));
+      selB.add(new Option(`${m.name} (${m.territoryName})`, m.name));
+    });
+    selA.value = municipalities[0]?.name || '';
+    selB.value = municipalities[1]?.name || municipalities[0]?.name || '';
+
+    function appendMetaRow(container, label, value) {
+      const row = document.createElement('div'); row.className = 'data-row';
+      const l = document.createElement('span'); l.className = 'data-label'; l.textContent = label;
+      const v = document.createElement('span'); v.className = 'data-value info'; v.textContent = value;
+      row.append(l, v); container.append(row);
+    }
+
+    function renderTerritoryDetail() {
+      const codeEl = $('#tdDetailCode');
+      const nameEl = $('#tdDetailName');
+      const vocEl = $('#tdDetailVocation');
+      const metaEl = $('#tdDetailMeta');
+      metaEl.replaceChildren();
+
+      const td = territories.find(item => item.id === selectedTerritoryId);
+      if (!td) {
+        const totalMun = territories.reduce((sum, item) => sum + item.municipalitiesCount, 0);
+        codeEl.textContent = '// PANORAMA ESTADUAL • 12 TERRITÓRIOS';
+        nameEl.textContent = 'Todos os Territórios do Piauí';
+        vocEl.textContent = 'Selecione qualquer território no mapa esquemático ou nos botões ao lado para examinar seu município-polo, bioma predominante, vocação produtiva, eixos logísticos e desafios estruturais.';
+        appendMetaRow(metaEl, 'Municípios abrangidos', `${totalMun} municípios em 12 TDs`);
+        appendMetaRow(metaEl, 'Biomas e zonas', 'Caatinga, Cerrado, Mata dos Cocais e Zona Costeira');
+        appendMetaRow(metaEl, 'Polos na amostra', `${municipalities.length} municípios de referência catalogados`);
+        appendMetaRow(metaEl, 'Órgão de planejamento', 'SEPLAN-PI / CEPRO');
+        return;
+      }
+
+      codeEl.textContent = `// ${td.code} • POLO: ${td.polo.toUpperCase()}`;
+      nameEl.textContent = td.name;
+      vocEl.textContent = td.vocation;
+      appendMetaRow(metaEl, 'Município-polo', td.polo);
+      appendMetaRow(metaEl, 'Municípios no território', `${td.municipalitiesCount} municípios`);
+      appendMetaRow(metaEl, 'Bioma / Zona dominante', td.biome);
+      appendMetaRow(metaEl, 'Eixos logísticos', td.logistics);
+      appendMetaRow(metaEl, 'Desafio prioritário', td.challenge);
+    }
+
+    function renderDirectory() {
+      const query = normalize(searchInput.value.trim());
+      const biome = biomeSelect.value;
+      const sortBy = sortSelect.value;
+      const filtered = municipalities
+        .filter(m => (!selectedTerritoryId || m.territory === selectedTerritoryId)
+          && (!biome || m.biome === biome)
+          && (!query || normalize(`${m.name} ${m.territoryName} ${m.biome} ${m.profile}`).includes(query)))
+        .slice()
+        .sort((a, b) => {
+          if (sortBy === 'density') return (b.pop2022 / b.areaKm2) - (a.pop2022 / a.areaKm2);
+          if (sortBy === 'area') return b.areaKm2 - a.areaKm2;
+          if (sortBy === 'name') return a.name.localeCompare(b.name, 'pt-BR');
+          return b.pop2022 - a.pop2022;
+        });
+
+      munBody.replaceChildren();
+      $('#munCount').textContent = `${filtered.length} de ${municipalities.length} municípios`;
+
+      if (!filtered.length) {
+        const tr = document.createElement('tr');
+        const td = document.createElement('td');
+        td.colSpan = 7;
+        td.textContent = 'Nenhum município encontrado para os filtros selecionados.';
+        tr.append(td);
+        munBody.append(tr);
+        return;
+      }
+
+      filtered.forEach(m => {
+        const density = (m.pop2022 / m.areaKm2).toFixed(1).replace('.', ',');
+        const tr = document.createElement('tr');
+        const nameTd = document.createElement('td');
+        const pickBtn = document.createElement('button');
+        pickBtn.type = 'button';
+        pickBtn.className = 'text-link';
+        pickBtn.textContent = m.name;
+        pickBtn.title = 'Carregar no comparador municipal';
+        pickBtn.addEventListener('click', () => {
+          if (selA.value !== m.name) selA.value = m.name;
+          renderComparison();
+          compareOut.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        });
+        nameTd.append(pickBtn);
+
+        const cells = [
+          m.territoryName,
+          m.biome,
+          m.pop2022.toLocaleString('pt-BR'),
+          m.areaKm2.toLocaleString('pt-BR'),
+          `${density} hab/km²`,
+          m.profile
+        ];
+        tr.append(nameTd, ...cells.map(val => {
+          const td = document.createElement('td');
+          td.textContent = val;
+          return td;
+        }));
+        munBody.append(tr);
+      });
+    }
+
+    function selectTerritory(id) {
+      selectedTerritoryId = id || '';
+      tdSelect.value = selectedTerritoryId;
+      regionNodes.forEach((group, key) => {
+        const active = key === selectedTerritoryId;
+        group.classList.toggle('active', active);
+        group.setAttribute('aria-pressed', String(active));
+      });
+      pillNodes.forEach((btn, key) => {
+        btn.setAttribute('aria-pressed', String(key === selectedTerritoryId));
+      });
+      renderTerritoryDetail();
+      renderDirectory();
+    }
+
+    // Constrói SVG e pílulas
+    territories.forEach(td => {
+      const g = document.createElementNS(svgNS, 'g');
+      g.setAttribute('class', 'td-region');
+      g.setAttribute('tabindex', '0');
+      g.setAttribute('role', 'button');
+      g.setAttribute('aria-pressed', 'false');
+      g.setAttribute('aria-label', `${td.code} ${td.name}, polo ${td.polo}`);
+      g.dataset.tdId = td.id;
+
+      const poly = document.createElementNS(svgNS, 'polygon');
+      poly.setAttribute('points', td.points);
+      const label = document.createElementNS(svgNS, 'text');
+      label.setAttribute('x', String(td.labelX));
+      label.setAttribute('y', String(td.labelY));
+      label.textContent = td.code.replace(' ', '');
+      g.append(poly, label);
+
+      if (td.capital) {
+        const star = document.createElementNS(svgNS, 'text');
+        star.setAttribute('x', String(td.labelX));
+        star.setAttribute('y', String(td.labelY - 12));
+        star.setAttribute('class', 'td-capital-mark');
+        star.textContent = '★ THE';
+        g.append(star);
+      }
+
+      const toggle = () => selectTerritory(selectedTerritoryId === td.id ? '' : td.id);
+      g.addEventListener('click', toggle);
+      g.addEventListener('keydown', event => {
+        if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); toggle(); }
+      });
+      svg.append(g);
+      regionNodes.set(td.id, g);
+
+      const pill = document.createElement('button');
+      pill.type = 'button';
+      pill.className = 'territory-pill';
+      pill.setAttribute('aria-pressed', 'false');
+      pill.dataset.territoryPill = td.id;
+      pill.textContent = `${td.code} · ${td.name}`;
+      pill.addEventListener('click', toggle);
+      pillsWrap.append(pill);
+      pillNodes.set(td.id, pill);
+    });
+
+    function buildCompareCard(mun, other) {
+      const box = document.createElement('div'); box.className = 'compare-city-box';
+      const h4 = document.createElement('h4'); h4.textContent = mun.name;
+      const sub = document.createElement('small'); sub.textContent = `${mun.territoryName} • ${mun.biome} • ${mun.distCapitalKm === 0 ? 'Capital estadual' : mun.distCapitalKm + ' km de Teresina'}`;
+      box.append(h4, sub);
+
+      const statePop = 3271199;
+      const density = mun.pop2022 / mun.areaKm2;
+      const otherDensity = other.pop2022 / other.areaKm2;
+      const metrics = [
+        { label: 'População (Censo 2022)', text: `${mun.pop2022.toLocaleString('pt-BR')} hab. (${((mun.pop2022 / statePop) * 100).toFixed(1).replace('.', ',')}% PI)`, ratio: mun.pop2022 / Math.max(mun.pop2022, other.pop2022) },
+        { label: 'Área territorial', text: `${mun.areaKm2.toLocaleString('pt-BR')} km²`, ratio: mun.areaKm2 / Math.max(mun.areaKm2, other.areaKm2) },
+        { label: 'Densidade demográfica', text: `${density.toFixed(1).replace('.', ',')} hab/km²`, ratio: density / Math.max(density, otherDensity) }
+      ];
+
+      metrics.forEach(metric => {
+        const wrap = document.createElement('div'); wrap.className = 'compare-metric';
+        const top = document.createElement('div'); top.className = 'compare-metric-top';
+        const s1 = document.createElement('span'); s1.textContent = metric.label;
+        const s2 = document.createElement('span'); s2.textContent = metric.text;
+        top.append(s1, s2);
+        const track = document.createElement('div'); track.className = 'compare-bar-track';
+        const fill = document.createElement('div'); fill.className = 'compare-bar-fill';
+        fill.style.width = `${Math.max(6, Math.round(metric.ratio * 100))}%`;
+        track.append(fill);
+        wrap.append(top, track);
+        box.append(wrap);
+      });
+
+      const prof = document.createElement('p');
+      prof.className = 'news-note';
+      prof.textContent = mun.profile;
+      box.append(prof);
+      return box;
+    }
+
+    function renderComparison() {
+      const munA = municipalities.find(m => m.name === selA.value) || municipalities[0];
+      const munB = municipalities.find(m => m.name === selB.value) || municipalities[1] || municipalities[0];
+      const grid = document.createElement('div'); grid.className = 'compare-vs-grid';
+      grid.append(buildCompareCard(munA, munB), buildCompareCard(munB, munA));
+      compareOut.replaceChildren(grid);
+    }
+
+    tdSelect.addEventListener('change', () => selectTerritory(tdSelect.value));
+    biomeSelect.addEventListener('change', renderDirectory);
+    sortSelect.addEventListener('change', renderDirectory);
+    searchInput.addEventListener('input', renderDirectory);
+    resetBtn.addEventListener('click', () => selectTerritory(''));
+    selA.addEventListener('change', renderComparison);
+    selB.addEventListener('change', renderComparison);
+    swapBtn.addEventListener('click', () => {
+      const tmp = selA.value; selA.value = selB.value; selB.value = tmp;
+      renderComparison();
+    });
+
+    selectTerritoryExternal = id => {
+      selectTab('territorios');
+      selectTerritory(id);
+    };
+    focusMunicipalityExternal = name => {
+      selectTab('territorios');
+      selectTerritory('');
+      searchInput.value = name;
+      renderDirectory();
+      selA.value = name;
+      renderComparison();
+    };
+
+    selectTerritory('');
+    renderComparison();
+  }
+
+  function setupSimulator() {
+    const rEl = $('#simRenovavel'), lEl = $('#simLogistica'), eEl = $('#simEducacao'), hEl = $('#simHidrica');
+    if (!rEl || !lEl || !eEl || !hEl) return;
+
+    const presets = {
+      base: [70, 55, 75, 60],
+      verde: [95, 75, 80, 65],
+      interior: [75, 95, 85, 90],
+      conservador: [40, 35, 50, 45]
+    };
+
+    function evaluate() {
+      const r = Number(rEl.value), l = Number(lEl.value), e = Number(eEl.value), h = Number(hEl.value);
+      $('#simRenovavelVal').textContent = `${r}%`;
+      $('#simLogisticaVal').textContent = `${l}%`;
+      $('#simEducacaoVal').textContent = `${e}%`;
+      $('#simHidricaVal').textContent = `${h}%`;
+
+      const total = Math.round((r + l + e + h) / 4);
+      const interior = Math.round(l * 0.45 + h * 0.25 + r * 0.15 + e * 0.15);
+      const clima = Math.round(h * 0.50 + r * 0.30 + e * 0.20);
+      const produtivo = Math.round(e * 0.40 + r * 0.35 + l * 0.25);
+
+      $('#simScoreTotal').textContent = `${total} / 100`;
+      $('#simBarTotal').style.width = `${total}%`;
+      $('#simScoreInterior').textContent = String(interior);
+      $('#simScoreClima').textContent = String(clima);
+      $('#simScoreProdutivo').textContent = String(produtivo);
+
+      const axes = [
+        { name: 'energia limpa e industrialização verde', val: r },
+        { name: 'logística e conectividade no interior', val: l },
+        { name: 'educação técnica e capital humano', val: e },
+        { name: 'segurança hídrica no semiárido', val: h }
+      ].sort((a, b) => b.val - a.val);
+
+      $('#simDiagnosis').textContent = `Leitura ilustrativa (índice ${total}/100): o maior vetor selecionado é ${axes[0].name} (${axes[0].val}%), enquanto o principal gargalo relativo está em ${axes[3].name} (${axes[3].val}%). O equilíbrio entre infraestrutura interiorana e formação profissional condiciona a desconcentração além de Teresina.`;
+    }
+
+    [rEl, lEl, eEl, hEl].forEach(slider => slider.addEventListener('input', evaluate));
+    $$('[data-sim-preset]').forEach(btn => btn.addEventListener('click', () => {
+      const vals = presets[btn.dataset.simPreset];
+      if (!vals) return;
+      [rEl.value, lEl.value, eEl.value, hEl.value] = vals.map(String);
+      evaluate();
+    }));
+    evaluate();
+  }
+
+  function setupAuditTable() {
+    const catalog = window.PIAUI_AUDIT_CATALOG || [];
+    const body = $('#auditTableBody');
+    if (!catalog.length || !body) return;
+    const buttons = $$('[data-audit-filter]');
+    let activeFilter = 'todos';
+
+    function render() {
+      body.replaceChildren();
+      const rows = catalog.filter(item => activeFilter === 'todos' || item.status === activeFilter);
+      rows.forEach(item => {
+        const tr = document.createElement('tr');
+        const tdInd = document.createElement('td'); tdInd.textContent = item.indicator;
+        const tdPer = document.createElement('td'); tdPer.textContent = item.period;
+        const tdUnit = document.createElement('td'); tdUnit.textContent = item.unit;
+        const tdStatus = document.createElement('td');
+        const badge = document.createElement('span');
+        badge.className = `audit-badge ${item.status}`;
+        badge.textContent = item.statusLabel;
+        tdStatus.append(badge);
+        const tdLink = document.createElement('td');
+        const link = document.createElement('a');
+        link.href = item.url; link.target = '_blank'; link.rel = 'noopener noreferrer';
+        link.textContent = item.source + ' ↗';
+        tdLink.append(link);
+        tr.append(tdInd, tdPer, tdUnit, tdStatus, tdLink);
+        body.append(tr);
+      });
+    }
+
+    buttons.forEach(btn => btn.addEventListener('click', () => {
+      activeFilter = btn.dataset.auditFilter;
+      buttons.forEach(b => b.setAttribute('aria-pressed', String(b === btn)));
+      render();
+    }));
+    render();
+  }
+
+  function setupPalette() {
+    const modal = $('#cmdPalette');
+    const openBtn = $('#openPalette');
+    const closeBtn = $('#closePalette');
+    const input = $('#cmdPaletteInput');
+    const list = $('#cmdPaletteList');
+    if (!modal || !input || !list) return;
+
+    let commands = [];
+    let filtered = [];
+    let activeIdx = 0;
+    let lastFocused = null;
+
+    function buildCommands() {
+      const tabCmds = tabs.map(tab => ({
+        title: `Ir para aba: ${clean(tab.textContent)}`,
+        type: 'ABA',
+        keywords: `${tab.dataset.tab} ${clean(tab.textContent)}`,
+        run: () => selectTab(tab.dataset.tab, true)
+      }));
+      const actionCmds = [
+        { title: 'Exportar indicadores em CSV', type: 'AÇÃO', keywords: 'csv baixar planilha', run: () => $('#exportCsv')?.click() },
+        { title: 'Exportar dados estruturados em JSON', type: 'AÇÃO', keywords: 'json exportar api dados', run: () => $('#exportJson')?.click() },
+        { title: 'Alternar modo de alto contraste', type: 'ACESSIBILIDADE', keywords: 'contraste tema leitura', run: () => $('#toggleContrast')?.click() },
+        { title: 'Imprimir seção atual', type: 'AÇÃO', keywords: 'imprimir pdf relatorio', run: () => window.print() }
+      ];
+      const tdCmds = (window.PIAUI_TERRITORIES || []).map(td => ({
+        title: `${td.code} · Território ${td.name} (Polo: ${td.polo})`,
+        type: 'TERRITÓRIO',
+        keywords: `${td.code} ${td.name} ${td.polo} ${td.biome}`,
+        run: () => { if (selectTerritoryExternal) selectTerritoryExternal(td.id); }
+      }));
+      const munCmds = (window.PIAUI_MUNICIPALITIES || []).map(m => ({
+        title: `Município: ${m.name} — ${m.pop2022.toLocaleString('pt-BR')} hab.`,
+        type: 'MUNICÍPIO',
+        keywords: `${m.name} ${m.territoryName} ${m.biome} ${m.profile}`,
+        run: () => { if (focusMunicipalityExternal) focusMunicipalityExternal(m.name); }
+      }));
+      const cardCmds = cards.map(c => ({
+        title: `${c.label}: ${c.value}`,
+        type: c.tabName,
+        keywords: `${c.label} ${c.value} ${c.context} ${c.tabName}`,
+        run: () => goToCard(c)
+      }));
+      commands = [...tabCmds, ...actionCmds, ...tdCmds, ...munCmds, ...cardCmds];
+    }
+
+    function renderList() {
+      const q = normalize(input.value.trim());
+      const terms = q ? q.split(/\s+/) : [];
+      filtered = commands.filter(cmd => terms.every(t => normalize(`${cmd.title} ${cmd.keywords} ${cmd.type}`).includes(t))).slice(0, 30);
+      activeIdx = 0;
+      list.replaceChildren();
+      if (!filtered.length) {
+        const empty = document.createElement('p');
+        empty.className = 'news-note';
+        empty.style.padding = '.8rem';
+        empty.textContent = 'Nenhum comando ou indicador correspondente.';
+        list.append(empty);
+        return;
+      }
+      filtered.forEach((cmd, idx) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'cmd-palette-item' + (idx === activeIdx ? ' active' : '');
+        btn.setAttribute('role', 'option');
+        btn.setAttribute('aria-selected', String(idx === activeIdx));
+        const span = document.createElement('span'); span.textContent = cmd.title;
+        const small = document.createElement('small'); small.textContent = cmd.type;
+        btn.append(span, small);
+        btn.addEventListener('click', () => { closePalette(); cmd.run(); });
+        list.append(btn);
+      });
+    }
+
+    function updateHighlight() {
+      $$('.cmd-palette-item', list).forEach((el, idx) => {
+        const active = idx === activeIdx;
+        el.classList.toggle('active', active);
+        el.setAttribute('aria-selected', String(active));
+        if (active) el.scrollIntoView({ block: 'nearest' });
+      });
+    }
+
+    function openPalette() {
+      if (!commands.length) buildCommands();
+      lastFocused = document.activeElement;
+      modal.hidden = false;
+      input.value = '';
+      renderList();
+      input.focus();
+    }
+
+    function closePalette() {
+      if (modal.hidden) return;
+      modal.hidden = true;
+      if (lastFocused && typeof lastFocused.focus === 'function') lastFocused.focus();
+    }
+
+    if (openBtn) openBtn.addEventListener('click', openPalette);
+    if (closeBtn) closeBtn.addEventListener('click', closePalette);
+    modal.addEventListener('click', event => { if (event.target === modal) closePalette(); });
+    input.addEventListener('input', renderList);
+    input.addEventListener('keydown', event => {
+      if (event.key === 'ArrowDown' && filtered.length) {
+        event.preventDefault(); activeIdx = (activeIdx + 1) % filtered.length; updateHighlight();
+      } else if (event.key === 'ArrowUp' && filtered.length) {
+        event.preventDefault(); activeIdx = (activeIdx - 1 + filtered.length) % filtered.length; updateHighlight();
+      } else if (event.key === 'Enter' && filtered[activeIdx]) {
+        event.preventDefault(); const chosen = filtered[activeIdx]; closePalette(); chosen.run();
+      }
+    });
+    document.addEventListener('keydown', event => {
+      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') {
+        event.preventDefault();
+        if (modal.hidden) openPalette(); else closePalette();
+      } else if (event.key === 'Escape' && !modal.hidden) {
+        event.preventDefault();
+        closePalette();
+      }
+    });
+  }
 
   function setupClock() {
     const update = () => {
@@ -401,6 +959,6 @@
 
   window.initDashboard = function () {
     if (initialized) return; initialized = true;
-    setupTabs(); readFavorites(); setupCards(); renderFavorites(); setupSearch(); setupExport(); setupCharts(); setupClock(); setupSpia(); setupNews();
+    setupTabs(); readFavorites(); setupCards(); renderFavorites(); setupTerritories(); setupSimulator(); setupAuditTable(); setupSearch(); setupExport(); setupCharts(); setupClock(); setupSpia(); setupNews(); setupPalette();
   };
 })();

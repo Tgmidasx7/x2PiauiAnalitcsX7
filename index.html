@@ -4,8 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Piauí Teresina Analytics | Painel de Indicadores</title>
-<meta name="description" content="Explore indicadores e análises sobre o Piauí e Teresina em um painel temático.">
+<meta name="description" content="Explore indicadores, territórios, municípios, transição energética e análises sobre o Piauí e Teresina em um painel temático interativo.">
 <meta name="theme-color" content="#0a0a0f">
+<link rel="icon" type="image/svg+xml" href="assets/icon.svg">
+<link rel="manifest" href="manifest.webmanifest">
 <script defer src="assets/vendor/chart.umd.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600;700&family=Orbitron:wght@400;500;600;700;800;900&family=Rajdhani:wght@300;400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
@@ -903,6 +905,7 @@ body {
       <div class="nav-title">PIAUÍ TERESINA ANALYTICS</div>
     </div>
     <div class="nav-status">
+      <button type="button" class="nav-cmd-btn" id="openPalette" aria-haspopup="dialog" aria-controls="cmdPalette" title="Abrir paleta de comandos (Ctrl+K)">⌘K Comandos</button>
       <span><span class="status-dot"></span>PAINEL ESTÁTICO</span>
       <span id="navTime" class="nav-hash">00:00:00</span>
       <span class="nav-hash">DADOS A CONFERIR</span>
@@ -950,9 +953,9 @@ body {
           <p id="searchHint">Busque nos indicadores e detalhes por tema, nome ou valor.</p>
           <div id="searchResults" class="search-results" aria-live="polite" hidden></div>
         </div>
-        <div class="quick-actions"><span class="tool-label">AÇÕES RÁPIDAS</span><div class="action-row"><button type="button" class="tool-button" id="exportCsv">↓ Exportar indicadores</button><button type="button" class="tool-button" id="printPage">⎙ Imprimir aba</button></div><p>O CSV reúne os cartões do painel, não uma base oficial.</p></div>
+        <div class="quick-actions"><span class="tool-label">AÇÕES RÁPIDAS</span><div class="action-row"><button type="button" class="tool-button" id="exportCsv">↓ Exportar CSV</button><button type="button" class="tool-button" id="exportJson">↓ Exportar JSON</button><button type="button" class="tool-button" id="copyTabLink">🔗 Copiar link</button><button type="button" class="tool-button" id="toggleContrast" aria-pressed="false">✦ Alto contraste</button><button type="button" class="tool-button" id="printPage">⎙ Imprimir aba</button></div><p>Exportações reúnem os indicadores estáticos do painel, não uma base oficial. <span id="quickActionStatus" class="quick-status" role="status" aria-live="polite"></span></p></div>
       </div>
-      <div class="favorites-panel"><div><span class="tool-label">★ SEUS FAVORITOS</span><p id="favoritesStatus" aria-live="polite">Salvos apenas neste navegador.</p></div><div id="favoritesList" class="favorites-list"><span class="empty-favorites">Marque uma estrela nos indicadores para acompanhar aqui.</span></div></div>
+      <div class="favorites-panel"><div><span class="tool-label">★ SEUS FAVORITOS</span><p id="favoritesStatus" aria-live="polite">Salvos apenas neste navegador.</p><button type="button" class="text-link clear-fav-btn" id="clearFavorites" hidden>Limpar favoritos</button></div><div id="favoritesList" class="favorites-list"><span class="empty-favorites">Marque uma estrela nos indicadores para acompanhar aqui.</span></div></div>
     </section>
     <aside class="data-notice"><span aria-hidden="true">ⓘ</span><div><strong>Transparência dos dados</strong><p>Os valores e análises são estáticos, têm anos de referência diferentes e ainda precisam de verificação individual. Não representam um monitoramento em tempo real. <button type="button" class="text-link" data-open-tab="fontes">Entenda as fontes e limitações →</button></p></div></aside>
 
@@ -961,15 +964,17 @@ body {
       <button type="button" class="tab-btn active" data-tab="overview" id="btn-overview" role="tab" aria-controls="tab-overview" aria-selected="true" tabindex="0">⬡ Visão Geral</button>
       <button type="button" class="tab-btn" data-tab="geo" id="btn-geo" role="tab" aria-controls="tab-geo" aria-selected="false" tabindex="-1">🌍 Geográfica</button>
       <button type="button" class="tab-btn" data-tab="demo" id="btn-demo" role="tab" aria-controls="tab-demo" aria-selected="false" tabindex="-1">👥 Demográfica</button>
+      <button type="button" class="tab-btn" data-tab="territorios" id="btn-territorios" role="tab" aria-controls="tab-territorios" aria-selected="false" tabindex="-1">🗺️ Municípios &amp; Territórios</button>
       <button type="button" class="tab-btn" data-tab="geo-pol" id="btn-geo-pol" role="tab" aria-controls="tab-geo-pol" aria-selected="false" tabindex="-1">🏛️ Geopolítica</button>
       <button type="button" class="tab-btn" data-tab="eco" id="btn-eco" role="tab" aria-controls="tab-eco" aria-selected="false" tabindex="-1">📊 Econômica</button>
+      <button type="button" class="tab-btn" data-tab="energia" id="btn-energia" role="tab" aria-controls="tab-energia" aria-selected="false" tabindex="-1">⚡ Energia &amp; Simulador</button>
       <button type="button" class="tab-btn" data-tab="edu" id="btn-edu" role="tab" aria-controls="tab-edu" aria-selected="false" tabindex="-1">🎓 Educacional</button>
       <button type="button" class="tab-btn" data-tab="idh" id="btn-idh" role="tab" aria-controls="tab-idh" aria-selected="false" tabindex="-1">📈 Desenv. Humano</button>
       <button type="button" class="tab-btn" data-tab="swot" id="btn-swot" role="tab" aria-controls="tab-swot" aria-selected="false" tabindex="-1">⚔️ SWOT</button>
       <button type="button" class="tab-btn" data-tab="spia" id="btn-spia" role="tab" aria-controls="tab-spia" aria-selected="false" tabindex="-1">◉ SPIA Piauí</button>
       <button type="button" class="tab-btn" data-tab="eye-of-god" id="btn-eye-of-god" role="tab" aria-controls="tab-eye-of-god" aria-selected="false" tabindex="-1">👁️ Eye of God</button>
       <button type="button" class="tab-btn" data-tab="terminal" id="btn-terminal" role="tab" aria-controls="tab-terminal" aria-selected="false" tabindex="-1">💻 Terminal</button>
-      <button type="button" class="tab-btn" data-tab="fontes" id="btn-fontes" role="tab" aria-controls="tab-fontes" aria-selected="false" tabindex="-1">◈ Fontes & método</button>
+      <button type="button" class="tab-btn" data-tab="fontes" id="btn-fontes" role="tab" aria-controls="tab-fontes" aria-selected="false" tabindex="-1">◈ Fontes &amp; método</button>
     </div>
 
     <!-- TAB: OVERVIEW -->
@@ -1047,6 +1052,107 @@ body {
           </div>
         </div>
       </div>
+
+      <!-- Atalhos de Exploração Integral -->
+      <section class="overview-shortcuts" aria-labelledby="shortcutsHeading">
+        <div class="sub-block-head">
+          <div>
+            <span class="eyebrow">// NAVEGAÇÃO RÁPIDA</span>
+            <h3 id="shortcutsHeading">Módulos interativos do dossiê</h3>
+          </div>
+          <small>Use <kbd>⌘K</kbd> ou <kbd>Ctrl+K</kbd> para ir a qualquer item</small>
+        </div>
+        <div class="shortcut-grid">
+          <button type="button" class="shortcut-card" data-open-tab="territorios">
+            <span class="shortcut-tag">12 TERRITÓRIOS • 224 MUN.</span>
+            <strong>🗺️ Municípios &amp; Territórios</strong>
+            <span>Mapa esquemático interativo, comparador municipal lado a lado e polos regionais.</span>
+          </button>
+          <button type="button" class="shortcut-card" data-open-tab="energia">
+            <span class="shortcut-tag">MATRIZ LIMPA • CENÁRIOS</span>
+            <strong>⚡ Energia, Digital &amp; Simulador</strong>
+            <span>Eólica, solar, H₂ verde, fibra óptica estadual e simulador pedagógico de cenários.</span>
+          </button>
+          <button type="button" class="shortcut-card" data-open-tab="terminal">
+            <span class="shortcut-tag">RSS + ARQUIVO LOCAL</span>
+            <strong>💻 Terminal de Notícias</strong>
+            <span>Console em rolagem, busca instantânea e atualização de feeds do Piauí.</span>
+          </button>
+          <button type="button" class="shortcut-card" data-open-tab="eye-of-god">
+            <span class="shortcut-tag">CANVAS C4ISR • DEMO</span>
+            <strong>👁️ S.P.I.A. // Eye of God</strong>
+            <span>Simulação visual com 6 modos ópticos, radar orbital, grafo e terminal CLI.</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- Síntese Comparativa -->
+      <section class="overview-comparison" aria-labelledby="comparisonHeading">
+        <div class="sub-block-head">
+          <div>
+            <span class="eyebrow">// SÍNTESE MULTI-ESCALA</span>
+            <h3 id="comparisonHeading">Quadro comparativo: Teresina × Piauí × Referência Nacional</h3>
+          </div>
+          <small>Valores estáticos de referência • conferir metodologia por indicador</small>
+        </div>
+        <div class="table-scroll">
+          <table class="comparison-table">
+            <thead>
+              <tr>
+                <th scope="col">Dimensão</th>
+                <th scope="col">Teresina</th>
+                <th scope="col">Piauí</th>
+                <th scope="col">Referência / Contexto</th>
+                <th scope="col">Portal base</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>População (Censo 2022)</td>
+                <td>866.300 hab.</td>
+                <td>3.271.199 hab.</td>
+                <td>Capital reúne ~26,5% do estado (18º no Brasil)</td>
+                <td>IBGE Censo 2022</td>
+              </tr>
+              <tr>
+                <td>Área &amp; Densidade (2022)</td>
+                <td>1.391 km² (622,66 hab/km²)</td>
+                <td>251.755 km² (12,99 hab/km²)</td>
+                <td>11º maior território estadual do país</td>
+                <td>IBGE Geociências</td>
+              </tr>
+              <tr>
+                <td>PIB per capita (ref. painel)</td>
+                <td>R$ 33.994</td>
+                <td>R$ 24.736</td>
+                <td>Teresina +37% acima da média estadual</td>
+                <td>IBGE / CEPRO-PI</td>
+              </tr>
+              <tr>
+                <td>Ensino Médio (IDEB 2023)</td>
+                <td>Rede pública destaque</td>
+                <td>4,5 (4º no Brasil)</td>
+                <td>1º no Nordeste; 100% escolas estaduais integrais</td>
+                <td>INEP / SEDUC-PI</td>
+              </tr>
+              <tr>
+                <td>Desenvolvimento Humano</td>
+                <td>0,751 (IDHM 2010)</td>
+                <td>0,690 (IDH 2021)</td>
+                <td>Séries com anos/metodologias distintas (conferir)</td>
+                <td>PNUD / Atlas BR</td>
+              </tr>
+              <tr>
+                <td>Matriz Elétrica Renovável</td>
+                <td>Geração distribuída solar</td>
+                <td>~95% eólica/solar</td>
+                <td>Expansão +2.500% (2013–2022) no interior</td>
+                <td>ANEEL / EPE</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
     </div>
 
     <!-- TAB: GEOGRÁFICA -->
@@ -1296,6 +1402,153 @@ body {
           <h3>📊 Distribuição da População por Concentração</h3>
           <div class="chart-wrapper">
             <canvas id="chartConcentracao"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: MUNICÍPIOS & TERRITÓRIOS -->
+    <div class="tab-content" id="tab-territorios" role="tabpanel" aria-labelledby="btn-territorios" tabindex="0">
+      <div class="data-section">
+        <div class="section-header">
+          <div class="section-icon">🗺️</div>
+          <div>
+            <div class="section-title">Municípios &amp; 12 Territórios de Desenvolvimento</div>
+            <div class="section-subtitle">Regionalização estadual (SEPLAN-PI), polos urbanos e comparador municipal</div>
+          </div>
+        </div>
+
+        <div class="data-notice">
+          <span aria-hidden="true">ⓘ</span>
+          <div>
+            <strong>Base territorial e demográfica de referência</strong>
+            <p>O mapa esquemático representa os 12 Territórios de Desenvolvimento do Piauí (divisão de planejamento estadual para os 224 municípios). Os dados dos 20 municípios de referência utilizam contagens e áreas estáticas associadas ao Censo 2022 — confira sempre cada município diretamente no portal IBGE Cidades.</p>
+          </div>
+        </div>
+
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-icon">🏛️</div>
+            <div class="kpi-label">Municípios do Piauí</div>
+            <div class="kpi-value">224</div>
+            <div class="kpi-sub">Distribuídos em 12 territórios</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-icon">🧭</div>
+            <div class="kpi-label">Territórios de Desenv.</div>
+            <div class="kpi-value">12</div>
+            <div class="kpi-sub">Planejamento regional SEPLAN-PI</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-icon">🏘️</div>
+            <div class="kpi-label">Pop. Interior (2022)</div>
+            <div class="kpi-value">2.404.899</div>
+            <div class="kpi-sub">~73,5% fora da capital</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-icon">📍</div>
+            <div class="kpi-label">Polos &gt; 40 mil hab.</div>
+            <div class="kpi-value">11</div>
+            <div class="kpi-sub">Censo 2022 (capital + 10 cidades)</div>
+          </div>
+        </div>
+
+        <!-- Mapa Esquemático + Ficha Territorial -->
+        <section class="territory-explorer" aria-labelledby="territoryMapTitle">
+          <div class="territory-map-card">
+            <div class="sub-block-head">
+              <div>
+                <span class="eyebrow">// CARTOGRAMA ESQUEMÁTICO</span>
+                <h3 id="territoryMapTitle">Mapa interativo dos 12 Territórios</h3>
+              </div>
+              <button type="button" class="tool-button" id="resetTerritoryFilter">Ver todos (12)</button>
+            </div>
+            <p class="territory-hint">Clique em um território no mapa ou nas etiquetas abaixo para inspecionar sua ficha e filtrar os municípios.</p>
+            <div class="territory-svg-wrap" id="territorySvgWrap">
+              <svg id="piauiSchematicSvg" viewBox="0 0 360 460" role="img" aria-label="Cartograma esquemático interativo dos 12 Territórios de Desenvolvimento do Piauí"></svg>
+            </div>
+            <div class="territory-pills" id="territoryPills" role="group" aria-label="Selecionar território de desenvolvimento"></div>
+          </div>
+
+          <div class="territory-detail-card" id="territoryDetailCard" aria-live="polite">
+            <span class="eyebrow" id="tdDetailCode">// PANORAMA ESTADUAL • 12 TERRITÓRIOS</span>
+            <h3 id="tdDetailName">Todos os Territórios do Piauí</h3>
+            <p class="td-summary" id="tdDetailVocation">Selecione qualquer território ao lado para examinar seu município-polo, bioma predominante, vocação produtiva, eixos logísticos e desafios estruturais.</p>
+            <div class="td-meta-rows" id="tdDetailMeta"></div>
+          </div>
+        </section>
+
+        <!-- Comparador Municipal A x B -->
+        <section class="mun-comparator" aria-labelledby="comparatorTitle">
+          <div class="sub-block-head">
+            <div>
+              <span class="eyebrow">// ANÁLISE COMPARATIVA</span>
+              <h3 id="comparatorTitle">Comparador Municipal Lado a Lado</h3>
+            </div>
+            <small>20 municípios-polo e centros sub-regionais</small>
+          </div>
+          <div class="mun-compare-controls">
+            <label for="compareMunA">Município A
+              <select id="compareMunA"></select>
+            </label>
+            <button type="button" class="tool-button" id="swapCompareMun" aria-label="Inverter municípios comparados">⇄ Inverter</button>
+            <label for="compareMunB">Município B
+              <select id="compareMunB"></select>
+            </label>
+          </div>
+          <div class="mun-compare-result" id="munCompareResult" aria-live="polite"></div>
+        </section>
+
+        <!-- Diretório Filtrável de Municípios -->
+        <section class="mun-directory" aria-labelledby="munDirTitle">
+          <div class="sub-block-head">
+            <div>
+              <span class="eyebrow">// DIRETÓRIO DE POLOS REGIONAIS</span>
+              <h3 id="munDirTitle">Municípios de referência por território e bioma</h3>
+            </div>
+            <span class="archive-count" id="munCount">—</span>
+          </div>
+          <div class="mun-filters">
+            <label for="munSearch">Buscar município ou vocação
+              <input type="search" id="munSearch" placeholder="Ex.: Parnaíba, Uruçuí, soja, arqueologia...">
+            </label>
+            <label for="munTerritorySelect">Território
+              <select id="munTerritorySelect"><option value="">Todos os territórios</option></select>
+            </label>
+            <label for="munBiomeSelect">Bioma / Zona
+              <select id="munBiomeSelect"><option value="">Todos os biomas</option></select>
+            </label>
+            <label for="munSortSelect">Ordenar por
+              <select id="munSortSelect">
+                <option value="pop">Maior população (2022)</option>
+                <option value="density">Maior densidade (hab/km²)</option>
+                <option value="area">Maior área (km²)</option>
+                <option value="name">Ordem alfabética (A–Z)</option>
+              </select>
+            </label>
+          </div>
+          <div class="table-scroll">
+            <table class="comparison-table mun-table">
+              <thead>
+                <tr>
+                  <th scope="col">Município</th>
+                  <th scope="col">Território</th>
+                  <th scope="col">Bioma</th>
+                  <th scope="col">Pop. 2022</th>
+                  <th scope="col">Área (km²)</th>
+                  <th scope="col">Densidade</th>
+                  <th scope="col">Perfil econômico</th>
+                </tr>
+              </thead>
+              <tbody id="munTableBody"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <div class="chart-container">
+          <h3>📊 10 Municípios Mais Populosos do Piauí (Censo 2022)</h3>
+          <div class="chart-wrapper">
+            <canvas id="chartMunicipios"></canvas>
           </div>
         </div>
       </div>
@@ -1573,6 +1826,172 @@ body {
             <div class="chart-wrapper">
               <canvas id="chartPIBSetores2"></canvas>
             </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: ENERGIA, DIGITAL & SIMULADOR -->
+    <div class="tab-content" id="tab-energia" role="tabpanel" aria-labelledby="btn-energia" tabindex="0">
+      <div class="data-section">
+        <div class="section-header">
+          <div class="section-icon">⚡</div>
+          <div>
+            <div class="section-title">Transição Energética, Piauí Digital &amp; Simulador</div>
+            <div class="section-subtitle">Matriz limpa, hidrogênio verde, infraestrutura logística, conectividade e cenários</div>
+          </div>
+        </div>
+
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-icon">🌬️</div>
+            <div class="kpi-label">Geração Renovável (PI)</div>
+            <div class="kpi-value">~95%</div>
+            <div class="kpi-sub">Eólica, solar e hídrica</div>
+            <div class="kpi-change up">▲ Destaque nacional</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-icon">☀️</div>
+            <div class="kpi-label">Expansão Elétrica</div>
+            <div class="kpi-value">+2.500%</div>
+            <div class="kpi-sub">Capacidade 2013–2022</div>
+            <div class="kpi-change up">▲ Interior semiárido e sul</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-icon">🌐</div>
+            <div class="kpi-label">Malha Óptica Estadual</div>
+            <div class="kpi-value">224 mun.</div>
+            <div class="kpi-sub">Escopo Piauí Conectado</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-icon">🌾</div>
+            <div class="kpi-label">Fronteira Matopiba</div>
+            <div class="kpi-value">Cerrado</div>
+            <div class="kpi-sub">Uruçuí, Bom Jesus e Gurguéia</div>
+          </div>
+        </div>
+
+        <div class="detail-grid">
+          <div class="detail-card">
+            <h3>Polos Eólicos, Solares e H₂ Verde</h3>
+            <div class="data-row">
+              <span class="data-label">Eólica (Sudeste/Litoral)</span>
+              <span class="data-value" style="color:var(--green);">Lagoa dos Ventos, Araripe, Parnaíba</span>
+            </div>
+            <div class="data-row">
+              <span class="data-label">Solar Fotovoltaica</span>
+              <span class="data-value info">São Gonçalo do Gurguéia, Ribeiro Gonçalves</span>
+            </div>
+            <div class="data-row">
+              <span class="data-label">Hidrelétrica Base</span>
+              <span class="data-value">UHE Boa Esperança (Guadalupe)</span>
+            </div>
+            <div class="data-row">
+              <span class="data-label">Hidrogênio Verde</span>
+              <span class="data-value info">ZPE Parnaíba (projetos anunciados)</span>
+            </div>
+          </div>
+
+          <div class="detail-card">
+            <h3>Logística e Integração Produtiva</h3>
+            <div class="data-row">
+              <span class="data-label">Porto Piauí</span>
+              <span class="data-value info">Luís Correia (implantação em etapas)</span>
+            </div>
+            <div class="data-row">
+              <span class="data-label">Ferrovia</span>
+              <span class="data-value">Transnordestina e FTL (Teresina–São Luís)</span>
+            </div>
+            <div class="data-row">
+              <span class="data-label">Eixos Rodoviários</span>
+              <span class="data-value">BR-343, BR-316, BR-135, Transcerrados</span>
+            </div>
+            <div class="data-row">
+              <span class="data-label">Aeroportos Regionais</span>
+              <span class="data-value">Teresina, Parnaíba e S. R. Nonato</span>
+            </div>
+          </div>
+
+          <div class="detail-card">
+            <h3>Transformação Digital &amp; Inovação</h3>
+            <div class="data-row">
+              <span class="data-label">Serviços Públicos</span>
+              <span class="data-value" style="color:var(--green);">Plataforma Gov.pi Cidadão</span>
+            </div>
+            <div class="data-row">
+              <span class="data-label">Telessaúde</span>
+              <span class="data-value info">Piauí Saúde Digital nos municípios</span>
+            </div>
+            <div class="data-row">
+              <span class="data-label">Infraestrutura PPP</span>
+              <span class="data-value">Fibra óptica Piauí Conectado</span>
+            </div>
+            <div class="data-row">
+              <span class="data-label">Educação Tecnológica</span>
+              <span class="data-value" style="color:var(--green);">Ensino técnico, programação e IA</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Simulador Exploratório de Cenários -->
+        <section class="scenario-simulator" id="scenarioSimulator" aria-labelledby="simTitle">
+          <div class="lab-heading">
+            <div>
+              <span class="eyebrow">// LABORATÓRIO PEDAGÓGICO DE POLÍTICAS PÚBLICAS</span>
+              <h3 id="simTitle">Simulador Exploratório de Vetores Estratégicos</h3>
+              <p>Ajuste o peso relativo de quatro frentes estruturantes para observar, de forma puramente ilustrativa, o equilíbrio entre dinamismo econômico, interiorização e resiliência climática.</p>
+            </div>
+            <span class="demo-badge">MODELO PEDAGÓGICO • NÃO OFICIAL</span>
+          </div>
+
+          <div class="sim-presets" role="group" aria-label="Cenários predefinidos">
+            <button type="button" class="tool-button" data-sim-preset="base">Cenário equilibrado</button>
+            <button type="button" class="tool-button" data-sim-preset="verde">Aceleração H₂ Verde</button>
+            <button type="button" class="tool-button" data-sim-preset="interior">Interiorização máxima</button>
+            <button type="button" class="tool-button" data-sim-preset="conservador">Restrição fiscal</button>
+          </div>
+
+          <div class="sim-grid">
+            <div class="sim-controls">
+              <div class="sim-slider-row">
+                <label for="simRenovavel"><span>🌬️ Energia Limpa &amp; Industrialização Verde</span><output id="simRenovavelVal" for="simRenovavel">70%</output></label>
+                <input type="range" id="simRenovavel" min="0" max="100" value="70">
+              </div>
+              <div class="sim-slider-row">
+                <label for="simLogistica"><span>🛤️ Logística, Portos &amp; Conectividade Interior</span><output id="simLogisticaVal" for="simLogistica">55%</output></label>
+                <input type="range" id="simLogistica" min="0" max="100" value="55">
+              </div>
+              <div class="sim-slider-row">
+                <label for="simEducacao"><span>🎓 Educação Integral, Técnica &amp; Inovação</span><output id="simEducacaoVal" for="simEducacao">75%</output></label>
+                <input type="range" id="simEducacao" min="0" max="100" value="75">
+              </div>
+              <div class="sim-slider-row">
+                <label for="simHidrica"><span>💧 Segurança Hídrica &amp; Convivência com Semiárido</span><output id="simHidricaVal" for="simHidrica">60%</output></label>
+                <input type="range" id="simHidrica" min="0" max="100" value="60">
+              </div>
+            </div>
+
+            <div class="sim-results" aria-live="polite">
+              <div class="sim-score-card">
+                <span>ÍNDICE SINTÉTICO ILUSTRATIVO</span>
+                <strong id="simScoreTotal">66 / 100</strong>
+                <div class="sim-bar"><div id="simBarTotal" style="width:66%"></div></div>
+              </div>
+              <div class="sim-subscores">
+                <div><span>Desconcentração Territorial</span><b id="simScoreInterior">61</b></div>
+                <div><span>Resiliência Climática</span><b id="simScoreClima">65</b></div>
+                <div><span>Produtividade &amp; Capital Humano</span><b id="simScoreProdutivo">71</b></div>
+              </div>
+              <div class="lab-output" id="simDiagnosis">Carregando leitura ilustrativa do cenário...</div>
+            </div>
+          </div>
+          <p class="lab-disclaimer">Aviso metodológico: os índices acima são calculados por ponderação linear simples para reflexão temática. Não constituem projeção econométrica nem estimativa oficial de PIB, emprego ou arrecadação.</p>
+        </section>
+
+        <div class="chart-container">
+          <h3>⚡ Perfil Indicativo da Matriz Elétrica Piauiense (%)</h3>
+          <div class="chart-wrapper">
+            <canvas id="chartMatrizEletrica"></canvas>
           </div>
         </div>
       </div>
@@ -1883,7 +2302,7 @@ body {
           <div class="news-terminal cmd-output" id="terminalBox" role="log" aria-label="Histórico de notícias" aria-live="off" tabindex="0"><span class="news-prompt">piaui@noticias:~$</span> Preparando notícias...</div>
           <div class="cmd-status" id="newsStatus" role="status">Curadoria local carregada. Aguardando atualização.</div>
           <div class="news-controls" aria-label="Controles do terminal"><button type="button" id="newsPrev" aria-label="Notícia anterior">← Anterior</button><button type="button" id="newsPause" aria-pressed="false">Ⅱ Pausar</button><button type="button" id="newsNext">Próxima →</button><button type="button" id="newsRefresh">↻ Atualizar agora</button><button type="button" id="newsClear">Limpar histórico</button></div>
-          <p class="news-note">Tentativa automática a cada 5 minutos enquanto a página estiver aberta, usando os feeds do g1 Piauí e Governo do Piauí via serviço externo RSS2JSON. Em caso de falha, a curadoria local de 30/10/2026 continua disponível. Notícias podem sofrer alterações nas fontes.</p>
+          <p class="news-note">Tentativa automática a cada 5 minutos enquanto a página estiver aberta, usando os feeds do g1 Piauí e Governo do Piauí via serviço externo RSS2JSON. Em caso de falha, a curadoria local atualizada em 13/11/2026 continua disponível. Notícias podem sofrer alterações nas fontes.</p>
         </div>
         <div class="news-archive"><div class="archive-header"><div><span class="eyebrow">// PIAUÍ & TERESINA</span><h3>Arquivo de notícias</h3><p>Publicações dos últimos 12 meses disponíveis nesta seleção.</p></div><span class="archive-count" id="archiveCount">—</span></div>
           <div class="archive-filters"><label>Buscar notícia<input id="newsSearch" type="search" placeholder="Ex.: Teresina, saúde, educação"></label><label>Assunto<select id="newsCategory"><option value="">Todos os assuntos</option></select></label></div>
@@ -2163,7 +2582,40 @@ body {
           <a class="source-card" href="https://www.gov.br/tesouronacional/pt-br" target="_blank" rel="noopener noreferrer"><span>04 / CONTAS PÚBLICAS</span><h3>Tesouro Nacional ↗</h3><p>Dados e relatórios sobre finanças públicas.</p></a>
           <a class="source-card" href="https://www.undp.org/pt/brazil" target="_blank" rel="noopener noreferrer"><span>05 / DESENVOLVIMENTO</span><h3>PNUD Brasil ↗</h3><p>Estudos e iniciativas de desenvolvimento humano.</p></a>
           <a class="source-card" href="https://www.seduc.pi.gov.br/" target="_blank" rel="noopener noreferrer"><span>06 / REDE ESTADUAL</span><h3>SEDUC-PI ↗</h3><p>Informações sobre a educação no Piauí.</p></a>
+          <a class="source-card" href="https://www.gov.br/aneel/pt-br" target="_blank" rel="noopener noreferrer"><span>07 / MATRIZ ELÉTRICA</span><h3>ANEEL &amp; EPE ↗</h3><p>Capacidade outorgada e geração eólica, solar e hídrica.</p></a>
+          <a class="source-card" href="https://www.seplan.pi.gov.br/" target="_blank" rel="noopener noreferrer"><span>08 / REGIONALIZAÇÃO</span><h3>SEPLAN / CEPRO-PI ↗</h3><p>Territórios de desenvolvimento, planejamento e estudos estaduais.</p></a>
         </div>
+
+        <section class="audit-matrix" id="auditSection" aria-labelledby="auditHeading">
+          <div class="sub-block-head">
+            <div>
+              <span class="eyebrow">// RASTREABILIDADE POR FAMÍLIA DE INDICADORES</span>
+              <h3 id="auditHeading">Catálogo de verificação e situação metodológica</h3>
+            </div>
+            <div class="spia-filters" role="group" aria-label="Filtrar indicadores por situação">
+              <button type="button" data-audit-filter="todos" aria-pressed="true">Todos</button>
+              <button type="button" data-audit-filter="oficial" aria-pressed="false">Base oficial</button>
+              <button type="button" data-audit-filter="estatico" aria-pressed="false">Painel estático</button>
+              <button type="button" data-audit-filter="estimativa" aria-pressed="false">Estimativas</button>
+              <button type="button" data-audit-filter="simulacao" aria-pressed="false">Simulação</button>
+            </div>
+          </div>
+          <div class="table-scroll">
+            <table class="comparison-table audit-table">
+              <thead>
+                <tr>
+                  <th scope="col">Família de indicadores</th>
+                  <th scope="col">Período ref.</th>
+                  <th scope="col">Unidade</th>
+                  <th scope="col">Situação no painel</th>
+                  <th scope="col">Portal de conferência</th>
+                </tr>
+              </thead>
+              <tbody id="auditTableBody"></tbody>
+            </table>
+          </div>
+        </section>
+
         <div class="method-grid"><div class="detail-card"><h3>Como interpretar</h3><p>Confira o ano, a unidade e a área geográfica antes de comparar. Estimativas, dados municipais e estaduais podem usar metodologias diferentes.</p></div><div class="detail-card"><h3>Limitações conhecidas</h3><p>Não há coleta automática nem auditoria comprovada. Alguns títulos, séries e conclusões precisam de validação em suas fontes primárias.</p></div><div class="detail-card"><h3>Próxima etapa</h3><p>Associar cada indicador à tabela ou relatório de origem, documentar a metodologia e revisar os valores antes de qualquer uso decisório.</p></div></div>
       </div>
     </div>
@@ -2173,9 +2625,29 @@ body {
       <p style="color: var(--green); font-family: var(--font-display); font-size: 0.8rem; margin-bottom: 8px;">PIAUÍ TERESINA ANALYTICS</p>
       <p>DOSSIÊ TEMÁTICO • PIAUÍ & TERESINA</p>
       <p>Conteúdo estático • Indicadores sujeitos a verificação</p>
-      <p><button type="button" class="text-link" data-open-tab="fontes">Fontes e metodologia</button> · <a href="https://github.com/Tgmidasx7/x2PiauiAnalitcsX7" target="_blank" rel="noopener noreferrer">Repositório no GitHub ↗</a></p>
+      <p><button type="button" class="text-link" data-open-tab="fontes">Fontes e metodologia</button> · <a href="https://tgmidasx7.github.io/x2PiauiAnalitcsX7/" target="_blank" rel="noopener noreferrer">Site público ↗</a> · <a href="eyeofgod/">Eye of God ↗</a> · <a href="https://github.com/Tgmidasx7/x2PiauiAnalitcsX7" target="_blank" rel="noopener noreferrer">Repositório no GitHub ↗</a></p>
     </footer>
   </main>
+</div>
+
+<!-- PALETA DE COMANDOS GLOBAL (Ctrl+K / Cmd+K) -->
+<div class="cmd-palette-backdrop" id="cmdPalette" role="dialog" aria-modal="true" aria-labelledby="cmdPaletteTitle" hidden>
+  <div class="cmd-palette-box">
+    <div class="cmd-palette-head">
+      <span id="cmdPaletteTitle" class="eyebrow">// PALETA DE COMANDOS • NAVEGAÇÃO RÁPIDA</span>
+      <button type="button" class="cmd-palette-close" id="closePalette" aria-label="Fechar paleta de comandos">ESC ✕</button>
+    </div>
+    <div class="cmd-palette-search">
+      <span aria-hidden="true">⌕</span>
+      <input type="search" id="cmdPaletteInput" autocomplete="off" placeholder="Ir para aba, município, território, indicador ou ação...">
+    </div>
+    <div class="cmd-palette-list" id="cmdPaletteList" role="listbox" aria-label="Resultados da paleta de comandos"></div>
+    <div class="cmd-palette-foot">
+      <span><kbd>↑</kbd> <kbd>↓</kbd> navegar</span>
+      <span><kbd>Enter</kbd> executar</span>
+      <span><kbd>Esc</kbd> fechar</span>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -2592,10 +3064,78 @@ function initCharts() {
       }
     }
   });
+
+  // BAR: 10 Municípios Mais Populosos (Censo 2022)
+  createChart(document.getElementById('chartMunicipios'), {
+    type: 'bar',
+    data: {
+      labels: ['Teresina', 'Parnaíba', 'Picos', 'Piripiri', 'Floriano', 'Barras', 'Altos', 'União', 'Campo Maior', 'José de Freitas'],
+      datasets: [{
+        label: 'População (Censo 2022)',
+        data: [866300, 162159, 83090, 65538, 62036, 47938, 47453, 46119, 45793, 42559],
+        backgroundColor: 'rgba(0,240,255,0.6)',
+        borderColor: '#00f0ff',
+        borderWidth: 1,
+        borderRadius: 4
+      }]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        x: { grid: { color: 'rgba(255,255,255,0.05)' } },
+        y: { grid: { color: 'rgba(255,255,255,0.05)' } }
+      },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: '#111820',
+          borderColor: '#1a3a2a',
+          borderWidth: 1,
+          titleColor: '#00f0ff',
+          bodyColor: '#e0e0e0',
+          callbacks: { label: ctx => ctx.parsed.x.toLocaleString('pt-BR') + ' hab.' }
+        }
+      }
+    }
+  });
+
+  // DOUGHNUT: Matriz Elétrica Piauiense (Indicativa)
+  createChart(document.getElementById('chartMatrizEletrica'), {
+    type: 'doughnut',
+    data: {
+      labels: ['Eólica', 'Solar Fotovoltaica', 'Hidrelétrica', 'Termelétrica / Outras'],
+      datasets: [{
+        label: 'Participação indicativa (%)',
+        data: [58, 31, 6, 5],
+        backgroundColor: ['#00ff41', '#ffd700', '#00f0ff', '#ff8c00'],
+        borderColor: '#111820',
+        borderWidth: 2,
+        hoverOffset: 8
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'right', labels: { padding: 12, usePointStyle: true } },
+        tooltip: {
+          backgroundColor: '#111820',
+          borderColor: '#1a3a2a',
+          borderWidth: 1,
+          titleColor: '#00ff41',
+          bodyColor: '#e0e0e0',
+          callbacks: { label: ctx => ctx.label + ': ' + ctx.parsed + '%' }
+        }
+      }
+    }
+  });
 }
 </script>
 <script src="assets/news.js"></script>
 <script src="assets/cameras.js"></script>
+<script src="assets/territories.js"></script>
 <script src="assets/dashboard.js"></script>
 <script src="assets/eye-of-god.js"></script>
 </body>
