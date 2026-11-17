@@ -121,9 +121,29 @@ class SiteTests(unittest.TestCase):
             resolved = (eog_path.parent / src).resolve()
             self.assertTrue(resolved.is_file(), f"Script ausente: {src}")
 
+    def test_ultron_standalone_page(self):
+        ult_path = ROOT / "ultron" / "index.html"
+        self.assertTrue(ult_path.is_file(), "Página /ultron/index.html ausente")
+        ult = PageParser()
+        ult.feed(ult_path.read_text(encoding="utf-8"))
+        ult.close()
+        self.assertTrue(ult.has_doctype)
+        self.assertEqual(ult.lang, "pt-BR")
+        self.assertTrue(ult.viewport)
+        duplicates = [key for key, count in collections.Counter(ult.ids).items() if count > 1]
+        self.assertEqual(duplicates, [])
+        for src in ult.script_sources:
+            self.assertFalse(src.startswith(("http:", "https:")), f"Script externo: {src}")
+            resolved = (ult_path.parent / src).resolve()
+            self.assertTrue(resolved.is_file(), f"Script ausente: {src}")
+
     def test_pwa_and_fallback_assets(self):
         self.assertTrue((ROOT / "assets" / "icon.svg").is_file(), "Ícone SVG ausente")
         self.assertTrue((ROOT / "manifest.webmanifest").is_file(), "Web App Manifest ausente")
+        self.assertTrue((ROOT / "sw.js").is_file(), "Service Worker sw.js ausente")
+        for js_file in [ROOT / "sw.js", ROOT / "assets" / "ultron.js", ROOT / "assets" / "dashboard.js", ROOT / "assets" / "eye-of-god.js"]:
+            res = subprocess.run(["node", "--check", str(js_file)], capture_output=True, text=True, check=False)
+            self.assertEqual(res.returncode, 0, res.stderr)
         fallback_path = ROOT / "404.html"
         self.assertTrue(fallback_path.is_file(), "Página 404.html ausente")
         fallback = PageParser()

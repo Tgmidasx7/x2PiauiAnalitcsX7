@@ -1,8 +1,9 @@
 # x2PiauiAnalitcsX7 — Piauí Teresina Analytics
 
-Análise do Piauí Integral: painel web que reúne indicadores e análises sobre o estado do Piauí e sua capital, Teresina. A proposta é facilitar a consulta de informações territoriais, sociais e econômicas em uma interface visual com gráficos, seções temáticas, terminal de notícias e módulos demonstrativos (`SPIA` e `Eye of God`).
+Análise do Piauí Integral: painel web que reúne indicadores e análises sobre o estado do Piauí e sua capital, Teresina. A proposta é facilitar a consulta de informações territoriais, sociais e econômicas em uma interface visual com 15 abas temáticas, gráficos interativos, terminal de notícias, módulos demonstrativos (`SPIA` e `Eye of God`) e o motor estratégico multi-agente **ULTRON // X7-OMEGA** (geodésia Haversine, simulação estocástica Monte Carlo 2025–2035, Co-Piloto flutuante e conector oficial da API do IBGE).
 
 **Site público (GitHub Pages):** [tgmidasx7.github.io/x2PiauiAnalitcsX7/](https://tgmidasx7.github.io/x2PiauiAnalitcsX7/)  
+**Cockpit Autônomo Ultron IA:** [tgmidasx7.github.io/x2PiauiAnalitcsX7/ultron/](https://tgmidasx7.github.io/x2PiauiAnalitcsX7/ultron/)  
 **Rota dedicada Eye of God:** [tgmidasx7.github.io/x2PiauiAnalitcsX7/eyeofgod/](https://tgmidasx7.github.io/x2PiauiAnalitcsX7/eyeofgod/)  
 **Repositório oficial:** [github.com/Tgmidasx7/x2PiauiAnalitcsX7](https://github.com/Tgmidasx7/x2PiauiAnalitcsX7)  
 **Projetos relacionados:** [APP-PIAUI-THE](https://tgmidasx7.github.io/APP-PIAUI-THE/) · [SPIA-PIAUIANALITCS](https://tgmidasx7.github.io/SPIA-PIAUIANALITCS/)
@@ -26,17 +27,18 @@ Análise do Piauí Integral: painel web que reúne indicadores e análises sobre
 | Desenvolvimento Humano | IDH, componentes e desigualdades | [`#idh`](https://tgmidasx7.github.io/x2PiauiAnalitcsX7/#idh) |
 | SWOT | Forças, fraquezas, oportunidades e ameaças | [`#swot`](https://tgmidasx7.github.io/x2PiauiAnalitcsX7/#swot) |
 | SPIA | Catálogo de 30 vídeos públicos e cenários fictícios para Teresina | [`#spia`](https://tgmidasx7.github.io/x2PiauiAnalitcsX7/#spia) |
-| Eye of God | Simulação tática e visual em Canvas: 6 modos de câmera, radar, grafo, CLI e áudio sintetizado | [`#eye-of-god`](https://tgmidasx7.github.io/x2PiauiAnalitcsX7/#eye-of-god) · [`/eyeofgod/`](https://tgmidasx7.github.io/x2PiauiAnalitcsX7/eyeofgod/) |
+| Eye of God | Simulação tática e visual em Canvas: 6 modos de câmera, radar, grafo, CLI (com ponte `ultron`) e áudio sintetizado | [`#eye-of-god`](https://tgmidasx7.github.io/x2PiauiAnalitcsX7/#eye-of-god) · [`/eyeofgod/`](https://tgmidasx7.github.io/x2PiauiAnalitcsX7/eyeofgod/) |
+| Ultron IA | Orquestrador multi-agente determinístico (6 sub-agentes), malha geodésica Haversine, simulação Monte Carlo (500 trajetórias, 2025–2035), auditoria opcional na API oficial do IBGE (224 municípios + SIDRA Censo 2022) e exportador de dossiê Markdown | [`#ultron`](https://tgmidasx7.github.io/x2PiauiAnalitcsX7/#ultron) · [`/ultron/`](https://tgmidasx7.github.io/x2PiauiAnalitcsX7/ultron/) |
 | Terminal | Notícias em rolagem, feeds e arquivo de notícias locais (atualizado em 13/11/2026) | [`#terminal`](https://tgmidasx7.github.io/x2PiauiAnalitcsX7/#terminal) |
 | Fontes & método | 8 portais institucionais, matriz filtrável de rastreabilidade de indicadores e limitações | [`#fontes`](https://tgmidasx7.github.io/x2PiauiAnalitcsX7/#fontes) |
 
-Os temas e indicadores acima descrevem o que a interface **apresenta**, não uma validação de sua precisão. O painel se apresenta como um dossiê de 2025 e reúne referências a diferentes anos; não se deve presumir que os valores estejam atualizados.
+Os temas e indicadores acima descrevem o que a interface **apresenta**, não uma validação de sua precisão. O painel se apresenta como um dossiê de 2025 e reúne referências a diferentes anos; não se deve presumir que os valores estáticos estejam atualizados, exceto quando sincronizada sob demanda a malha oficial pública do IBGE no módulo Ultron.
 
 ## Como funciona
 
-A aplicação é um site estático: o navegador abre `index.html`, que contém a estrutura, os dados e parte dos estilos e scripts. Os recursos complementares ficam em `assets/`. As abas são controladas no navegador e os gráficos são desenhados com [Chart.js 4.4.7](https://www.chartjs.org/), incluído localmente no projeto. As fontes visuais são carregadas do Google Fonts. Não há backend, banco de dados ou integração com APIs de indicadores no código atual.
+A aplicação é um site estático executado integralmente no navegador: `index.html` contém a estrutura principal e parte dos estilos e scripts, enquanto `assets/` concentra os módulos JavaScript, CSS, bases territoriais e o motor **Ultron-X7**. As abas são controladas no cliente e os gráficos são desenhados com [Chart.js 4.4.7](https://www.chartjs.org/), incluído localmente no projeto, além de visualizações vetoriais e estocásticas em HTML5 Canvas. Um Service Worker (`sw.js`) provê cache offline para os recursos principais quando servido em HTTPS ou `localhost`.
 
-O conteúdo principal aparece imediatamente, sem uma tela de carregamento obrigatória. O relógio usa o fuso `America/Fortaleza`; os indicadores são estáticos e o terminal também tenta consultar feeds de notícias. A busca (`/`), a paleta global de comandos (`Ctrl+K` / `⌘K`), o modo de alto contraste e os favoritos funcionam localmente no navegador. As exportações em CSV e JSON reúnem os valores exibidos no painel, não uma base oficial. Cada um dos 12 gráficos oferece uma tabela acessível com seus dados, inclusive quando a biblioteca de gráficos não estiver disponível. As 14 abas suportam navegação pelo teclado e links diretos por `#nome-da-aba`.
+O conteúdo principal aparece imediatamente, sem tela de carregamento obrigatória. O relógio usa o fuso `America/Fortaleza`. A busca (`/`), a paleta global de comandos (`Ctrl+K` / `⌘K`), o Co-Piloto flutuante Ultron (`Alt+U`), o modo de alto contraste e os favoritos funcionam localmente no navegador. As exportações em CSV, JSON e Dossiê Executivo Markdown (`.md`) reúnem os valores e simulações exibidos no painel. Cada um dos 12 gráficos do Chart.js e o simulador Monte Carlo oferecem tabelas acessíveis com seus dados. As 15 abas suportam navegação pelo teclado e links diretos por `#nome-da-aba`.
 
 ## Executar localmente
 
@@ -78,11 +80,13 @@ Veja [publicação e manutenção](docs/publicacao.md) para o fluxo de atualiza�
 ## Estrutura do repositório
 
 ```text
-index.html                      Página principal (14 abas), dados, gráficos e paleta Ctrl+K
-eyeofgod/index.html             Rota dedicada para a simulação Eye of God
+index.html                      Página principal (15 abas), gráficos, Co-Piloto Ultron e paleta Ctrl+K
+ultron/index.html               Rota dedicada em tela cheia para o Agente Autônomo Ultron-X7
+eyeofgod/index.html             Rota dedicada para a simulação tática Eye of God
 404.html                        Página de retorno personalizada para rotas inexistentes
-manifest.webmanifest            Metadados de instalação Web App (PWA)
-assets/                         CSS, JavaScript, dados territoriais, notícias, ícone SVG e Chart.js local
+manifest.webmanifest            Metadados e atalhos de instalação Web App (PWA)
+sw.js                           Service Worker offline-first para cache local de recursos
+assets/                         CSS, JavaScript (dashboard, ultron, eye-of-god), bases territoriais, notícias e Chart.js
 README.md                       Visão geral e instruções de uso
 CONTRIBUTING.md                 Orientações de contribuição
 docs/relatorio-entendimento.md  Análise do funcionamento e do estado do projeto

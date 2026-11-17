@@ -23,7 +23,7 @@ Separe claramente indicadores estaduais e municipais, assim como séries com ano
 4. Atualizar conteúdo, períodos e ressalvas na interface em mudança revisada separadamente.
 5. Definir uma periodicidade de revisão compatível com cada fonte; não prometer atualização em tempo real sem uma integração real.
 
-Este documento é um guia de verificação, não um atestado da precisão do conteúdo atual. Nenhuma fonte ou indicador foi auditado nesta etapa.
+Este documento é um guia de verificação, não um atestado da precisão do conteúdo estático atual. No módulo **Ultron IA** (`#ultron` / `/ultron/`), o botão **"Sincronizar IBGE (224 mun.)"** permite consultar diretamente no navegador a API pública oficial do IBGE (`servicodados.ibge.gov.br/api/v1/localidades/estados/22/municipios` e agregado SIDRA `4714` do Censo Demográfico 2022 para Piauí `22` e Teresina `2211001`), mantendo fallback estático verificável caso não haja conexão. Já o simulador estocástico Monte Carlo (2025–2035) é explicitamente rotulado como modelo geométrico exploratório e não representa projeção oficial.
 
 ## Curadoria de notícias
 

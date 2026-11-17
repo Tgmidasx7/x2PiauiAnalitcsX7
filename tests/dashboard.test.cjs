@@ -11,6 +11,7 @@ const news = fs.readFileSync(path.join(root, 'assets/news.js'), 'utf8');
 const cameras = fs.readFileSync(path.join(root, 'assets/cameras.js'), 'utf8');
 const territories = fs.readFileSync(path.join(root, 'assets/territories.js'), 'utf8');
 const eyeOfGod = fs.readFileSync(path.join(root, 'assets/eye-of-god.js'), 'utf8');
+const ultron = fs.readFileSync(path.join(root, 'assets/ultron.js'), 'utf8');
 
 function createApp({ chart = true, hash = '', timerSpy = null, canvasMock = false } = {}) {
   const dom = new JSDOM(html, { url: 'https://example.test/' + hash, runScripts: 'outside-only', pretendToBeVisual: true });
@@ -37,6 +38,8 @@ function createApp({ chart = true, hash = '', timerSpy = null, canvasMock = fals
         stroke() {},
         fill() {},
         fillText() {},
+        setLineDash() {},
+        closePath() {},
         createRadialGradient() { return { addColorStop() {} }; }
       };
     };
@@ -58,6 +61,7 @@ function createApp({ chart = true, hash = '', timerSpy = null, canvasMock = fals
   window.eval(territories);
   window.eval(dashboard);
   window.eval(eyeOfGod);
+  window.eval(ultron);
   window.document.dispatchEvent(new window.Event('DOMContentLoaded'));
   return dom;
 }
@@ -196,7 +200,7 @@ test('aba Eye of God funciona isolada sem afetar as demais abas', t => {
   const dom = createApp({ hash: '#eye-of-god', canvasMock: true }); t.after(() => dom.window.close());
   const { document, KeyboardEvent } = dom.window;
 
-  assert.equal(document.querySelectorAll('.tab-btn').length, 14);
+  assert.equal(document.querySelectorAll('.tab-btn').length, 15);
   assert.equal(document.getElementById('btn-eye-of-god').getAttribute('aria-selected'), 'true');
   assert.ok(document.getElementById('tab-eye-of-god').classList.contains('active'));
   assert.equal(document.querySelectorAll('#eog-cctv-grid .eog-cam-cell').length, 6);
@@ -330,7 +334,7 @@ test('simulador exploratório, matriz de auditoria, paleta Ctrl+K e alto contras
   // Matriz de auditoria na aba Fontes
   document.getElementById('btn-fontes').click();
   assert.equal(document.querySelectorAll('#tab-fontes .source-card').length, 8);
-  assert.equal(document.querySelectorAll('#auditTableBody tr').length, 10);
+  assert.equal(document.querySelectorAll('#auditTableBody tr').length, 11);
   document.querySelector('[data-audit-filter="simulacao"]').click();
   assert.equal(document.querySelectorAll('#auditTableBody tr').length, 1);
 
@@ -383,4 +387,135 @@ test('página dedicada /eyeofgod/ funciona de forma autônoma', t => {
   window.document.querySelector('[data-eog-mode="SAR"]').click();
   assert.equal(window.document.querySelector('[data-eog-mode="SAR"]').getAttribute('aria-pressed'), 'true');
   assert.match(window.document.getElementById('eog-terminal-body').textContent, /SAR/);
+});
+
+test('Agente Autônomo Ultron-X7 opera raciocínio multi-agente, Haversine, Monte Carlo e Co-Piloto', t => {
+  const dom = createApp({ hash: '#ultron', canvasMock: true }); t.after(() => dom.window.close());
+  const { document, Event, KeyboardEvent } = dom.window;
+
+  assert.equal(document.getElementById('btn-ultron').getAttribute('aria-selected'), 'true');
+  assert.ok(document.getElementById('tab-ultron').classList.contains('active'));
+  assert.equal(document.querySelectorAll('.ult-agent-node').length, 6);
+
+  // Coordenadas IBGE reais presentes nos 20 municípios e cálculo Haversine preciso
+  assert.equal(dom.window.PIAUI_MUNICIPALITIES.every(m => m.ibgeCode && typeof m.lat === 'number' && typeof m.lon === 'number'), true);
+  const the = dom.window.PIAUI_MUNICIPALITIES.find(m => m.name === 'Teresina');
+  const phb = dom.window.PIAUI_MUNICIPALITIES.find(m => m.name === 'Parnaíba');
+  const distKm = dom.window.ultronHaversineKm(the.lat, the.lon, phb.lat, phb.lon);
+  assert.ok(distKm > 265 && distKm < 295, `Distância Haversine inesperada: ${distKm}`);
+  assert.match(document.getElementById('ultDistanceReadout').textContent, /km geodésicos/);
+  const initialCityB = document.getElementById('ultCityB').value;
+  document.getElementById('ultSwapCities').click();
+  assert.equal(document.getElementById('ultCityA').value, initialCityB);
+
+  // Simulação estocástica Monte Carlo (2025–2035) com bandas ordenadas P10 < P50 < P90
+  const mcSeries = dom.window.ultronRunMonteCarlo({ startVal: 80.9, years: 10, driftPct: 4.5, volPct: 2.8, paths: 500, seed: 42 });
+  assert.equal(mcSeries.length, 11);
+  const y2035 = mcSeries[mcSeries.length - 1];
+  assert.equal(y2035.year, 2035);
+  assert.ok(y2035.p10 < y2035.p50 && y2035.p50 < y2035.p90);
+  assert.equal(document.querySelectorAll('#ultMcTableBody tr').length, 11);
+  document.getElementById('ultMcDrift').value = '6.5';
+  document.getElementById('ultMcDrift').dispatchEvent(new Event('change'));
+  assert.match(document.getElementById('ultMcP50').textContent, /R\$/);
+
+  // Console cognitivo multi-agente por chips e formulário
+  document.querySelector('[data-ult-prompt="Compare Teresina e Uruçuí"]').click();
+  assert.match(document.getElementById('ultChatLog').textContent, /Teresina × Uruçuí/);
+  assert.match(document.getElementById('ultChatLog').textContent, /Haversine/);
+
+  const chatInput = document.getElementById('ultChatInput');
+  chatInput.value = 'Qual o risco fiscal da dívida e limites da LRF?';
+  document.getElementById('ultChatForm').dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+  assert.match(document.getElementById('ultChatLog').textContent, /LRF/);
+
+  // Modo Sentinela autônomo e exportação de Dossiê Executivo (.md)
+  let exportedBlob = null;
+  dom.window.URL.createObjectURL = blob => { exportedBlob = blob; return 'blob:ultron-dossier'; };
+  dom.window.URL.revokeObjectURL = () => {};
+  document.getElementById('ultExportDossierBtn').click();
+  assert.ok(exportedBlob);
+
+  const sentinelBtn = document.getElementById('ultSentinelBtn');
+  sentinelBtn.click();
+  assert.equal(sentinelBtn.getAttribute('aria-pressed'), 'true');
+  sentinelBtn.click();
+  assert.equal(sentinelBtn.getAttribute('aria-pressed'), 'false');
+
+  // Co-Piloto Flutuante Global (FAB + Alt+U) e ponte CLI no Eye of God
+  document.getElementById('btn-eco').click();
+  document.dispatchEvent(new KeyboardEvent('keydown', { key: 'u', altKey: true, bubbles: true }));
+  assert.equal(document.getElementById('ultronCopilotDrawer').hidden, false);
+  const drawerInput = document.getElementById('ultDrawerInput');
+  drawerInput.value = 'Ranking multicritério dos territórios';
+  document.getElementById('ultDrawerForm').dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+  assert.match(document.getElementById('ultDrawerLog').textContent, /Ranking Multicritério/i);
+  document.getElementById('ultCloseDrawer').click();
+  assert.equal(document.getElementById('ultronCopilotDrawer').hidden, true);
+
+  document.getElementById('btn-eye-of-god').click();
+  const eogInput = document.getElementById('eog-terminal-input');
+  eogInput.value = 'ultron energia limpa e H2 verde';
+  eogInput.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+  assert.equal(document.getElementById('btn-ultron').getAttribute('aria-selected'), 'true');
+  assert.match(document.getElementById('ultChatLog').textContent, /Transição Verde/i);
+});
+
+test('conector IBGE do Ultron sincroniza 224 municípios + SIDRA e possui fallback offline', async t => {
+  const dom = createApp({ hash: '#ultron' }); t.after(() => dom.window.close());
+  const { window } = dom;
+  const { document, Event } = window;
+
+  // 1) Simula falha de rede: preserva os 20 polos locais sem quebrar a interface
+  window.fetch = async () => { throw new Error('offline'); };
+  document.getElementById('ultSyncIbgeBtn').click();
+  await new Promise(r => setTimeout(r, 15));
+  assert.match(document.getElementById('ultIbgeStatus').textContent, /Sem conexão direta à API do IBGE/);
+  assert.equal(document.querySelectorAll('#ultIbgeResults .ult-ibge-row').length, 20);
+
+  // 2) Simula resposta oficial da API IBGE Localidades (224 municípios) + SIDRA Censo 2022
+  const fake224 = Array.from({ length: 224 }, (_, idx) => ({
+    id: idx === 0 ? 2211001 : 2200000 + idx,
+    nome: idx === 0 ? 'Teresina' : `Município Piauiense ${idx}`,
+    microrregiao: { mesorregiao: { nome: 'Centro-Norte Piauiense' } }
+  }));
+  window.fetch = async url => {
+    if (String(url).includes('/v1/localidades/')) {
+      return { ok: true, json: async () => fake224 };
+    }
+    return {
+      ok: true,
+      json: async () => ([{ resultados: [{ series: [
+        { localidade: { id: '22' }, serie: { '2022': '3271199' } },
+        { localidade: { id: '2211001' }, serie: { '2022': '866300' } }
+      ] }] }])
+    };
+  };
+  document.getElementById('ultSyncIbgeBtn').click();
+  await new Promise(r => setTimeout(r, 15));
+  assert.match(document.getElementById('ultIbgeBadge').textContent, /224 MUN\. AO VIVO/);
+  assert.match(document.getElementById('ultIbgeStatus').textContent, /3\.271\.199/);
+  const search = document.getElementById('ultIbgeSearchInput');
+  search.value = '2211001';
+  search.dispatchEvent(new Event('input'));
+  assert.equal(document.querySelectorAll('#ultIbgeResults .ult-ibge-row').length, 1);
+  assert.match(document.getElementById('ultIbgeResults').textContent, /Teresina/);
+});
+
+test('página dedicada /ultron/ funciona de forma autônoma', t => {
+  const ultHtml = fs.readFileSync(path.join(root, 'ultron/index.html'), 'utf8');
+  const dom = new JSDOM(ultHtml, { url: 'https://example.test/ultron/', runScripts: 'outside-only', pretendToBeVisual: true });
+  t.after(() => dom.window.close());
+  const { window } = dom;
+  window.matchMedia = () => ({ matches: false, addListener() {}, removeListener() {} });
+  window.HTMLElement.prototype.scrollIntoView = function () {};
+  window.HTMLCanvasElement.prototype.getContext = () => null;
+  window.eval(news);
+  window.eval(territories);
+  window.eval(ultron);
+  window.document.dispatchEvent(new window.Event('DOMContentLoaded'));
+  assert.equal(window.document.querySelectorAll('.ult-agent-node').length, 6);
+  assert.equal(window.document.querySelectorAll('#ultMcTableBody tr').length, 11);
+  window.document.querySelector('[data-ult-prompt="Ranking multicritério dos territórios"]').click();
+  assert.match(window.document.getElementById('ultChatLog').textContent, /Ranking Multicritério/i);
 });
