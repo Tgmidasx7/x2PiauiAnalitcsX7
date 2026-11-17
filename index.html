@@ -887,6 +887,7 @@ body {
 </style>
 <link rel="stylesheet" href="assets/enhancements.css">
 <link rel="stylesheet" href="assets/eye-of-god.css">
+<link rel="stylesheet" href="assets/ultron.css">
 <noscript><style>.tab-content{display:block!important;margin-bottom:2rem}.dashboard-tools,.tab-navigation,.data-notice button{display:none!important}</style></noscript>
 </head>
 <body>
@@ -905,6 +906,7 @@ body {
       <div class="nav-title">PIAUÍ TERESINA ANALYTICS</div>
     </div>
     <div class="nav-status">
+      <button type="button" class="nav-cmd-btn" data-open-tab="ultron" title="Ativar Agente Autônomo Ultron-X7" style="border-color:rgba(255,34,87,0.55);color:#ff557e;">🤖 Ultron IA</button>
       <button type="button" class="nav-cmd-btn" id="openPalette" aria-haspopup="dialog" aria-controls="cmdPalette" title="Abrir paleta de comandos (Ctrl+K)">⌘K Comandos</button>
       <span><span class="status-dot"></span>PAINEL ESTÁTICO</span>
       <span id="navTime" class="nav-hash">00:00:00</span>
@@ -973,6 +975,7 @@ body {
       <button type="button" class="tab-btn" data-tab="swot" id="btn-swot" role="tab" aria-controls="tab-swot" aria-selected="false" tabindex="-1">⚔️ SWOT</button>
       <button type="button" class="tab-btn" data-tab="spia" id="btn-spia" role="tab" aria-controls="tab-spia" aria-selected="false" tabindex="-1">◉ SPIA Piauí</button>
       <button type="button" class="tab-btn" data-tab="eye-of-god" id="btn-eye-of-god" role="tab" aria-controls="tab-eye-of-god" aria-selected="false" tabindex="-1">👁️ Eye of God</button>
+      <button type="button" class="tab-btn" data-tab="ultron" id="btn-ultron" role="tab" aria-controls="tab-ultron" aria-selected="false" tabindex="-1">🤖 Ultron IA</button>
       <button type="button" class="tab-btn" data-tab="terminal" id="btn-terminal" role="tab" aria-controls="tab-terminal" aria-selected="false" tabindex="-1">💻 Terminal</button>
       <button type="button" class="tab-btn" data-tab="fontes" id="btn-fontes" role="tab" aria-controls="tab-fontes" aria-selected="false" tabindex="-1">◈ Fontes &amp; método</button>
     </div>
@@ -2564,8 +2567,186 @@ body {
           </div>
           <div class="eog-terminal-prompt">
             <label class="eog-prompt-symbol" for="eog-terminal-input">root@SPIA-GODS-EYE:~#</label>
-            <input type="text" id="eog-terminal-input" class="eog-prompt-input" autocomplete="off" placeholder="execute comandos como: help, target, lockdown, thermal, scan, clear...">
+            <input type="text" id="eog-terminal-input" class="eog-prompt-input" autocomplete="off" placeholder="execute comandos como: help, target, lockdown, thermal, scan, ultron, clear...">
           </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: ULTRON // AGENTE AUTÔNOMO X7 -->
+    <div class="tab-content" id="tab-ultron" role="tabpanel" aria-labelledby="btn-ultron" tabindex="0">
+      <aside class="data-notice">
+        <span aria-hidden="true">🤖</span>
+        <div>
+          <strong>Motor Analítico Multi-Agente (Ultron-X7)</strong>
+          <p>Orquestra 6 sub-agentes determinísticos locais sobre a base do painel, cálculo geodésico Haversine em coordenadas reais, simulação estocástica Monte Carlo (500 trajetórias, 2025–2035) e consulta opcional em tempo real à API pública oficial do IBGE (224 municípios + SIDRA Censo 2022). Não substitui pareceres oficiais.</p>
+        </div>
+      </aside>
+
+      <div class="ult-shell" id="ult-shell">
+        <header class="ult-header">
+          <div class="ult-brand">
+            <div class="ult-core-orb" aria-hidden="true">
+              <span class="ult-core-glyph">UX7</span>
+            </div>
+            <div>
+              <h2 class="ult-title">ULTRON <span>// AGENTE AUTÔNOMO X7</span></h2>
+              <p class="ult-subtitle">ORQUESTRADOR MULTI-ESPECIALISTA · GEODÉSIA · MONTE CARLO · AUDITORIA IBGE</p>
+            </div>
+          </div>
+
+          <div class="ult-telemetry-strip">
+            <div class="ult-pill">STATUS:<b class="ok" id="ultModeBadge">ANALÍTICO SOB DEMANDA</b></div>
+            <div class="ult-pill">SUB-AGENTES:<b>6 ATIVOS</b></div>
+            <div class="ult-pill">MISSÕES:<b id="ultMissionCounter">001</b></div>
+            <div class="ult-pill">MALHA IBGE:<b id="ultIbgeBadge">20 POLOS LOCAIS</b></div>
+          </div>
+
+          <div class="ult-actions">
+            <a class="ult-btn" href="ultron/" target="_blank" rel="noopener noreferrer">↗ COCKPIT TELA CHEIA</a>
+            <button type="button" class="ult-btn crimson" id="ultSentinelBtn" aria-pressed="false">⚡ MODO SENTINELA</button>
+            <button type="button" class="ult-btn" id="ultVoiceBtn" aria-pressed="false">🔇 VOZ IA: OFF</button>
+            <button type="button" class="ult-btn emerald" id="ultExportDossierBtn">📄 EXPORTAR DOSSIÊ (.MD)</button>
+          </div>
+        </header>
+
+        <div class="ult-swarm-grid" aria-label="Enxame de sub-agentes especializados">
+          <div class="ult-agent-node" data-ult-agent="macro">
+            <div class="ult-agent-top"><span>AGENTE 01</span><i class="ult-agent-dot"></i></div>
+            <strong>MACRO-FISCAL</strong>
+            <small>PIB setorial, receitas SEFAZ, DCL/RCL e margens da LRF</small>
+          </div>
+          <div class="ult-agent-node" data-ult-agent="geo">
+            <div class="ult-agent-top"><span>AGENTE 02</span><i class="ult-agent-dot"></i></div>
+            <strong>GEO-TERRITORIAL</strong>
+            <small>12 Territórios, 224 municípios, Haversine e ranking TOPSIS</small>
+          </div>
+          <div class="ult-agent-node" data-ult-agent="energia">
+            <div class="ult-agent-top"><span>AGENTE 03</span><i class="ult-agent-dot"></i></div>
+            <strong>TRANSIÇÃO VERDE</strong>
+            <small>Eólica, solar, H₂ Verde, ZPE Parnaíba e Cerrado Matopiba</small>
+          </div>
+          <div class="ult-agent-node" data-ult-agent="humano">
+            <div class="ult-agent-top"><span>AGENTE 04</span><i class="ult-agent-dot"></i></div>
+            <strong>CAPITAL HUMANO</strong>
+            <small>IDEB 4,5, EM 100% integral, alfabetização, IDH e Gini</small>
+          </div>
+          <div class="ult-agent-node" data-ult-agent="osint">
+            <div class="ult-agent-top"><span>AGENTE 05</span><i class="ult-agent-dot"></i></div>
+            <strong>OSINT NOTÍCIAS</strong>
+            <small>Indexação semântica de 50 publicações e feeds do Piauí</small>
+          </div>
+          <div class="ult-agent-node" data-ult-agent="prime">
+            <div class="ult-agent-top"><span>AGENTE 06</span><i class="ult-agent-dot"></i></div>
+            <strong>ULTRON-PRIME</strong>
+            <small>Síntese executiva, Monte Carlo 2035 e geração de dossiê</small>
+          </div>
+        </div>
+
+        <div class="ult-cockpit-grid">
+          <section class="ult-panel" aria-labelledby="ultConsoleTitle">
+            <div class="ult-panel-head">
+              <h3 id="ultConsoleTitle">🧠 Console Cognitivo Multi-Agente (Linguagem Natural)</h3>
+              <span class="ult-tag crimson">RACIOCÍNIO DETERMINÍSTICO</span>
+            </div>
+            <div class="ult-prompt-chips" role="group" aria-label="Missões analíticas rápidas">
+              <button type="button" class="ult-chip" data-ult-prompt="Compare Teresina e Uruçuí">Compare Teresina × Uruçuí</button>
+              <button type="button" class="ult-chip" data-ult-prompt="Qual o risco fiscal da dívida do Piauí?">Stress-test fiscal (LRF)</button>
+              <button type="button" class="ult-chip" data-ult-prompt="Projete o PIB até 2035 no Monte Carlo">Projeção Monte Carlo 2035</button>
+              <button type="button" class="ult-chip" data-ult-prompt="Analise energia limpa, H2 verde e Porto Piauí">H₂ Verde &amp; Matopiba</button>
+              <button type="button" class="ult-chip" data-ult-prompt="Ranking multicritério dos territórios">Ranking TOPSIS Polos</button>
+              <button type="button" class="ult-chip" data-ult-prompt="Últimas notícias de saúde e infraestrutura">Radar OSINT Notícias</button>
+            </div>
+            <div class="ult-chat-log" id="ultChatLog" role="log" aria-live="polite"></div>
+            <form class="ult-chat-form" id="ultChatForm">
+              <input type="text" id="ultChatInput" autocomplete="off" aria-label="Pergunte ao Agente Ultron" placeholder="Ex.: Compare Parnaíba e Bom Jesus, risco fiscal, Serra da Capivara, projeção 2035...">
+              <button type="submit" class="ult-btn crimson">EXECUTAR →</button>
+            </form>
+          </section>
+
+          <section class="ult-panel" aria-labelledby="ultGeoTitle">
+            <div class="ult-panel-head">
+              <h3 id="ultGeoTitle">🧭 Malha Geoespacial Real &amp; Calculadora Haversine</h3>
+              <span class="ult-tag">LAT/LON REAIS · 20 POLOS</span>
+            </div>
+            <div class="ult-geo-canvas-wrap">
+              <canvas id="ultGeoCanvas" width="520" height="310" aria-label="Mapa vetorial de corredores logísticos e coordenadas reais dos municípios do Piauí"></canvas>
+            </div>
+            <div class="ult-haversine-bar">
+              <label for="ultCityA">Origem geodésica<select id="ultCityA"></select></label>
+              <label for="ultCityB">Destino geodésico<select id="ultCityB"></select></label>
+              <button type="button" class="ult-btn" id="ultSwapCities">⇄ Inverter</button>
+            </div>
+            <div class="ult-distance-readout" id="ultDistanceReadout" aria-live="polite">Calculando vetor geodésico...</div>
+          </section>
+        </div>
+
+        <div class="ult-bottom-grid">
+          <section class="ult-panel" aria-labelledby="ultMcTitle">
+            <div class="ult-panel-head">
+              <h3 id="ultMcTitle">📈 Motor Estocástico Monte Carlo (Horizonte 2025–2035)</h3>
+              <button type="button" class="ult-btn" id="ultRunMcBtn">↻ Recalcular cone</button>
+            </div>
+            <div class="ult-mc-controls">
+              <label for="ultMcDrift">Taxa real base (% a.a.)
+                <select id="ultMcDrift">
+                  <option value="2.5">Conservadora (2,5%)</option>
+                  <option value="4.5" selected>Referência (4,5%)</option>
+                  <option value="6.5">Aceleração Verde (6,5%)</option>
+                </select>
+              </label>
+              <label for="ultMcVol">Volatilidade / Risco (% a.a.)
+                <select id="ultMcVol">
+                  <option value="1.8">Baixa (1,8%)</option>
+                  <option value="2.8" selected>Moderada (2,8%)</option>
+                  <option value="4.5">Alta / Climática (4,5%)</option>
+                </select>
+              </label>
+              <label for="ultMcPaths">Trajetórias estocásticas
+                <select id="ultMcPaths">
+                  <option value="250">250 simulações</option>
+                  <option value="500" selected>500 simulações</option>
+                  <option value="1000">1.000 simulações</option>
+                </select>
+              </label>
+            </div>
+            <canvas id="ultMonteCarloCanvas" width="600" height="220" aria-label="Gráfico em leque das bandas P10, P50 e P90 da simulação Monte Carlo 2025 a 2035"></canvas>
+            <div class="ult-mc-summary">
+              <div class="ult-mc-card p10"><span>2035 P10 (PESSIMISTA)</span><strong id="ultMcP10">—</strong></div>
+              <div class="ult-mc-card p50"><span>2035 P50 (MEDIANA)</span><strong id="ultMcP50">—</strong></div>
+              <div class="ult-mc-card p90"><span>2035 P90 (OTIMISTA)</span><strong id="ultMcP90">—</strong></div>
+            </div>
+            <details class="ult-mc-details">
+              <summary>Ver série completa Monte Carlo (2025–2035) em tabela</summary>
+              <div class="chart-table-wrap">
+                <table>
+                  <caption>Bandas estocásticas ilustrativas (modelo geométrico exploratório — não constitui projeção oficial)</caption>
+                  <thead><tr><th scope="col">Ano</th><th scope="col">P10</th><th scope="col">Mediana (P50)</th><th scope="col">P90</th></tr></thead>
+                  <tbody id="ultMcTableBody"></tbody>
+                </table>
+              </div>
+            </details>
+          </section>
+
+          <section class="ult-panel" aria-labelledby="ultIbgeTitle">
+            <div class="ult-panel-head">
+              <h3 id="ultIbgeTitle">🛰️ Auditoria API Oficial IBGE &amp; Radar Estrutural</h3>
+              <button type="button" class="ult-btn emerald" id="ultSyncIbgeBtn">↻ Sincronizar IBGE (224 mun.)</button>
+            </div>
+            <div class="ult-ibge-box">
+              <span class="ult-tag">API PÚBLICA • SERVICODADOS.IBGE.GOV.BR</span>
+              <p class="ult-ibge-status" id="ultIbgeStatus" role="status">Modo local ativo (20 polos com código IBGE). Clique em "Sincronizar IBGE" para baixar os 224 municípios oficiais e validar o Censo 2022 no SIDRA.</p>
+              <div class="ult-ibge-search">
+                <input type="search" id="ultIbgeSearchInput" aria-label="Filtrar municípios por nome ou código IBGE" placeholder="Filtrar município ou código IBGE (ex.: 2211001, Picos)...">
+              </div>
+              <div class="ult-ibge-results" id="ultIbgeResults"></div>
+            </div>
+            <div class="ult-panel-head" style="padding-top:0.25rem;">
+              <h3>⚡ Sinais &amp; Assimetrias Detectadas</h3>
+              <span class="ult-tag crimson">SENTINELA</span>
+            </div>
+            <div class="ult-anomaly-list" id="ultAnomalyList" aria-live="polite"></div>
+          </section>
         </div>
       </div>
     </div>
@@ -2625,10 +2806,32 @@ body {
       <p style="color: var(--green); font-family: var(--font-display); font-size: 0.8rem; margin-bottom: 8px;">PIAUÍ TERESINA ANALYTICS</p>
       <p>DOSSIÊ TEMÁTICO • PIAUÍ & TERESINA</p>
       <p>Conteúdo estático • Indicadores sujeitos a verificação</p>
-      <p><button type="button" class="text-link" data-open-tab="fontes">Fontes e metodologia</button> · <a href="https://tgmidasx7.github.io/x2PiauiAnalitcsX7/" target="_blank" rel="noopener noreferrer">Site público ↗</a> · <a href="eyeofgod/">Eye of God ↗</a> · <a href="https://github.com/Tgmidasx7/x2PiauiAnalitcsX7" target="_blank" rel="noopener noreferrer">Repositório no GitHub ↗</a></p>
+      <p><button type="button" class="text-link" data-open-tab="fontes">Fontes e metodologia</button> · <a href="https://tgmidasx7.github.io/x2PiauiAnalitcsX7/" target="_blank" rel="noopener noreferrer">Site público ↗</a> · <a href="ultron/">Ultron IA ↗</a> · <a href="eyeofgod/">Eye of God ↗</a> · <a href="https://github.com/Tgmidasx7/x2PiauiAnalitcsX7" target="_blank" rel="noopener noreferrer">Repositório no GitHub ↗</a></p>
     </footer>
   </main>
 </div>
+
+<!-- CO-PILOTO FLUTUANTE GLOBAL ULTRON-X7 -->
+<button type="button" class="ult-fab" id="ultronFab" aria-expanded="false" aria-controls="ultronCopilotDrawer" title="Abrir Co-Piloto Autônomo Ultron (Alt+U)">
+  <span class="ult-fab-dot" aria-hidden="true"></span>
+  <span>ULTRON IA</span>
+</button>
+
+<aside class="ult-copilot-drawer" id="ultronCopilotDrawer" role="dialog" aria-modal="false" aria-labelledby="ultDrawerTitle" hidden>
+  <div class="ult-drawer-head">
+    <strong id="ultDrawerTitle">🤖 CO-PILOTO ULTRON // X7</strong>
+    <button type="button" class="ult-btn" id="ultCloseDrawer" aria-label="Fechar Co-Piloto Ultron">✕</button>
+  </div>
+  <div class="ult-drawer-ctx">
+    <span id="ultDrawerContext">Contexto ativo: Visão Geral</span>
+    <button type="button" class="text-link" data-open-tab="ultron">Abrir Cockpit →</button>
+  </div>
+  <div class="ult-drawer-body" id="ultDrawerLog" role="log" aria-live="polite"></div>
+  <form class="ult-drawer-foot" id="ultDrawerForm">
+    <input type="text" id="ultDrawerInput" autocomplete="off" aria-label="Perguntar ao Co-Piloto Ultron" placeholder="Pergunte sobre a aba atual ou qualquer município...">
+    <button type="submit" class="ult-btn crimson">IR</button>
+  </form>
+</aside>
 
 <!-- PALETA DE COMANDOS GLOBAL (Ctrl+K / Cmd+K) -->
 <div class="cmd-palette-backdrop" id="cmdPalette" role="dialog" aria-modal="true" aria-labelledby="cmdPaletteTitle" hidden>
@@ -3138,5 +3341,6 @@ function initCharts() {
 <script src="assets/territories.js"></script>
 <script src="assets/dashboard.js"></script>
 <script src="assets/eye-of-god.js"></script>
+<script src="assets/ultron.js"></script>
 </body>
 </html>

@@ -768,10 +768,24 @@
       switch (main) {
         case 'help':
           printTerminal(
-            'COMANDOS: help, target <nome>, lockdown, standdown, thermal, nvg, lidar, optical, neural, sar, scan, radar, intercept, status, clear',
+            'COMANDOS: help, target <nome>, lockdown, standdown, thermal, nvg, lidar, optical, neural, sar, scan, radar, intercept, ultron [missão], status, clear',
             'success'
           );
           break;
+        case 'ultron': {
+          const ulBtn = document.getElementById('btn-ultron');
+          if (ulBtn) {
+            printTerminal('PONTE COGNITIVA: Transferindo controle tático para o Agente Autônomo ULTRON-X7...', 'success');
+            ulBtn.click();
+            if (arg && typeof window.ultronAsk === 'function') {
+              window.ultronAsk(arg);
+            }
+          } else {
+            printTerminal('REDIRECIONANDO: Abrindo cockpit autônomo ULTRON-X7 (../ultron/)...', 'success');
+            window.location.href = '../ultron/';
+          }
+          break;
+        }
         case 'target': {
           if (arg) {
             const idx = camerasDB.findIndex(

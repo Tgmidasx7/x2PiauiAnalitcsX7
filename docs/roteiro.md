@@ -15,6 +15,7 @@ Este roteiro distingue itens entregues dos próximos passos. Os itens marcados s
 - [ ] Avaliar navegação por teclado, foco visível, semântica das abas, contraste e alternativas textuais para gráficos.
 - [ ] Separar gradualmente dados, JavaScript e estilos da marcação e introduzir testes de interface.
 - [x] Oferecer tabelas quando a biblioteca de gráficos não estiver disponível.
+- [x] Implementar Service Worker offline (`sw.js`), comparador geodésico Haversine, simulação estocástica Monte Carlo com tabela acessível e conector opcional à API pública oficial do IBGE (224 municípios + SIDRA Censo 2022) no módulo Ultron-X7.
 - [ ] Avaliar tratamento adicional para falhas de carregamento de fontes externas.
 
 ## Prioridade 3 — manutenção e publicação

@@ -663,10 +663,21 @@
       pillNodes.set(td.id, pill);
     });
 
+    function haversineLocalKm(lat1, lon1, lat2, lon2) {
+      if ([lat1, lon1, lat2, lon2].some(v => typeof v !== 'number')) return null;
+      const toRad = d => (d * Math.PI) / 180;
+      const dLat = toRad(lat2 - lat1);
+      const dLon = toRad(lon2 - lon1);
+      const a = Math.sin(dLat / 2) ** 2
+        + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2;
+      return 6371 * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
+    }
+
     function buildCompareCard(mun, other) {
       const box = document.createElement('div'); box.className = 'compare-city-box';
       const h4 = document.createElement('h4'); h4.textContent = mun.name;
-      const sub = document.createElement('small'); sub.textContent = `${mun.territoryName} • ${mun.biome} • ${mun.distCapitalKm === 0 ? 'Capital estadual' : mun.distCapitalKm + ' km de Teresina'}`;
+      const ibgeInfo = mun.ibgeCode ? `IBGE ${mun.ibgeCode} • ` : '';
+      const sub = document.createElement('small'); sub.textContent = `${ibgeInfo}${mun.territoryName} • ${mun.biome} • ${mun.distCapitalKm === 0 ? 'Capital estadual' : mun.distCapitalKm + ' km de Teresina'}`;
       box.append(h4, sub);
 
       const statePop = 3271199;
@@ -704,7 +715,35 @@
       const munB = municipalities.find(m => m.name === selB.value) || municipalities[1] || municipalities[0];
       const grid = document.createElement('div'); grid.className = 'compare-vs-grid';
       grid.append(buildCompareCard(munA, munB), buildCompareCard(munB, munA));
-      compareOut.replaceChildren(grid);
+      const nodes = [grid];
+
+      const km = haversineLocalKm(munA.lat, munA.lon, munB.lat, munB.lon);
+      if (km !== null) {
+        const geoNote = document.createElement('div');
+        geoNote.className = 'news-note';
+        geoNote.style.marginTop = '.75rem';
+        geoNote.style.display = 'flex';
+        geoNote.style.flexWrap = 'wrap';
+        geoNote.style.justifyContent = 'space-between';
+        geoNote.style.alignItems = 'center';
+        geoNote.style.gap = '.5rem';
+        const roadEst = Math.round(km * 1.24);
+        const textSpan = document.createElement('span');
+        textSpan.textContent = `🧭 Distância geodésica Haversine (${munA.name} ↔ ${munB.name}): ${km.toFixed(1).replace('.', ',')} km em linha reta (~${roadEst.toLocaleString('pt-BR')} km rodoviários estimados).`;
+        const askUltronBtn = document.createElement('button');
+        askUltronBtn.type = 'button';
+        askUltronBtn.className = 'text-link';
+        askUltronBtn.textContent = '🤖 Analisar par no Ultron IA →';
+        askUltronBtn.addEventListener('click', () => {
+          selectTab('ultron');
+          if (typeof window.ultronAsk === 'function') {
+            window.ultronAsk(`Compare ${munA.name} e ${munB.name}`);
+          }
+        });
+        geoNote.append(textSpan, askUltronBtn);
+        nodes.push(geoNote);
+      }
+      compareOut.replaceChildren(...nodes);
     }
 
     tdSelect.addEventListener('change', () => selectTerritory(tdSelect.value));
@@ -844,6 +883,12 @@
         run: () => selectTab(tab.dataset.tab, true)
       }));
       const actionCmds = [
+        { title: '🤖 Ativar Agente Autônomo Ultron-X7 (Cockpit IA)', type: 'IA ULTRON', keywords: 'ultron ia agente monte carlo haversine ibge', run: () => selectTab('ultron', true) },
+        { title: '🤖 Abrir Co-Piloto Flutuante Ultron (Alt+U)', type: 'IA ULTRON', keywords: 'copiloto chat assistente ultron alt+u', run: () => $('#ultronFab')?.click() },
+        { title: '📄 Exportar Dossiê Executivo Ultron (.md)', type: 'IA ULTRON', keywords: 'dossie markdown relatorio executivo ultron', run: () => { selectTab('ultron'); $('#ultExportDossierBtn')?.click(); } },
+        { title: '🛰️ Sincronizar 224 municípios na API oficial do IBGE', type: 'API IBGE', keywords: 'ibge sidra api 224 municipios censo', run: () => { selectTab('ultron'); $('#ultSyncIbgeBtn')?.click(); } },
+        { title: '↗ Abrir Cockpit Ultron em tela cheia (/ultron/)', type: 'ROTA', keywords: 'ultron fullscreen tela cheia pagina', run: () => { window.location.href = 'ultron/'; } },
+        { title: '↗ Abrir Eye of God em tela cheia (/eyeofgod/)', type: 'ROTA', keywords: 'eye of god c4isr fullscreen tela cheia', run: () => { window.location.href = 'eyeofgod/'; } },
         { title: 'Exportar indicadores em CSV', type: 'AÇÃO', keywords: 'csv baixar planilha', run: () => $('#exportCsv')?.click() },
         { title: 'Exportar dados estruturados em JSON', type: 'AÇÃO', keywords: 'json exportar api dados', run: () => $('#exportJson')?.click() },
         { title: 'Alternar modo de alto contraste', type: 'ACESSIBILIDADE', keywords: 'contraste tema leitura', run: () => $('#toggleContrast')?.click() },
@@ -856,9 +901,9 @@
         run: () => { if (selectTerritoryExternal) selectTerritoryExternal(td.id); }
       }));
       const munCmds = (window.PIAUI_MUNICIPALITIES || []).map(m => ({
-        title: `Município: ${m.name} — ${m.pop2022.toLocaleString('pt-BR')} hab.`,
+        title: `Município: ${m.name} — ${m.pop2022.toLocaleString('pt-BR')} hab.${m.ibgeCode ? ' (IBGE ' + m.ibgeCode + ')' : ''}`,
         type: 'MUNICÍPIO',
-        keywords: `${m.name} ${m.territoryName} ${m.biome} ${m.profile}`,
+        keywords: `${m.name} ${m.ibgeCode || ''} ${m.territoryName} ${m.biome} ${m.profile}`,
         run: () => { if (focusMunicipalityExternal) focusMunicipalityExternal(m.name); }
       }));
       const cardCmds = cards.map(c => ({
@@ -957,8 +1002,16 @@
     update(); setInterval(update, 1000);
   }
 
+  function registerServiceWorker() {
+    if (!('serviceWorker' in navigator)) return;
+    const proto = window.location.protocol;
+    const host = window.location.hostname;
+    if (proto !== 'https:' && host !== 'localhost' && host !== '127.0.0.1') return;
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  }
+
   window.initDashboard = function () {
     if (initialized) return; initialized = true;
-    setupTabs(); readFavorites(); setupCards(); renderFavorites(); setupTerritories(); setupSimulator(); setupAuditTable(); setupSearch(); setupExport(); setupCharts(); setupClock(); setupSpia(); setupNews(); setupPalette();
+    setupTabs(); readFavorites(); setupCards(); renderFavorites(); setupTerritories(); setupSimulator(); setupAuditTable(); setupSearch(); setupExport(); setupCharts(); setupClock(); setupSpia(); setupNews(); setupPalette(); registerServiceWorker();
   };
 })();

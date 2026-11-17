@@ -1,7 +1,7 @@
 {
-  "name": "x2PiauiAnalitcsX7 — Piauí Teresina Analytics",
+  "name": "x2PiauiAnalitcsX7 — Piauí Teresina Analytics + Ultron IA",
   "short_name": "Piauí Analytics",
-  "description": "Painel interativo de indicadores, territórios, transição energética, notícias e simulações sobre o Piauí e Teresina.",
+  "description": "Painel interativo de indicadores, territórios, transição energética, notícias, simulações e Agente Autônomo Ultron-X7 sobre o Piauí e Teresina.",
   "lang": "pt-BR",
   "start_url": "./",
   "scope": "./",
@@ -14,6 +14,23 @@
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Agente Autônomo Ultron-X7",
+      "short_name": "Ultron IA",
+      "url": "./ultron/"
+    },
+    {
+      "name": "Eye of God C4ISR",
+      "short_name": "Eye of God",
+      "url": "./eyeofgod/"
+    },
+    {
+      "name": "Municípios & Territórios",
+      "short_name": "Territórios",
+      "url": "./#territorios"
     }
   ]
 }
