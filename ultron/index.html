@@ -42,7 +42,9 @@
           <a class="ult-btn" href="../">← PAINEL PRINCIPAL</a>
           <button type="button" class="ult-btn crimson" id="ultSentinelBtn" aria-pressed="false">⚡ MODO SENTINELA</button>
           <button type="button" class="ult-btn" id="ultVoiceBtn" aria-pressed="false">🔇 VOZ IA: OFF</button>
-          <button type="button" class="ult-btn emerald" id="ultExportDossierBtn">📄 EXPORTAR DOSSIÊ (.MD)</button>
+          <button type="button" class="ult-btn emerald" id="ultExportDossierBtn">📄 DOSSIÊ (.MD)</button>
+          <button type="button" class="ult-btn" id="ultExportJsonBtn">↓ TELEMETRIA (.JSON)</button>
+          <button type="button" class="ult-btn" id="ultSnapshotBtn">📸 SNAPSHOT (.PNG)</button>
         </div>
       </header>
 
@@ -86,12 +88,13 @@
             <span class="ult-tag crimson">RACIOCÍNIO DETERMINÍSTICO</span>
           </div>
           <div class="ult-prompt-chips" role="group" aria-label="Missões analíticas rápidas">
+            <button type="button" class="ult-chip" data-ult-prompt="Qual a rota rodoviária de Luís Correia a Corrente?">Rota Dijkstra Norte→Sul</button>
+            <button type="button" class="ult-chip" data-ult-prompt="Otimize o portfólio Pareto de investimentos">Otimizador Pareto Capex</button>
             <button type="button" class="ult-chip" data-ult-prompt="Compare Teresina e Uruçuí">Compare Teresina × Uruçuí</button>
             <button type="button" class="ult-chip" data-ult-prompt="Qual o risco fiscal da dívida do Piauí?">Stress-test fiscal (LRF)</button>
             <button type="button" class="ult-chip" data-ult-prompt="Projete o PIB até 2035 no Monte Carlo">Projeção Monte Carlo 2035</button>
             <button type="button" class="ult-chip" data-ult-prompt="Analise energia limpa, H2 verde e Porto Piauí">H₂ Verde &amp; Matopiba</button>
             <button type="button" class="ult-chip" data-ult-prompt="Ranking multicritério dos territórios">Ranking TOPSIS Polos</button>
-            <button type="button" class="ult-chip" data-ult-prompt="Últimas notícias de saúde e infraestrutura">Radar OSINT Notícias</button>
           </div>
           <div class="ult-chat-log" id="ultChatLog" role="log" aria-live="polite"></div>
           <form class="ult-chat-form" id="ultChatForm">
@@ -184,6 +187,46 @@
           <div class="ult-anomaly-list" id="ultAnomalyList" aria-live="polite"></div>
         </section>
       </div>
+
+      <section class="ult-panel ult-pareto-section" aria-labelledby="ultParetoTitle">
+        <div class="ult-panel-head">
+          <h3 id="ultParetoTitle">🎯 Otimizador Multi-Objetivo de Alocação de Investimentos (Fronteira de Pareto)</h3>
+          <span class="ult-tag crimson">ALOCAÇÃO ÓTIMA · RADAR 5D</span>
+        </div>
+        <div class="ult-pareto-controls">
+          <label for="ultCapexTotal">Envelope ilustrativo de Capex
+            <select id="ultCapexTotal">
+              <option value="1.0">R$ 1,0 bilhão</option>
+              <option value="2.5">R$ 2,5 bilhões</option>
+              <option value="5.0" selected>R$ 5,0 bilhões</option>
+              <option value="10.0">R$ 10,0 bilhões</option>
+            </select>
+          </label>
+          <label for="ultCapexRegime">Regime estratégico prioritário
+            <select id="ultCapexRegime">
+              <option value="pareto" selected>Equilíbrio Ótimo de Pareto</option>
+              <option value="verde">Aceleração Industrial Verde &amp; H₂</option>
+              <option value="interior">Desconcentração &amp; Logística Interiorana</option>
+              <option value="humano">Salto de Capital Humano &amp; Inovação</option>
+              <option value="hidrico">Blindagem Climática &amp; Hídrica Semiárido</option>
+            </select>
+          </label>
+          <div class="ult-mc-card p50">
+            <span>SCORE MULTIDIMENSIONAL PARETO</span>
+            <strong id="ultParetoScore">—</strong>
+          </div>
+        </div>
+        <div class="ult-pareto-layout">
+          <canvas id="ultParetoCanvas" width="380" height="260" aria-label="Gráfico radar pentagonal de impacto multidimensional do portfólio de investimento"></canvas>
+          <div class="chart-table-wrap">
+            <table>
+              <caption>Alocação ótima simulada por vetor estruturante (modelo exploratório de elasticidades — não oficial)</caption>
+              <thead><tr><th scope="col">Eixo Estratégico</th><th scope="col">Peso (%)</th><th scope="col">Alocação Simulada</th></tr></thead>
+              <tbody id="ultParetoTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
     </div>
   </main>
 

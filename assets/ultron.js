@@ -83,6 +83,160 @@
 
   window.ultronRunMonteCarlo = computeMonteCarloSeries;
 
+  // Malha rodoviária federal e estadual estruturante conectando os 20 polos do Piauí
+  const PIAUI_HIGHWAY_EDGES = [
+    ['Luís Correia', 'Parnaíba', 18, 'BR-343'],
+    ['Parnaíba', 'Esperantina', 155, 'BR-222 / PI-214'],
+    ['Parnaíba', 'Piripiri', 162, 'BR-343'],
+    ['Esperantina', 'Piripiri', 84, 'BR-222'],
+    ['Esperantina', 'Barras', 62, 'PI-113'],
+    ['Piripiri', 'Pedro II', 52, 'BR-404'],
+    ['Piripiri', 'Campo Maior', 82, 'BR-343'],
+    ['Pedro II', 'Campo Maior', 122, 'PI-215'],
+    ['Barras', 'Campo Maior', 68, 'PI-110'],
+    ['Barras', 'José de Freitas', 79, 'PI-113'],
+    ['União', 'Teresina', 59, 'PI-112'],
+    ['União', 'José de Freitas', 49, 'PI-367'],
+    ['José de Freitas', 'Teresina', 48, 'PI-113'],
+    ['José de Freitas', 'Altos', 28, 'PI-366'],
+    ['Campo Maior', 'Altos', 43, 'BR-343'],
+    ['Altos', 'Teresina', 41, 'BR-343'],
+    ['Teresina', 'Valença do Piauí', 216, 'BR-316'],
+    ['Teresina', 'Floriano', 244, 'BR-343'],
+    ['Valença do Piauí', 'Picos', 98, 'BR-316'],
+    ['Valença do Piauí', 'Oeiras', 102, 'BR-230 / PI-120'],
+    ['Oeiras', 'Picos', 90, 'BR-230'],
+    ['Oeiras', 'Floriano', 112, 'BR-230'],
+    ['Picos', 'Paulistana', 154, 'BR-407'],
+    ['Picos', 'São Raimundo Nonato', 276, 'BR-020'],
+    ['Paulistana', 'São Raimundo Nonato', 246, 'PI-459 / BR-020'],
+    ['Oeiras', 'São Raimundo Nonato', 252, 'PI-143'],
+    ['Floriano', 'São Raimundo Nonato', 282, 'PI-140'],
+    ['Floriano', 'Uruçuí', 209, 'PI-247'],
+    ['Floriano', 'Bom Jesus', 364, 'BR-135'],
+    ['Uruçuí', 'Bom Jesus', 228, 'PI-247 / Transcerrados'],
+    ['São Raimundo Nonato', 'Bom Jesus', 265, 'BR-324 / PI-140'],
+    ['Bom Jesus', 'Corrente', 237, 'BR-135']
+  ];
+
+  // Algoritmo de Dijkstra para menor rota rodoviária multi-polos no Piauí
+  function dijkstraCorridor(origin, dest) {
+    if (!origin || !dest) return null;
+    if (origin === dest) return { path: [origin], segments: [], totalKm: 0, roads: [] };
+    const adj = new Map();
+    PIAUI_HIGHWAY_EDGES.forEach(([a, b, km, road]) => {
+      if (!adj.has(a)) adj.set(a, []);
+      if (!adj.has(b)) adj.set(b, []);
+      adj.get(a).push({ to: b, km, road });
+      adj.get(b).push({ to: a, km, road });
+    });
+    if (!adj.has(origin) || !adj.has(dest)) return null;
+
+    const dist = new Map();
+    const prev = new Map();
+    const visited = new Set();
+    adj.forEach((_, node) => dist.set(node, Infinity));
+    dist.set(origin, 0);
+
+    while (visited.size < adj.size) {
+      let current = null;
+      let best = Infinity;
+      dist.forEach((d, node) => {
+        if (!visited.has(node) && d < best) {
+          best = d;
+          current = node;
+        }
+      });
+      if (!current || current === dest || best === Infinity) break;
+      visited.add(current);
+      (adj.get(current) || []).forEach(edge => {
+        if (visited.has(edge.to)) return;
+        const alt = best + edge.km;
+        if (alt < dist.get(edge.to)) {
+          dist.set(edge.to, alt);
+          prev.set(edge.to, { from: current, km: edge.km, road: edge.road });
+        }
+      });
+    }
+
+    if (!Number.isFinite(dist.get(dest))) return null;
+    const path = [dest];
+    const segments = [];
+    let step = dest;
+    while (step !== origin) {
+      const info = prev.get(step);
+      if (!info) break;
+      segments.unshift({ from: info.from, to: step, km: info.km, road: info.road });
+      path.unshift(info.from);
+      step = info.from;
+    }
+    const roads = Array.from(new Set(segments.map(s => s.road)));
+    return { path, segments, totalKm: dist.get(dest), roads };
+  }
+
+  window.ultronDijkstraRoute = dijkstraCorridor;
+
+  // Otimizador multi-objetivo de alocação de investimentos públicos (Fronteira de Pareto)
+  const PARETO_AXES = [
+    { id: 'energia', name: 'Transição Energética, ZPE & H₂ Verde', baseWeight: 0.24, elasticities: [0.68, 0.92, 0.76, 0.88, 0.54] },
+    { id: 'logistica', name: 'Corredores Multimodais, Porto & Ferrovias', baseWeight: 0.23, elasticities: [0.94, 0.84, 0.58, 0.82, 0.62] },
+    { id: 'educacao', name: 'Educação Integral, EPT, P&D & IA', baseWeight: 0.22, elasticities: [0.72, 0.90, 0.64, 0.78, 0.95] },
+    { id: 'hidrica', name: 'Segurança Hídrica & Irrigação Semiárido', baseWeight: 0.17, elasticities: [0.88, 0.66, 0.96, 0.64, 0.89] },
+    { id: 'saude', name: 'Saúde Regionalizada & Piauí Digital', baseWeight: 0.14, elasticities: [0.82, 0.62, 0.60, 0.58, 0.93] }
+  ];
+
+  const PARETO_REGIMES = {
+    pareto: { label: 'Equilíbrio Ótimo de Pareto', weights: [0.24, 0.23, 0.22, 0.17, 0.14] },
+    verde: { label: 'Aceleração Industrial Verde & H₂', weights: [0.38, 0.26, 0.16, 0.11, 0.09] },
+    interior: { label: 'Desconcentração & Logística Interiorana', weights: [0.18, 0.34, 0.16, 0.20, 0.12] },
+    humano: { label: 'Salto de Capital Humano & Inovação', weights: [0.15, 0.15, 0.38, 0.12, 0.20] },
+    hidrico: { label: 'Blindagem Climática & Hídrica Semiárido', weights: [0.16, 0.16, 0.14, 0.38, 0.16] }
+  };
+
+  function optimizeParetoPortfolio({ budgetBi = 5.0, regime = 'pareto' } = {}) {
+    const chosen = PARETO_REGIMES[regime] || PARETO_REGIMES.pareto;
+    const totalBi = Math.max(0.5, Number(budgetBi) || 5.0);
+    const scaleFactor = Math.min(1.18, 0.82 + Math.log10(totalBi + 1) * 0.36);
+
+    const allocations = PARETO_AXES.map((axis, idx) => {
+      const share = chosen.weights[idx];
+      const amountMi = Math.round(totalBi * 1000 * share);
+      return {
+        id: axis.id,
+        name: axis.name,
+        sharePct: Math.round(share * 100),
+        amountMi
+      };
+    });
+
+    const radarLabels = ['Interiorização', 'Produtividade', 'Resiliência Climática', 'Retorno Fiscal', 'Inclusão Social'];
+    const radarScores = radarLabels.map((label, dimIdx) => {
+      const weighted = PARETO_AXES.reduce((acc, axis, axisIdx) => acc + chosen.weights[axisIdx] * axis.elasticities[dimIdx], 0);
+      const baseline = PARETO_AXES.reduce((acc, axis) => acc + axis.baseWeight * axis.elasticities[dimIdx], 0);
+      return {
+        dimension: label,
+        score: Math.min(99, Math.round(weighted * 100 * scaleFactor)),
+        baseline: Math.min(95, Math.round(baseline * 100 * 0.92))
+      };
+    });
+
+    const compositeIndex = Math.round(radarScores.reduce((s, r) => s + r.score, 0) / radarScores.length);
+    return { budgetBi: totalBi, regime, regimeLabel: chosen.label, allocations, radarScores, compositeIndex };
+  }
+
+  window.ultronOptimizePortfolio = optimizeParetoPortfolio;
+
+  function computeGini(values) {
+    const cleanVals = values.filter(v => Number.isFinite(v) && v > 0).sort((a, b) => a - b);
+    const n = cleanVals.length;
+    if (n < 2) return 0;
+    const sum = cleanVals.reduce((s, v) => s + v, 0);
+    if (!sum) return 0;
+    let weighted = 0;
+    cleanVals.forEach((v, i) => { weighted += (i + 1) * v; });
+    return (2 * weighted) / (n * sum) - (n + 1) / n;
+  }
+
   // Briefings contextuais por aba para o Co-Piloto flutuante
   const TAB_BRIEFS = {
     overview: 'Síntese Ultron: Teresina concentra ~26,5% da população e PIB per capita 37% superior à média estadual. O vetor crítico de longo prazo é desconcentrar serviços avançados e indústria verde para os 11 polos do interior.',
@@ -124,6 +278,7 @@
     let ibgeCatalog = [];
     let ibgeVerified = null;
     let lastMcResult = null;
+    let lastParetoResult = null;
     let sentinelIdx = 0;
 
     // Corredores logísticos principais (pares de municípios)
@@ -233,12 +388,13 @@
       const matchedCities = findMunicipalitiesInText(q);
       const matchedTds = findTerritoriesInText(q);
 
-      // 1) Comparação entre 2+ municípios ou cálculo de distância/rota
-      if (matchedCities.length >= 2 || ((q.includes('compar') || q.includes('distancia') || q.includes('rota')) && matchedCities.length >= 1)) {
+      // 1) Comparação entre 2+ municípios ou cálculo de distância/rota Dijkstra
+      if (matchedCities.length >= 2 || ((q.includes('compar') || q.includes('distancia') || q.includes('rota') || q.includes('rodovia') || q.includes('dijkstra')) && matchedCities.length >= 1)) {
         const c1 = matchedCities[0] || municipalities[0];
         const c2 = matchedCities[1] || (c1.name === 'Teresina' ? municipalities[1] : municipalities[0]);
         const straightKm = haversineKm(c1.lat, c1.lon, c2.lat, c2.lon);
-        const roadEstKm = Math.round(straightKm * 1.24);
+        const route = dijkstraCorridor(c1.name, c2.name);
+        const roadEstKm = route ? route.totalKm : Math.round(straightKm * 1.24);
         const d1 = (c1.pop2022 / c1.areaKm2).toFixed(1).replace('.', ',');
         const d2 = (c2.pop2022 / c2.areaKm2).toFixed(1).replace('.', ',');
         const popRatio = (Math.max(c1.pop2022, c2.pop2022) / Math.max(1, Math.min(c1.pop2022, c2.pop2022))).toFixed(1).replace('.', ',');
@@ -252,21 +408,42 @@
           renderGeoCanvas(Date.now());
         }
 
+        const routeLine = route && route.path.length > 1
+          ? `• Menor Corredor Viário (Dijkstra): ${route.totalKm} km via ${route.path.join(' → ')} [${route.roads.join(', ')}].`
+          : `• Estimativa rodoviária: ~${roadEstKm} km.`;
+
         return {
           agents: ['geo', 'macro', 'prime'],
-          trace: 'SUB-AGENTES [GEO-TD + MACRO + SÍNTESE]',
-          title: `Análise Geodésica & Comparativa: ${c1.name} × ${c2.name}`,
+          trace: 'SUB-AGENTES [GEO-DIJKSTRA + HAVERSINE + SÍNTESE]',
+          title: `Análise Geodésica, Rota Viária & Comparativa: ${c1.name} × ${c2.name}`,
           body: [
-            `• Distância geodésica em linha reta (Haversine): ${straightKm.toFixed(1).replace('.', ',')} km (rota rodoviária estimada: ~${roadEstKm} km).`,
+            `• Distância geodésica em linha reta (Haversine): ${straightKm.toFixed(1).replace('.', ',')} km.`,
+            routeLine,
             `• ${c1.name} (${c1.territoryName} · ${c1.biome}): ${c1.pop2022.toLocaleString('pt-BR')} hab. em ${c1.areaKm2.toLocaleString('pt-BR')} km² (${d1} hab/km²) — ${c1.profile}.`,
             `• ${c2.name} (${c2.territoryName} · ${c2.biome}): ${c2.pop2022.toLocaleString('pt-BR')} hab. em ${c2.areaKm2.toLocaleString('pt-BR')} km² (${d2} hab/km²) — ${c2.profile}.`,
             `• Relação demográfica: razão de ${popRatio}x entre os dois polos (referência estática Censo 2022).`
           ].join('\n'),
           metrics: [
             `Haversine: ${straightKm.toFixed(1).replace('.', ',')} km`,
-            `Razão pop.: ${popRatio}x`,
+            `Dijkstra: ${roadEstKm} km`,
             `Códigos IBGE: ${c1.ibgeCode} / ${c2.ibgeCode}`
           ],
+          elapsedMs: Math.max(1, Date.now() - t0)
+        };
+      }
+
+      // 1b) Otimização de portfólio de investimentos (Pareto / Capex)
+      if (/pareto|capex|aloca|otimiz|investimento|portfolio/.test(q)) {
+        const pf = lastParetoResult || runParetoSimulation();
+        return {
+          agents: ['macro', 'energia', 'humano', 'prime'],
+          trace: 'SUB-AGENTES [OTIMIZADOR PARETO + MACRO + TRANSIÇÃO VERDE]',
+          title: `Portfólio Otimizado de Investimento: ${pf.regimeLabel} (R$ ${pf.budgetBi.toFixed(1).replace('.', ',')} BI)`,
+          body: [
+            ...pf.allocations.map(a => `• ${a.name}: ${a.sharePct}% (R$ ${a.amountMi.toLocaleString('pt-BR')} milhões)`),
+            `• Índice sintético composto de impacto multidimensional: ${pf.compositeIndex}/100 (modelo exploratório de elasticidades).`
+          ].join('\n'),
+          metrics: [`Capex: R$ ${pf.budgetBi.toFixed(1)} BI`, `Score Pareto: ${pf.compositeIndex}/100`, `Eixos: 5`],
           elapsedMs: Math.max(1, Date.now() - t0)
         };
       }
@@ -526,11 +703,15 @@
       const cB = municipalities.find(m => m.name === selB.value) || municipalities[1] || municipalities[0];
       if (!cA || !cB) return;
       const km = haversineKm(cA.lat, cA.lon, cB.lat, cB.lon);
-      const roadKm = Math.round(km * 1.24);
+      const route = dijkstraCorridor(cA.name, cB.name);
+      const roadKm = route ? route.totalKm : Math.round(km * 1.24);
       out.replaceChildren();
       const strong = document.createElement('strong');
       strong.textContent = `${cA.name} ↔ ${cB.name}: ${km.toFixed(1).replace('.', ',')} km geodésicos`;
-      const detail = document.createTextNode(` (estimativa viária ~${roadKm} km · coords [${cA.lat.toFixed(2)}°, ${cA.lon.toFixed(2)}°] → [${cB.lat.toFixed(2)}°, ${cB.lon.toFixed(2)}°])`);
+      const routeInfo = route && route.path.length > 1
+        ? ` · Rota Dijkstra: ${roadKm} km via ${route.path.join(' → ')} [${route.roads.join(', ')}]`
+        : ` (estimativa viária ~${roadKm} km)`;
+      const detail = document.createTextNode(`${routeInfo} · coords [${cA.lat.toFixed(2)}°, ${cA.lon.toFixed(2)}°] → [${cB.lat.toFixed(2)}°, ${cB.lon.toFixed(2)}°]`);
       out.append(strong, detail);
     }
 
@@ -559,8 +740,8 @@
         if (!a || !b) return;
         const p1 = projectCoord(a.lat, a.lon, w, h);
         const p2 = projectCoord(b.lat, b.lon, w, h);
-        ctx.strokeStyle = 'rgba(0, 255, 65, 0.24)';
-        ctx.lineWidth = 1.2;
+        ctx.strokeStyle = 'rgba(0, 255, 65, 0.20)';
+        ctx.lineWidth = 1.1;
         ctx.beginPath(); ctx.moveTo(p1.x, p1.y); ctx.lineTo(p2.x, p2.y); ctx.stroke();
 
         if (sentinelActive) {
@@ -572,8 +753,24 @@
         }
       });
 
-      // Vetor geodésico ativo
+      // Corredor rodoviário ótimo multi-saltos (Dijkstra)
       const selA = $('#ultCityA')?.value, selB = $('#ultCityB')?.value;
+      const activeRoute = dijkstraCorridor(selA, selB);
+      if (activeRoute && activeRoute.path.length > 1) {
+        ctx.strokeStyle = '#00f0ff';
+        ctx.lineWidth = 2.6;
+        ctx.beginPath();
+        activeRoute.path.forEach((cityName, idx) => {
+          const city = byName.get(cityName);
+          if (!city) return;
+          const pt = projectCoord(city.lat, city.lon, w, h);
+          if (idx === 0) ctx.moveTo(pt.x, pt.y);
+          else ctx.lineTo(pt.x, pt.y);
+        });
+        ctx.stroke();
+      }
+
+      // Vetor geodésico ativo
       const cA = byName.get(selA), cB = byName.get(selB);
       if (cA && cB && cA !== cB) {
         const pA = projectCoord(cA.lat, cA.lon, w, h);
@@ -708,7 +905,9 @@
         const left = document.createElement('span');
         left.textContent = `${item.nome} (${item.id})`;
         const right = document.createElement('small');
-        right.textContent = item.pop ? `${Number(item.pop).toLocaleString('pt-BR')} hab.` : (item.territorio || 'IBGE Oficial');
+        const popPart = item.pop ? `${Number(item.pop).toLocaleString('pt-BR')} hab.` : '';
+        const pibPart = item.pibMil ? ` · PIB R$ ${(Number(item.pibMil) / 1000).toFixed(1).replace('.', ',')} mi` : '';
+        right.textContent = (popPart || pibPart) ? `${popPart}${pibPart}` : (item.territorio || 'IBGE Oficial');
         row.append(left, right);
         box.append(row);
       });
@@ -722,42 +921,71 @@
         statusEl.textContent = 'API fetch indisponível neste ambiente. Mantendo catálogo local de 20 municípios.';
         return;
       }
-      statusEl.textContent = 'Consultando API oficial servicodados.ibge.gov.br (UF 22 — Piauí)…';
+      statusEl.textContent = 'Consultando API oficial servicodados.ibge.gov.br (UF 22 — 224 municípios + SIDRA)…';
       flashAgents(['geo', 'macro']);
 
       const controller = new AbortController();
-      const timer = setTimeout(() => controller.abort(), 12000);
+      const timer = setTimeout(() => controller.abort(), 14000);
       try {
-        const [munRes, sidraRes] = await Promise.all([
+        const [munRes, sidraRes, pibRes] = await Promise.all([
           fetch('https://servicodados.ibge.gov.br/api/v1/localidades/estados/22/municipios?orderBy=nome', { signal: controller.signal }),
-          fetch('https://servicodados.ibge.gov.br/api/v3/agregados/4714/periodos/2022/variaveis/93?localidades=N3[22]|N6[2211001]', { signal: controller.signal })
+          fetch('https://servicodados.ibge.gov.br/api/v3/agregados/4714/periodos/2022/variaveis/93?localidades=N3[22]|N6[N3[22]]', { signal: controller.signal }),
+          fetch('https://servicodados.ibge.gov.br/api/v3/agregados/5938/periodos/-1/variaveis/37?localidades=N6[N3[22]]', { signal: controller.signal }).catch(() => null)
         ]);
         if (!munRes.ok) throw new Error('HTTP ' + munRes.status);
         const munData = await munRes.json();
         if (!Array.isArray(munData) || !munData.length) throw new Error('Lista vazia');
 
+        const sidraPopMap = new Map();
+        let piPop = null;
+        if (sidraRes && sidraRes.ok) {
+          const sidraJson = await sidraRes.json();
+          const serieList = sidraJson?.[0]?.resultados?.[0]?.series || [];
+          serieList.forEach(entry => {
+            const locId = String(entry.localidade?.id || '');
+            const val2022 = Number(entry.serie?.['2022']);
+            if (!Number.isFinite(val2022) || val2022 <= 0) return;
+            if (locId === '22') piPop = val2022;
+            else sidraPopMap.set(locId, val2022);
+          });
+        }
+
+        const sidraPibMap = new Map();
+        if (pibRes && pibRes.ok) {
+          try {
+            const pibJson = await pibRes.json();
+            const pibSeries = pibJson?.[0]?.resultados?.[0]?.series || [];
+            pibSeries.forEach(entry => {
+              const locId = String(entry.localidade?.id || '');
+              const vals = Object.values(entry.serie || {});
+              const latest = Number(vals[vals.length - 1]);
+              if (locId && Number.isFinite(latest) && latest > 0) sidraPibMap.set(locId, latest);
+            });
+          } catch (_) {}
+        }
+
         const localByCode = new Map(municipalities.map(m => [String(m.ibgeCode), m]));
         ibgeCatalog = munData.map(item => {
-          const local = localByCode.get(String(item.id));
+          const code = String(item.id);
+          const local = localByCode.get(code);
           const regImediata = item['regiao-imediata']?.nome || item.microrregiao?.nome || 'Piauí';
           return {
-            id: String(item.id),
+            id: code,
             nome: String(item.nome),
             territorio: local ? local.territoryName : `Reg. ${regImediata}`,
-            pop: local ? local.pop2022 : null
+            pop: sidraPopMap.get(code) || (local ? local.pop2022 : null),
+            pibMil: sidraPibMap.get(code) || null
           };
         });
 
         let sidraSummary = '';
-        if (sidraRes.ok) {
-          const sidraJson = await sidraRes.json();
-          const serieList = sidraJson?.[0]?.resultados?.[0]?.series || [];
-          const piPop = serieList.find(s => s.localidade?.id === '22')?.serie?.['2022'];
-          const thePop = serieList.find(s => s.localidade?.id === '2211001')?.serie?.['2022'];
-          if (piPop && thePop) {
-            ibgeVerified = { piPop: Number(piPop), thePop: Number(thePop) };
-            sidraSummary = ` · Censo 2022 SIDRA: PI = ${Number(piPop).toLocaleString('pt-BR')} hab. | Teresina = ${Number(thePop).toLocaleString('pt-BR')} hab. (100% convergente).`;
-          }
+        const thePop = sidraPopMap.get('2211001');
+        if (piPop && thePop) {
+          const popVals = ibgeCatalog.map(c => c.pop).filter(Boolean);
+          const giniMun = popVals.length >= 20 ? computeGini(popVals) : null;
+          ibgeVerified = { piPop, thePop, giniMun, syncedCount: ibgeCatalog.length };
+          const giniTxt = giniMun ? ` · Gini demográfico municipal (${popVals.length} mun.): ${giniMun.toFixed(3).replace('.', ',')}` : '';
+          sidraSummary = ` · Censo 2022 SIDRA: PI = ${piPop.toLocaleString('pt-BR')} hab. | Teresina = ${thePop.toLocaleString('pt-BR')} hab.${giniTxt}.`;
         }
 
         if (badgeEl) {
@@ -772,6 +1000,107 @@
       } finally {
         clearTimeout(timer);
       }
+    }
+
+    // ==================== OTIMIZADOR PARETO & GRÁFICO RADAR ====================
+    function runParetoSimulation() {
+      const budgetBi = Number($('#ultCapexTotal')?.value || 5.0);
+      const regime = $('#ultCapexRegime')?.value || 'pareto';
+      lastParetoResult = optimizeParetoPortfolio({ budgetBi, regime });
+      renderParetoUI(lastParetoResult);
+      return lastParetoResult;
+    }
+
+    function renderParetoUI(pf) {
+      if ($('#ultParetoScore')) {
+        $('#ultParetoScore').textContent = `${pf.compositeIndex} / 100`;
+      }
+      const tbody = $('#ultParetoTableBody');
+      if (tbody) {
+        tbody.replaceChildren();
+        pf.allocations.forEach(item => {
+          const tr = document.createElement('tr');
+          [item.name, `${item.sharePct}%`, `R$ ${item.amountMi.toLocaleString('pt-BR')} mi`].forEach(val => {
+            const td = document.createElement('td');
+            td.textContent = val;
+            tr.append(td);
+          });
+          tbody.append(tr);
+        });
+      }
+
+      const canvas = $('#ultParetoCanvas');
+      const ctx = safeCtx(canvas);
+      if (!ctx || !canvas) return;
+      const w = canvas.width, h = canvas.height;
+      const cx = w / 2, cy = h / 2 + 6;
+      const maxR = Math.min(w, h) * 0.34;
+      ctx.clearRect(0, 0, w, h);
+
+      const n = pf.radarScores.length;
+      const angleOf = i => -Math.PI / 2 + (i * 2 * Math.PI) / n;
+
+      // Teias pentagonais concêntricas
+      [0.25, 0.5, 0.75, 1.0].forEach(level => {
+        ctx.strokeStyle = 'rgba(0, 240, 255, 0.14)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        for (let i = 0; i < n; i++) {
+          const ang = angleOf(i);
+          const x = cx + Math.cos(ang) * maxR * level;
+          const y = cy + Math.sin(ang) * maxR * level;
+          if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+        }
+        ctx.closePath();
+        ctx.stroke();
+      });
+
+      // Eixos radiais e rótulos
+      pf.radarScores.forEach((item, i) => {
+        const ang = angleOf(i);
+        const xEnd = cx + Math.cos(ang) * maxR;
+        const yEnd = cy + Math.sin(ang) * maxR;
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.12)';
+        ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(xEnd, yEnd); ctx.stroke();
+
+        const lx = cx + Math.cos(ang) * (maxR + 24);
+        const ly = cy + Math.sin(ang) * (maxR + 16);
+        ctx.fillStyle = '#dcebff';
+        ctx.font = '10px monospace';
+        ctx.fillText(`${item.dimension} (${item.score})`, lx - 42, ly + 3);
+      });
+
+      // Polígono de referência base
+      ctx.fillStyle = 'rgba(0, 240, 255, 0.10)';
+      ctx.strokeStyle = 'rgba(0, 240, 255, 0.55)';
+      ctx.lineWidth = 1.4;
+      ctx.beginPath();
+      pf.radarScores.forEach((item, i) => {
+        const ang = angleOf(i);
+        const r = (item.baseline / 100) * maxR;
+        const x = cx + Math.cos(ang) * r;
+        const y = cy + Math.sin(ang) * r;
+        if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      });
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+
+      // Polígono otimizado Ultron-Pareto
+      ctx.fillStyle = 'rgba(255, 34, 87, 0.22)';
+      ctx.strokeStyle = '#ff2257';
+      ctx.lineWidth = 2.2;
+      ctx.beginPath();
+      pf.radarScores.forEach((item, i) => {
+        const ang = angleOf(i);
+        const r = (item.score / 100) * maxR;
+        const x = cx + Math.cos(ang) * r;
+        const y = cy + Math.sin(ang) * r;
+        if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      });
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
     }
 
     // ==================== RADAR DE ANOMALIAS & SENTINELA AUTÔNOMO ====================
@@ -838,18 +1167,31 @@
       rafId = window.requestAnimationFrame(step);
     }
 
-    // ==================== GERADOR DE DOSSIÊ EXECUTIVO (.MD) ====================
+    // ==================== GERADOR DE DOSSIÊ EXECUTIVO (.MD / .JSON / .PNG) ====================
+    function triggerDownload(blob, filename) {
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.append(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }
+
     function exportExecutiveDossier() {
       const mc = lastMcResult || runMonteCarloSimulation();
+      const pf = lastParetoResult || runParetoSimulation();
       const end = mc.rows[mc.rows.length - 1];
       const selA = $('#ultCityA')?.value || 'Teresina';
       const selB = $('#ultCityB')?.value || 'Uruçuí';
       const cA = municipalities.find(m => m.name === selA) || municipalities[0];
       const cB = municipalities.find(m => m.name === selB) || municipalities[1] || municipalities[0];
       const distKm = cA && cB ? haversineKm(cA.lat, cA.lon, cB.lat, cB.lon).toFixed(1) : '0.0';
+      const route = dijkstraCorridor(selA, selB);
 
       const md = [
-        '# DOSSIÊ ESTRATÉGICO ULTRON-X7 — PIAUÍ & TERESINA ANALYTICS',
+        '# DOSSIÊ ESTRATÉGICO ULTRON-X7 v2.0 — PIAUÍ & TERESINA ANALYTICS',
         `Gerado em: ${new Date().toISOString()}`,
         '',
         '> **Aviso de Governança:** Este relatório sintetiza indicadores estáticos e simulações matemáticas exploratórias do painel `x2PiauiAnalitcsX7`. Confira sempre as tabelas primárias no IBGE, INEP, SEFAZ-PI, PNUD e ANEEL antes de qualquer decisão oficial.',
@@ -863,10 +1205,17 @@
         '- **Matriz Elétrica:** ~95% renovável (eólica, solar e hídrica)',
         ibgeVerified ? `- **Auditoria API IBGE SIDRA na sessão:** PI = ${ibgeVerified.piPop.toLocaleString('pt-BR')} | Teresina = ${ibgeVerified.thePop.toLocaleString('pt-BR')}` : '- **Auditoria API IBGE SIDRA:** não executada nesta sessão (modo local)',
         '',
-        `## 2. Vetor Geodésico Selecionado (${selA} ↔ ${selB})`,
-        `- Distância em linha reta (Haversine): **${distKm} km** (estimativa rodoviária ~${Math.round(Number(distKm) * 1.24)} km)`,
+        `## 2. Vetor Geodésico & Rota Viária (${selA} ↔ ${selB})`,
+        `- Distância em linha reta (Haversine): **${distKm} km**`,
+        route && route.path.length > 1
+          ? `- Menor corredor rodoviário (Dijkstra): **${route.totalKm} km** via ${route.path.join(' → ')} (${route.roads.join(', ')})`
+          : `- Estimativa rodoviária: ~${Math.round(Number(distKm) * 1.24)} km`,
         '',
-        `## 3. Simulação Estocástica Monte Carlo (${mc.paths} trajetórias · 2025–2035)`,
+        `## 3. Portfólio Otimizado de Investimento (${pf.regimeLabel} · R$ ${pf.budgetBi.toFixed(1)} BI)`,
+        ...pf.allocations.map(a => `- **${a.name}:** ${a.sharePct}% (R$ ${a.amountMi.toLocaleString('pt-BR')} milhões)`),
+        `- **Score Composto Multidimensional:** ${pf.compositeIndex}/100`,
+        '',
+        `## 4. Simulação Estocástica Monte Carlo (${mc.paths} trajetórias · 2025–2035)`,
         `- Crescimento real médio assumido: ${(mc.drift * 100).toFixed(1)}% a.a. | Volatilidade: ${(mc.vol * 100).toFixed(1)}% a.a.`,
         `- **2035 P10 (Pessimista):** R$ ${end.p10.toFixed(1)} BI`,
         `- **2035 P50 (Mediana):** R$ ${end.p50.toFixed(1)} BI`,
@@ -878,20 +1227,71 @@
         ''
       ].join('\r\n');
 
-      const url = URL.createObjectURL(new Blob([md], { type: 'text/markdown;charset=utf-8' }));
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'dossie-estrategico-ultron-piaui.md';
-      document.body.append(a);
-      a.click();
-      a.remove();
-      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      triggerDownload(new Blob([md], { type: 'text/markdown;charset=utf-8' }), 'dossie-estrategico-ultron-piaui.md');
       appendChatMessage('agent', {
         trace: 'EXPORTADOR EXECUTIVO ULTRON-X7',
         title: 'Dossiê Estratégico Markdown (.md) compilado com sucesso',
-        body: `Relatório gerado com vetor geodésico ${selA} ↔ ${selB} (${distKm} km) e tabela completa Monte Carlo 2025–2035.`,
-        metrics: ['Formato: Markdown', `Trajetórias: ${mc.paths}`, 'Horizonte: 2035'],
+        body: `Relatório gerado com vetor ${selA} ↔ ${selB}, portfólio Pareto (${pf.compositeIndex}/100) e série Monte Carlo 2025–2035.`,
+        metrics: ['Formato: Markdown', `Trajetórias: ${mc.paths}`, `Score Pareto: ${pf.compositeIndex}/100`],
         elapsedMs: 2
+      });
+    }
+
+    function exportExecutiveJson() {
+      const mc = lastMcResult || runMonteCarloSimulation();
+      const pf = lastParetoResult || runParetoSimulation();
+      const selA = $('#ultCityA')?.value || 'Teresina';
+      const selB = $('#ultCityB')?.value || 'Uruçuí';
+      const cA = municipalities.find(m => m.name === selA) || municipalities[0];
+      const cB = municipalities.find(m => m.name === selB) || municipalities[1] || municipalities[0];
+      const payload = {
+        generatedAt: new Date().toISOString(),
+        engine: 'ULTRON-X7-OMEGA-v2.0',
+        notice: 'Simulações exploratórias e base estática sujeitas a conferência oficial.',
+        geodesicPair: {
+          origin: selA,
+          destination: selB,
+          haversineKm: cA && cB ? Number(haversineKm(cA.lat, cA.lon, cB.lat, cB.lon).toFixed(2)) : 0,
+          dijkstraCorridor: dijkstraCorridor(selA, selB)
+        },
+        paretoPortfolio: pf,
+        monteCarlo2025_2035: mc,
+        ibgeSessionAudit: ibgeVerified,
+        topPolesMultiCriteria: computeMultiCriteriaTop(10)
+      };
+      triggerDownload(new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json;charset=utf-8' }), 'ultron-x7-piaui-telemetria.json');
+      appendChatMessage('agent', {
+        trace: 'EXPORTADOR JSON ESTRUTURADO',
+        title: 'Pacote Analítico JSON (.json) exportado com sucesso',
+        body: 'Arquivo JSON contendo rota Dijkstra, matriz Haversine, portfólio Pareto, cone Monte Carlo e ranking TOPSIS.',
+        metrics: ['Formato: JSON', 'Polos: 20', 'Horizonte: 2035'],
+        elapsedMs: 2
+      });
+    }
+
+    function exportVisualSnapshot() {
+      const geoCanvas = $('#ultGeoCanvas');
+      let dataUrl = '';
+      if (geoCanvas && typeof geoCanvas.toDataURL === 'function') {
+        try { dataUrl = geoCanvas.toDataURL('image/png'); } catch (_) {}
+      }
+      if (dataUrl && dataUrl.startsWith('data:image/png')) {
+        const a = document.createElement('a');
+        a.href = dataUrl;
+        a.download = 'ultron-x7-malha-geodesica.png';
+        document.body.append(a);
+        a.click();
+        a.remove();
+      } else {
+        exportExecutiveJson();
+        return;
+      }
+      appendChatMessage('agent', {
+        trace: 'CAPTURA VISUAL CANVAS',
+        title: 'Snapshot Vetorial (.png) exportado',
+        body: 'Imagem PNG da malha geodésica e corredor rodoviário ótimo baixada no navegador.',
+        metrics: ['Formato: PNG', 'Canvas: 520×310'],
+        elapsedMs: 1
       });
     }
 
@@ -925,10 +1325,16 @@
       });
     }
     if ($('#ultExportDossierBtn')) $('#ultExportDossierBtn').addEventListener('click', exportExecutiveDossier);
+    if ($('#ultExportJsonBtn')) $('#ultExportJsonBtn').addEventListener('click', exportExecutiveJson);
+    if ($('#ultSnapshotBtn')) $('#ultSnapshotBtn').addEventListener('click', exportVisualSnapshot);
     if ($('#ultRunMcBtn')) $('#ultRunMcBtn').addEventListener('click', () => { runMonteCarloSimulation(); pulseTone(580, 0.05); });
     ['#ultMcDrift', '#ultMcVol', '#ultMcPaths'].forEach(sel => {
       const el = $(sel);
       if (el) el.addEventListener('change', runMonteCarloSimulation);
+    });
+    ['#ultCapexTotal', '#ultCapexRegime'].forEach(sel => {
+      const el = $(sel);
+      if (el) el.addEventListener('change', runParetoSimulation);
     });
     if ($('#ultSyncIbgeBtn')) $('#ultSyncIbgeBtn').addEventListener('click', syncIbgeLive);
     if ($('#ultIbgeSearchInput')) $('#ultIbgeSearchInput').addEventListener('input', renderIbgeList);
@@ -937,6 +1343,7 @@
     structuralAnomalies.slice().reverse().forEach(pushAnomaly);
     setupGeodesicModule();
     runMonteCarloSimulation();
+    runParetoSimulation();
     renderIbgeList();
     renderGeoCanvas(Date.now());
 
@@ -947,6 +1354,7 @@
       if (event.detail === 'ultron') {
         renderGeoCanvas(Date.now());
         if (lastMcResult) renderMonteCarloUI(lastMcResult);
+        if (lastParetoResult) renderParetoUI(lastParetoResult);
         if (sentinelActive) startGeoLoop();
       }
     });

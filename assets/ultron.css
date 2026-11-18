@@ -722,17 +722,103 @@
   flex-wrap: wrap;
 }
 
+.ult-drawer-head, .ult-drawer-ctx {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+  padding-bottom: 0.55rem;
+  margin-bottom: 0.55rem;
+  border-bottom: 1px solid #1d2e47;
+  font: 600 0.72rem var(--ult-mono);
+  color: #cfe0f6;
+}
+
+.ult-drawer-body {
+  max-height: 260px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  margin-bottom: 0.65rem;
+}
+
+.ult-drawer-foot {
+  display: flex;
+  gap: 0.45rem;
+}
+
+.ult-drawer-foot input {
+  flex: 1;
+  min-width: 0;
+  padding: 0.6rem 0.75rem;
+  border-radius: 6px;
+  border: 1px solid #2b4466;
+  background: #070c15;
+  color: #f4f9ff;
+  font: 500 0.74rem var(--ult-mono);
+}
+
+/* PARETO MULTI-OBJECTIVE OPTIMIZER */
+.ult-pareto-section {
+  margin-top: 1.1rem;
+}
+
+.ult-pareto-layout {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap: 1rem;
+  align-items: center;
+}
+
+.ult-pareto-controls {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.65rem;
+  margin-bottom: 0.8rem;
+}
+
+.ult-pareto-controls label {
+  display: block;
+  font: 600 0.62rem var(--ult-mono);
+  color: var(--ult-muted);
+}
+
+.ult-pareto-controls select {
+  display: block;
+  width: 100%;
+  margin-top: 0.35rem;
+  padding: 0.55rem 0.65rem;
+  border-radius: 6px;
+  border: 1px solid #2b4466;
+  background: #070c15;
+  color: #eef6ff;
+  font: 600 0.72rem var(--ult-mono);
+}
+
+#ultParetoCanvas {
+  width: 100%;
+  max-width: 420px;
+  height: auto;
+  margin: 0 auto;
+  display: block;
+  border: 1px solid #1c2d46;
+  border-radius: 8px;
+  background: radial-gradient(circle at 50% 50%, #101f36 0%, #060911 78%);
+}
+
 @media (max-width: 1080px) {
   .ult-swarm-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-  .ult-cockpit-grid, .ult-bottom-grid { grid-template-columns: 1fr; }
+  .ult-cockpit-grid, .ult-bottom-grid, .ult-pareto-layout { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 640px) {
   .ult-swarm-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .ult-mc-controls, .ult-mc-summary, .ult-haversine-bar { grid-template-columns: 1fr; }
+  .ult-mc-controls, .ult-mc-summary, .ult-haversine-bar, .ult-pareto-controls { grid-template-columns: 1fr; }
   .ult-shell { padding: 0.95rem; }
 }
 
 @media print {
-  .ult-fab, .ult-copilot-drawer { display: none !important; }
+  .ult-fab, .ult-copilot-drawer, .ult-actions, .ult-chat-form { display: none !important; }
+  .ult-shell, .ult-panel { background: #fff !important; color: #111 !important; border-color: #ccc !important; box-shadow: none !important; }
 }

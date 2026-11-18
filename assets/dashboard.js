@@ -280,6 +280,15 @@
       table.append(body); wrapper.append(table); details.append(wrapper); container.append(details);
       const note = chartNotes[canvas.id];
       if (note) {
+        if (note[2]) {
+          const h3 = $('h3', container);
+          if (h3 && !$('.chart-meta-badge', h3)) {
+            const metaBadge = document.createElement('span');
+            metaBadge.className = 'chart-meta-badge';
+            metaBadge.textContent = note[2];
+            h3.append(metaBadge);
+          }
+        }
         const context = document.createElement('p'); context.className = 'chart-context';
         const label = document.createElement('strong'); label.textContent = 'Como ler: ';
         const source = document.createElement('a'); source.href = note[1]; source.target = '_blank'; source.rel = 'noopener noreferrer'; source.textContent = 'Consultar portal de referência ↗';
@@ -449,18 +458,18 @@
   }
 
   const chartNotes = {
-    chartPIBSetores: ['Participação setorial em percentuais, conforme os valores já incorporados ao painel. A soma é 100%; a origem e a definição de cada setor precisam ser conferidas.', 'https://www.ibge.gov.br/explica/pib.php'],
-    chartPIBSetores2: ['Os mesmos percentuais do gráfico de visão geral aparecem aqui em formato polar. Áreas do gráfico não devem ser lidas como valores adicionais.', 'https://www.ibge.gov.br/explica/pib.php'],
-    chartIDH: ['Série apresentada para 2000, 2010, 2020 e 2021. Antes de comparar os anos, confira fonte, metodologia e abrangência estadual de cada ponto.', 'https://www.undp.org/pt/brazil'],
-    chartIDH2: ['O gráfico inclui uma série atribuída ao Piauí e um ponto de IDHM para Teresina em 2010. IDH e IDHM podem ter metodologias distintas; a comparação requer confirmação.', 'https://www.undp.org/pt/brazil'],
-    chartRelevo: ['Percentuais de relevo presentes no painel, sem metodologia documentada. Categorias e limites de altitude devem ser validados em uma fonte geográfica.', 'https://www.ibge.gov.br/geociencias.html'],
-    chartPopulacao: ['Contagens em habitantes: Censo 2022 e estimativas para 2023–2025 conforme o painel. Não confunda estimativas com recenseamento; verifique cada ano no IBGE.', 'https://www.ibge.gov.br/cidades-e-estados/pi.html'],
-    chartConcentracao: ['Percentuais atribuídos à concentração da população em 14 municípios e nos demais. O ano e a lista dos municípios não estão documentados e precisam de revisão.', 'https://www.ibge.gov.br/cidades-e-estados/pi.html'],
-    chartFinancas: ['Valores em bilhões de reais. A figura mistura receitas brutas e despesas empenhadas de 2024 com valores correntes de 2025; não é uma série diretamente comparável.', 'https://www.gov.br/tesouronacional/pt-br'],
-    chartIDEB: ['Notas atribuídas a Piauí, Brasil e Nordeste nos níveis do ensino básico. Confirme o ano, a rede de ensino e os rótulos do indicador antes de comparar.', 'https://www.gov.br/inep/pt-br/areas-de-atuacao/pesquisas-estatisticas-e-indicadores/ideb'],
-    chartPosicaoEM: ['Posições de 2021 e 2023 conforme o painel; a escala é invertida porque uma posição menor representa colocação melhor. O critério e a rede devem ser confirmados.', 'https://www.gov.br/inep/pt-br/areas-de-atuacao/pesquisas-estatisticas-e-indicadores/ideb'],
-    chartMunicipios: ['População residente dos dez municípios mais populosos conforme referência do Censo 2022 no painel. Confira cada município na tabela oficial do IBGE.', 'https://www.ibge.gov.br/cidades-e-estados/pi.html'],
-    chartMatrizEletrica: ['Distribuição percentual indicativa das fontes de geração elétrica no estado. Consulte potência outorgada e geração efetiva na ANEEL e no Balanço Energético.', 'https://www.gov.br/aneel/pt-br']
+    chartPIBSetores: ['Participação setorial em percentuais, conforme os valores já incorporados ao painel. A soma é 100%; a origem e a definição de cada setor precisam ser conferidas.', 'https://www.ibge.gov.br/explica/pib.php', 'Ref.: 2023 • Revisão doc.: 13/11/2026'],
+    chartPIBSetores2: ['Os mesmos percentuais do gráfico de visão geral aparecem aqui em formato polar. Áreas do gráfico não devem ser lidas como valores adicionais.', 'https://www.ibge.gov.br/explica/pib.php', 'Ref.: 2023 • Revisão doc.: 13/11/2026'],
+    chartIDH: ['Série apresentada para 2000, 2010, 2020 e 2021. Antes de comparar os anos, confira fonte, metodologia e abrangência estadual de cada ponto.', 'https://www.undp.org/pt/brazil', 'Ref.: 2000–2021 • Revisão doc.: 13/11/2026'],
+    chartIDH2: ['O gráfico inclui uma série atribuída ao Piauí e um ponto de IDHM para Teresina em 2010. IDH e IDHM podem ter metodologias distintas; a comparação requer confirmação.', 'https://www.undp.org/pt/brazil', 'Ref.: 2000–2021 • Revisão doc.: 13/11/2026'],
+    chartRelevo: ['Percentuais de relevo presentes no painel, sem metodologia documentada. Categorias e limites de altitude devem ser validados em uma fonte geográfica.', 'https://www.ibge.gov.br/geociencias.html', 'Ref.: Malha física • Revisão doc.: 13/11/2026'],
+    chartPopulacao: ['Contagens em habitantes: Censo 2022 e estimativas para 2023–2025 conforme o painel. Não confunda estimativas com recenseamento; verifique cada ano no IBGE.', 'https://www.ibge.gov.br/cidades-e-estados/pi.html', 'Ref.: 2022–2025 • Revisão doc.: 13/11/2026'],
+    chartConcentracao: ['Percentuais atribuídos à concentração da população em 14 municípios e nos demais. O ano e a lista dos municípios não estão documentados e precisam de revisão.', 'https://www.ibge.gov.br/cidades-e-estados/pi.html', 'Ref.: Censo 2022 (a conferir) • Revisão doc.: 13/11/2026'],
+    chartFinancas: ['Valores em bilhões de reais. A figura mistura receitas brutas e despesas empenhadas de 2024 com valores correntes de 2025; não é uma série diretamente comparável.', 'https://www.gov.br/tesouronacional/pt-br', 'Ref.: 2024–2025 • Revisão doc.: 13/11/2026'],
+    chartIDEB: ['Notas atribuídas a Piauí, Brasil e Nordeste nos níveis do ensino básico. Confirme o ano, a rede de ensino e os rótulos do indicador antes de comparar.', 'https://www.gov.br/inep/pt-br/areas-de-atuacao/pesquisas-estatisticas-e-indicadores/ideb', 'Ref.: 2023 • Revisão doc.: 13/11/2026'],
+    chartPosicaoEM: ['Posições de 2021 e 2023 conforme o painel; a escala é invertida porque uma posição menor representa colocação melhor. O critério e a rede devem ser confirmados.', 'https://www.gov.br/inep/pt-br/areas-de-atuacao/pesquisas-estatisticas-e-indicadores/ideb', 'Ref.: 2021–2023 • Revisão doc.: 13/11/2026'],
+    chartMunicipios: ['População residente dos dez municípios mais populosos conforme referência do Censo 2022 no painel. Confira cada município na tabela oficial do IBGE.', 'https://www.ibge.gov.br/cidades-e-estados/pi.html', 'Ref.: Censo 2022 • Revisão doc.: 13/11/2026'],
+    chartMatrizEletrica: ['Distribuição percentual indicativa das fontes de geração elétrica no estado. Consulte potência outorgada e geração efetiva na ANEEL e no Balanço Energético.', 'https://www.gov.br/aneel/pt-br', 'Ref.: 2023–2025 (indicativo) • Revisão doc.: 13/11/2026']
   };
 
   let selectTerritoryExternal = null;

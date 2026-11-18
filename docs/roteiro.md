@@ -7,15 +7,15 @@ Este roteiro distingue itens entregues dos próximos passos. Os itens marcados s
 - [ ] Inventariar todos os indicadores e textos da página e verificar cada um em fonte primária específica, com período e metodologia.
 - [ ] Corrigir ou retirar números sem comprovação e rotular estimativas e projeções.
 - [x] Substituir afirmações de dados em tempo real e auditoria por avisos de conteúdo estático e não verificado.
-- [ ] Identificar claramente o ano de referência de cada gráfico e a data da última revisão.
+- [x] Identificar claramente o ano de referência de cada gráfico e a data da última revisão documental (`13/11/2026`).
 
 ## Prioridade 2 — experiência e qualidade
 
-- [ ] Revisar hierarquia visual, textos, legibilidade, comportamento em dispositivos móveis e tempo de carregamento.
-- [ ] Avaliar navegação por teclado, foco visível, semântica das abas, contraste e alternativas textuais para gráficos.
-- [ ] Separar gradualmente dados, JavaScript e estilos da marcação e introduzir testes de interface.
+- [x] Revisar hierarquia visual, textos, legibilidade, comportamento em dispositivos móveis, folha de impressão (`@media print`) e tempo de carregamento imediato.
+- [x] Avaliar navegação por teclado, foco visível, semântica das abas, modo de alto contraste e alternativas textuais em tabela para todos os gráficos.
+- [x] Separar módulos complementares (`dashboard.js`, `territories.js`, `news.js`, `cameras.js`, `eye-of-god.js`, `ultron.js`) e introduzir suíte automatizada de testes estruturais e de interface.
 - [x] Oferecer tabelas quando a biblioteca de gráficos não estiver disponível.
-- [x] Implementar Service Worker offline (`sw.js`), comparador geodésico Haversine, simulação estocástica Monte Carlo com tabela acessível e conector opcional à API pública oficial do IBGE (224 municípios + SIDRA Censo 2022) no módulo Ultron-X7.
+- [x] Implementar Service Worker offline (`sw.js`), comparador geodésico Haversine + menor rota rodoviária Dijkstra, otimizador multi-objetivo Pareto (radar 5D), simulação estocástica Monte Carlo com tabela acessível e conector opcional à API pública oficial do IBGE (224 municípios + Censo 2022 + PIB Municipal SIDRA) no módulo Ultron-X7 v2.0.
 - [ ] Avaliar tratamento adicional para falhas de carregamento de fontes externas.
 
 ## Prioridade 3 — manutenção e publicação
