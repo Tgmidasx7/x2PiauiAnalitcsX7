@@ -1,5 +1,5 @@
 /* Service Worker Offline-First para x2PiauiAnalitcsX7 */
-const CACHE_NAME = 'piaui-ultron-x7-v1';
+const CACHE_NAME = 'piaui-ultron-x7-v2';
 const CORE_ASSETS = [
   './',
   './index.html',

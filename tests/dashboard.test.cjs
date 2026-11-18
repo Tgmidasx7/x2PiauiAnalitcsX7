@@ -22,6 +22,7 @@ function createApp({ chart = true, hash = '', timerSpy = null, canvasMock = fals
   window.Date = class extends RealDate { constructor(...args) { super(...(args.length ? args : ['2026-11-13T15:00:00-03:00'])); } static now() { return new RealDate('2026-11-13T15:00:00-03:00').getTime(); } };
   window.HTMLElement.prototype.scrollIntoView = function () {};
   if (canvasMock) {
+    window.HTMLCanvasElement.prototype.toDataURL = () => 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg==';
     window.HTMLCanvasElement.prototype.getContext = function () {
       return {
         fillStyle: '',
@@ -404,9 +405,31 @@ test('Agente Autônomo Ultron-X7 opera raciocínio multi-agente, Haversine, Mont
   const distKm = dom.window.ultronHaversineKm(the.lat, the.lon, phb.lat, phb.lon);
   assert.ok(distKm > 265 && distKm < 295, `Distância Haversine inesperada: ${distKm}`);
   assert.match(document.getElementById('ultDistanceReadout').textContent, /km geodésicos/);
+  assert.match(document.getElementById('ultDistanceReadout').textContent, /Rota Dijkstra/);
+
+  // Algoritmo de Dijkstra na malha rodoviária norte-sul (Luís Correia → Corrente)
+  const northSouth = dom.window.ultronDijkstraRoute('Luís Correia', 'Corrente');
+  assert.ok(northSouth && northSouth.path.length >= 6);
+  assert.equal(northSouth.path[0], 'Luís Correia');
+  assert.equal(northSouth.path[northSouth.path.length - 1], 'Corrente');
+  assert.ok(northSouth.totalKm > 900 && northSouth.totalKm < 1400);
+  assert.ok(northSouth.roads.includes('BR-343') && northSouth.roads.includes('BR-135'));
+
   const initialCityB = document.getElementById('ultCityB').value;
   document.getElementById('ultSwapCities').click();
   assert.equal(document.getElementById('ultCityA').value, initialCityB);
+
+  // Otimizador multi-objetivo Pareto Capex + Radar 5D + Tabela acessível
+  const pf = dom.window.ultronOptimizePortfolio({ budgetBi: 10.0, regime: 'verde' });
+  assert.equal(pf.allocations.reduce((s, a) => s + a.sharePct, 0), 100);
+  assert.equal(pf.radarScores.length, 5);
+  assert.equal(document.querySelectorAll('#ultParetoTableBody tr').length, 5);
+  document.getElementById('ultCapexRegime').value = 'humano';
+  document.getElementById('ultCapexRegime').dispatchEvent(new Event('change'));
+  assert.match(document.getElementById('ultParetoScore').textContent, /\/ 100/);
+
+  // Metadados de período de referência e revisão em todos os 12 gráficos Chart.js
+  assert.equal(document.querySelectorAll('.chart-meta-badge').length, 12);
 
   // Simulação estocástica Monte Carlo (2025–2035) com bandas ordenadas P10 < P50 < P90
   const mcSeries = dom.window.ultronRunMonteCarlo({ startVal: 80.9, years: 10, driftPct: 4.5, volPct: 2.8, paths: 500, seed: 42 });
@@ -429,12 +452,14 @@ test('Agente Autônomo Ultron-X7 opera raciocínio multi-agente, Haversine, Mont
   document.getElementById('ultChatForm').dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
   assert.match(document.getElementById('ultChatLog').textContent, /LRF/);
 
-  // Modo Sentinela autônomo e exportação de Dossiê Executivo (.md)
-  let exportedBlob = null;
-  dom.window.URL.createObjectURL = blob => { exportedBlob = blob; return 'blob:ultron-dossier'; };
+  // Modo Sentinela autônomo e exportação de Dossiê Executivo (.md), Telemetria (.json) e Snapshot
+  const exportedBlobs = [];
+  dom.window.URL.createObjectURL = blob => { exportedBlobs.push(blob); return 'blob:ultron-artifact'; };
   dom.window.URL.revokeObjectURL = () => {};
   document.getElementById('ultExportDossierBtn').click();
-  assert.ok(exportedBlob);
+  document.getElementById('ultExportJsonBtn').click();
+  document.getElementById('ultSnapshotBtn').click();
+  assert.ok(exportedBlobs.length >= 2);
 
   const sentinelBtn = document.getElementById('ultSentinelBtn');
   sentinelBtn.click();
@@ -454,6 +479,8 @@ test('Agente Autônomo Ultron-X7 opera raciocínio multi-agente, Haversine, Mont
   assert.equal(document.getElementById('ultronCopilotDrawer').hidden, true);
 
   document.getElementById('btn-eye-of-god').click();
+  document.getElementById('eog-snapshot-btn').click();
+  assert.match(document.getElementById('eog-terminal-body').textContent, /CAPTURA HUD CONCLUÍDA/);
   const eogInput = document.getElementById('eog-terminal-input');
   eogInput.value = 'ultron energia limpa e H2 verde';
   eogInput.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
@@ -480,8 +507,17 @@ test('conector IBGE do Ultron sincroniza 224 municípios + SIDRA e possui fallba
     microrregiao: { mesorregiao: { nome: 'Centro-Norte Piauiense' } }
   }));
   window.fetch = async url => {
-    if (String(url).includes('/v1/localidades/')) {
+    const u = String(url);
+    if (u.includes('/v1/localidades/')) {
       return { ok: true, json: async () => fake224 };
+    }
+    if (u.includes('/agregados/5938/')) {
+      return {
+        ok: true,
+        json: async () => ([{ resultados: [{ series: [
+          { localidade: { id: '2211001' }, serie: { '2021': '23895000' } }
+        ] }] }])
+      };
     }
     return {
       ok: true,
@@ -500,6 +536,7 @@ test('conector IBGE do Ultron sincroniza 224 municípios + SIDRA e possui fallba
   search.dispatchEvent(new Event('input'));
   assert.equal(document.querySelectorAll('#ultIbgeResults .ult-ibge-row').length, 1);
   assert.match(document.getElementById('ultIbgeResults').textContent, /Teresina/);
+  assert.match(document.getElementById('ultIbgeResults').textContent, /PIB R\$/);
 });
 
 test('página dedicada /ultron/ funciona de forma autônoma', t => {

@@ -740,6 +740,45 @@
       renderTacticalRadar(Date.now());
     }
 
+    const snapshotBtn = document.getElementById('eog-snapshot-btn');
+    function captureHudSnapshot() {
+      playTacticalSound(1320, 'sine', 0.08);
+      const cam = camerasDB[focusedCamIdx] || camerasDB[0];
+      const activeCanvas = radarCanvas || faceCanvas;
+      let dataUrl = '';
+      if (activeCanvas && typeof activeCanvas.toDataURL === 'function') {
+        try { dataUrl = activeCanvas.toDataURL('image/png'); } catch (_) {}
+      }
+      if (dataUrl && dataUrl.startsWith('data:image/png')) {
+        const a = document.createElement('a');
+        a.href = dataUrl;
+        a.download = `eye-of-god-hud-${cam.id.toLowerCase()}.png`;
+        document.body.append(a);
+        a.click();
+        a.remove();
+      } else if (typeof URL !== 'undefined' && typeof URL.createObjectURL === 'function') {
+        const report = JSON.stringify({
+          timestamp: new Date().toISOString(),
+          mode: activeCamMode,
+          lockdown: lockdownActive,
+          camera: cam
+        }, null, 2);
+        const url = URL.createObjectURL(new Blob([report], { type: 'application/json;charset=utf-8' }));
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `eye-of-god-hud-${cam.id.toLowerCase()}.json`;
+        document.body.append(a);
+        a.click();
+        a.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+      }
+      printTerminal(`CAPTURA HUD CONCLUÍDA: Frame tático de ${cam.id} (${activeCamMode}) exportado.`, 'success');
+      pushEventFeed({ text: `SNAPSHOT: Captura de telemetria ${cam.id} (${activeCamMode})`, crit: false });
+    }
+
+    if (snapshotBtn) {
+      snapshotBtn.addEventListener('click', captureHudSnapshot);
+    }
     if (lockdownBtn) {
       lockdownBtn.addEventListener('click', () => setLockdown(!lockdownActive));
     }
@@ -768,9 +807,12 @@
       switch (main) {
         case 'help':
           printTerminal(
-            'COMANDOS: help, target <nome>, lockdown, standdown, thermal, nvg, lidar, optical, neural, sar, scan, radar, intercept, ultron [missão], status, clear',
+            'COMANDOS: help, target <nome>, lockdown, standdown, thermal, nvg, lidar, optical, neural, sar, scan, radar, intercept, snapshot, ultron [missão], status, clear',
             'success'
           );
+          break;
+        case 'snapshot':
+          captureHudSnapshot();
           break;
         case 'ultron': {
           const ulBtn = document.getElementById('btn-ultron');
